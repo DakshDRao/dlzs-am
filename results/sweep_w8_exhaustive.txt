@@ -1,0 +1,17 @@
+DLZS-AM error characterization
+width w = 8
+input set: exhaustive (all ordered pairs)
+designs: dlzs_floor, dlzs_ceil, dlzs_nearest_linear, dlzs_nearest_log, mitchell, drum4, drum6
+total pairs: 65536
+
+design                   MRED   maxRED      bias      NMED      maxAED err_rate
+-------------------------------------------------------------------------------
+dlzs_floor            0.29855  0.49804  -0.29855  0.082682       32385  0.96107
+dlzs_ceil             0.37153  0.98450  +0.37153  0.082682       32385  0.96107
+dlzs_nearest_linear   0.16918  0.33333  -0.00964  0.041828       16320  0.96107
+dlzs_nearest_log      0.17364  0.40659  +0.03890  0.042961       18870  0.96107
+mitchell              0.03788  0.11111  -0.03788  0.009326        4096  0.93092
+drum4                 0.05887  0.26562  +0.01596  0.014238        7425  0.97717
+drum6                 0.01301  0.06348  +0.00571  0.003581        2000  0.85431
+-------------------------------------------------------------------------------
+n_total = 65536 (NMED, maxAED, err_rate); n_red = 65025 (MRED, maxRED, bias; zero-product pairs excluded, all designs exact on them by construction)
