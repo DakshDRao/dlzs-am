@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# cocotb / simulation
+tb/sim_build/
+tb/results.xml
+tb/*.fst
+tb/*.vcd
+sim_build/
+results.xml
+
+# Verilator
+obj_dir/
+*.log
+
+# Generated results — regenerate with `python3 src/sweep.py`
+results/
+
+# Editor
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
