@@ -23,7 +23,7 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from golden_model import (  # noqa: E402
+from src.golden_model import (  # noqa: E402
     lead_one,
     exact,
     dlzs_floor,
