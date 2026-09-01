@@ -1,29 +1,35 @@
-# cocotb makefile for the LZC testbench.
+# cocotb makefile for the multiplier testbench.
 #
-#   make                        run everything with Icarus
-#   make lint                   Verilator lint only
-#   make LZC16_N_RANDOM=1000    short smoke run (16-bit coverage drops; the
-#                               testbench warns rather than silently shrinking)
-#   make WAVES=1                dump lzc.fst
-#   make clean
+#   make -f Makefile.mult                    run everything with Icarus
+#   make -f Makefile.mult lint               Verilator lint only
+#   make -f Makefile.mult MULT_N_RANDOM=1000 short smoke run
+#   make -f Makefile.mult WAVES=1            dump mult.fst
+#   make -f Makefile.mult clean
+#
+# Kept separate from the LZC Makefile rather than merged behind a variable:
+# cocotb drives one TOPLEVEL per invocation, and a shared makefile would put
+# the choice of DUT in an environment variable where it is easy to run the
+# wrong one and believe the pass.
 
 TOPDIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 RTLDIR := $(TOPDIR)/../rtl
 
 SIM            ?= icarus
 TOPLEVEL_LANG  ?= verilog
-TOPLEVEL       := lzc_tb_top
-COCOTB_TEST_MODULES := test_lzc
+TOPLEVEL       := mult_tb_top
+COCOTB_TEST_MODULES := test_mult
 
 # One module per file, matching module names, so Verilator's -y search and
-# svlangserver both resolve lzc_8 from lzc_tb_top.
-VERILOG_SOURCES := $(RTLDIR)/lzc_8.sv $(RTLDIR)/lzc_16.sv $(TOPDIR)/lzc_tb_top.sv
+# svlangserver both resolve the leaf modules from mult_tb_top.
+VERILOG_SOURCES := $(RTLDIR)/lzc_8.sv $(RTLDIR)/lzc_16.sv \
+                   $(RTLDIR)/dlzc_mult.sv $(RTLDIR)/dlzc_mult_top.sv \
+                   $(TOPDIR)/mult_tb_top.sv
 
 # Must have a value before export: `export FOO` on an unset variable passes an
 # empty string through to the environment, not an absent key, so the
 # testbench's os.environ.get() default would never fire.
-LZC16_N_RANDOM ?= 1000000
-export LZC16_N_RANDOM
+MULT_N_RANDOM ?= 200000
+export MULT_N_RANDOM
 
 ifeq ($(WAVES),1)
     ifeq ($(SIM),icarus)
@@ -43,11 +49,10 @@ endif
 include $(COCOTB_MAKEFILES)/Makefile.sim
 
 lint:
-	verilator --lint-only -Wall -y $(RTLDIR) \
-	    $(RTLDIR)/lzc_8.sv $(RTLDIR)/lzc_16.sv $(TOPDIR)/lzc_tb_top.sv
+	verilator --lint-only -Wall -y $(RTLDIR) $(VERILOG_SOURCES)
 
 clean::
 	rm -rf $(TOPDIR)/sim_build $(TOPDIR)/__pycache__ \
-	       $(TOPDIR)/results.xml $(TOPDIR)/lzc.fst
+	       $(TOPDIR)/results.xml $(TOPDIR)/mult.fst
 
 .PHONY: lint clean
