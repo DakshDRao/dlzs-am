@@ -48,7 +48,11 @@ __all__ = [
     "mitchell",
     "drum_extract",
     "drum",
+    "to_signed",
+    "to_unsigned",
+    "signed_wrap",
     "DESIGNS",
+    "SIGNED_DESIGNS",
 ]
 
 
@@ -255,6 +259,70 @@ def drum(a, b, k, w):
 
 
 # ---------------------------------------------------------------------------
+# Signed operation -- sign-magnitude wrapper around any unsigned design
+# ---------------------------------------------------------------------------
+#
+# rtl/dlzc_mult_top.sv computes sign = A[w-1] ^ B[w-1], takes the two's
+# complement magnitude of each operand, feeds the UNSIGNED core, and negates
+# the result if the signs differ. This section is the bit-exact model of that.
+#
+# Two properties of the wrapper are worth stating explicitly, because both are
+# claims the report will make:
+#
+#   1. The wrapper is EXACT. It introduces no approximation of its own -- it is
+#      a bijection composed with the unsigned core. Every bit of error in a
+#      signed product is error the unsigned core already had on the magnitudes.
+#      The existing unsigned characterization therefore still applies; only the
+#      operand DISTRIBUTION changes (see below).
+#
+#   2. The error is symmetric about zero by construction, since the magnitude
+#      path cannot see the sign. This is a good property for the top-k ranking
+#      study, and it is also why signed `bias` is a useless metric -- over a
+#      symmetric input set it averages to ~0 no matter how biased the core is.
+#      Characterize bias on MAGNITUDES.
+#
+# Distribution note: signed w-bit magnitudes span 0..2^(w-1), so the top binade
+# all but disappears -- at w=16 the only magnitude with lead_one == 15 is
+# 32768 itself. Signed sweep tables are not comparable to unsigned ones and
+# must say which distribution they were taken over.
+
+def to_signed(u, w):
+    """Interpret a w-bit pattern as two's complement."""
+    assert 0 <= u < (1 << w), f"pattern {u} out of range for width {w}"
+    return u - (1 << w) if u >> (w - 1) else u
+
+
+def to_unsigned(x, w):
+    """Two's complement bit pattern of `x` in w bits. Accepts either sign."""
+    return x & ((1 << w) - 1)
+
+
+def signed_wrap(design, a, b, w):
+    """Signed w x w product via `design` applied to the magnitudes.
+
+    WIDTH SUBTLETY -- this is the one thing that makes signed operation not a
+    drop-in call. abs(-2^(w-1)) == 2^(w-1), which occupies w bits of STORAGE
+    but is out of range for a w-bit unsigned operand, so lead_one's
+    `a < (1 << w)` assert fires. The core is therefore invoked at width w+1.
+    That is a range check only: no design in this module consults `w` for
+    anything but the assert, so the datapath is unchanged.
+
+    The RTL gets away with the same thing implicitly, because abs_value1 is
+    declared unsigned [15:0] and 0x8000 is simply 32768 there. Declaring those
+    intermediates `signed` would break it.
+
+    Negative zero is not a hazard: the core returns 0 for a zero operand, and
+    the two's complement of 0 is 0, so the sign bit is harmlessly ignored.
+    """
+    lo, hi = -(1 << (w - 1)), (1 << (w - 1)) - 1
+    assert lo <= a <= hi, f"operand {a} out of range for signed width {w}"
+    assert lo <= b <= hi, f"operand {b} out of range for signed width {w}"
+
+    magnitude = design(abs(a), abs(b), w + 1)
+    return -magnitude if (a < 0) != (b < 0) else magnitude
+
+
+# ---------------------------------------------------------------------------
 # Registry -- lets sweep/characterization code iterate designs uniformly.
 # Every entry is a callable (a, b, w) -> int, so DRUM's k is bound here.
 # ---------------------------------------------------------------------------
@@ -268,4 +336,15 @@ DESIGNS = {
     "mitchell":            mitchell,
     "drum4":               lambda a, b, w: drum(a, b, 4, w),
     "drum6":               lambda a, b, w: drum(a, b, 6, w),
+}
+# Same designs under the sign-magnitude wrapper. Signature is (a, b, w) with a
+# and b two's complement in range [-2^(w-1), 2^(w-1)-1], so signed sweeps can
+# reuse the unsigned driver code unchanged.
+#
+# `exact` is wrapped too rather than aliased to `a * b`: it exercises the same
+# assert path as the approximate entries, so an out-of-range operand fails on
+# the reference row instead of surviving to poison the comparison.
+SIGNED_DESIGNS = {
+    name: (lambda fn: lambda a, b, w: signed_wrap(fn, a, b, w))(fn)
+    for name, fn in DESIGNS.items()
 }

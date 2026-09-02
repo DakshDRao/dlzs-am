@@ -53,17 +53,28 @@ property of the metric, not of the hardware.
 __all__ = ["error_metrics", "p_max_for_width", "format_table"]
 
 
-def p_max_for_width(w):
-    """Maximum representable exact product at width w, used as the NMED
-    normalizer. Note that some designs (e.g. dlzs_ceil) can produce results
-    ABOVE this value -- dlzs_ceil(255, 255, 8) = 65280 vs exact 65025 -- which
-    is legitimate and stays within 2w bits. Size RTL output ports from 2w, not
+def p_max_for_width(w, signed=False):
+    """Maximum representable exact product MAGNITUDE at width w, used as the
+    NMED normalizer.
+
+    Unsigned: (2^w - 1)^2.
+    Signed:   2^(2w-2), attained at (-2^(w-1)) * (-2^(w-1)).
+
+    Passing the unsigned bound for signed data inflates the normalizer by
+    roughly 4x and makes NMED look about four times better than it is, so this
+    flag has to be threaded through wherever signed sweeps are run.
+
+    Note that some designs (e.g. dlzs_ceil) can produce results ABOVE this
+    value -- dlzs_ceil(255, 255, 8) = 65280 vs exact 65025 -- which is
+    legitimate and stays within 2w bits. Size RTL output ports from 2w, not
     from the exact product's range.
     """
+    if signed:
+        return 1 << (2 * w - 2)
     return ((1 << w) - 1) ** 2
 
 
-def error_metrics(exact_vals, approx_vals, w):
+def error_metrics(exact_vals, approx_vals, w, signed=False):
     """Compute the full metric set for one design.
 
     Parameters
@@ -71,6 +82,9 @@ def error_metrics(exact_vals, approx_vals, w):
     exact_vals  : sequence of exact products
     approx_vals : sequence of approximate products, same order and length
     w           : operand bit-width, used to derive the NMED normalizer
+    signed      : True if the operands were two's complement, which changes the
+                  NMED normalizer (see p_max_for_width). Ignored by every other
+                  metric -- RED already uses abs() in its denominator.
 
     Returns
     -------
@@ -84,7 +98,7 @@ def error_metrics(exact_vals, approx_vals, w):
     if n_total == 0:
         raise ValueError("empty input set")
 
-    p_max = ((1 << w) - 1) ** 2
+    p_max = p_max_for_width(w, signed)
 
     # --- full-set accumulators (absolute error, no singularity) ------------
     sum_abs = 0
@@ -108,7 +122,14 @@ def error_metrics(exact_vals, approx_vals, w):
             n_wrong += 1
 
         if p != 0:
-            red = d / p                 # signed
+            # abs(p), NOT p. With signed operands a negative exact product
+            # would flip the sign of every RED taken over it, and `bias` --
+            # whose whole value is its sign -- would come out sign-scrambled
+            # rather than merely noisy. abs() in the denominator makes RED mean
+            # "fractional error, positive = overestimate" for both signs, which
+            # is the reading the report assumes. Identical to `d / p` on
+            # unsigned data, so the existing tables are unaffected.
+            red = d / abs(p)            # signed numerator, magnitude denom
             ared = abs(red)
             sum_abs_red += ared
             sum_signed_red += red

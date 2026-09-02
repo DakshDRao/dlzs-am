@@ -1,0 +1,352 @@
+# DLZS-AM
+
+**An FPGA-optimized differential log-domain approximate multiplier with error
+compensation — design, characterization, and application to attention-sparsity
+prediction.**
+
+B.Tech ECE major project, NIT Andhra Pradesh.
+
+---
+
+## 1. What this is
+
+A multiplier is one of the most expensive things you can put on an FPGA fabric.
+An *approximate* multiplier trades a bounded amount of numerical error for a
+large reduction in area and delay — which is a good trade whenever the consumer
+of the result only needs a ranking or a threshold decision, not an exact
+product.
+
+This project implements and characterizes **DLZS** (differential leading-zero
+summation), a scheme that comes from the SOFA accelerator paper
+(Wang et al., MICRO 2024). DLZS is asymmetric: it converts **one** operand to
+the log domain via its leading-zero count — snapping it to a power of two — and
+**shifts** the other operand by that amount. The multiply collapses into a
+shifter and a leading-one detector. No partial products, no mantissa adder, no
+carry-resolution branch.
+
+    A × B  ≈  2^round(log₂ A) × B  =  B << round(log₂ A)
+
+SOFA describes DLZS as a component inside a larger accelerator, and its
+Eq. 1a–1c is notationally ambiguous about which way the snap rounds. Nobody has
+published a standalone characterization of the scheme. That gap is the project.
+
+### What is and is not claimed
+
+Log-domain multiplication is **Mitchell (1962)** and is **not** claimed as
+novel here. The claim is narrower and defensible:
+
+- the first standalone FPGA implementation and error characterization of the
+  differential/asymmetric log scheme, at matched bit-widths against DRUM,
+  Mitchell, and an exact multiplier under identical LUT-only constraints; and
+- an MBM-style error compensation for it, evaluated on an accuracy-vs-LUTs
+  Pareto front.
+
+A negative result on the compensation tier is an acceptable outcome provided
+it is characterized honestly.
+
+---
+
+## 2. The four snap interpretations
+
+Because SOFA's notation is ambiguous, all four readings are implemented and
+measured rather than argued about. Operand **A** is always the snapped operand;
+operand **B** is shifted.
+
+| Mode | A snaps to | Round-up test | Relative error of A |
+|------|-----------|---------------|---------------------|
+| `dlzs_floor` | 2^⌊log₂A⌋ | never | (−0.5, 0] — always under |
+| `dlzs_ceil` | 2^⌈log₂A⌉ | whenever A is not an exact power of two | [0, +1.0) — always over |
+| `dlzs_nearest_linear` | nearer power, **linear** midpoint 1.5·2^k | bit (k−1) of A is set | [−0.25, +0.333] |
+| `dlzs_nearest_log` | nearer power, **log** midpoint √2·2^k | A² ≥ 2^(2k+1) | [−0.293, +0.414] |
+
+Two details are load-bearing:
+
+- **`nearest_linear` is a single wire.** The midpoint between 2^k and 2^(k+1)
+  is 1.5·2^k, i.e. mantissa 0.5, and the mantissa's MSB is bit (k−1) of A. So
+  the round-up decision is one bit tap — no comparator, no arithmetic.
+- **`nearest_log` uses no floats.** The log-space midpoint √2·2^k squares to
+  the integer test A² ≥ 2^(2k+1). It also has **no tie case**, since equality
+  would need A = 2^k·√2, which is irrational. (Watch int32 overflow at w=16:
+  A² reaches ~4.29e9.)
+
+Tie-break for `nearest_linear` is **round up** (ties away from zero). That is a
+specification, not an accident, and the RTL matches it bit-for-bit. The tie
+values at w=8 are {3, 6, 12, 24, 48, 96, 192} — a corner-case list, because a
+wrong tie-break costs about one pair in 2^16 and otherwise hides inside a pass
+rate.
+
+---
+
+## 3. Baselines
+
+**Mitchell (1962).** Both operands go to the log domain. Writing
+A = 2^ka·(1+ma), the approximation log₂(1+m) ≈ m makes the binary
+representation *its own logarithm* — no computation at all. Then:
+
+    P = 2^(ka+kb) · (1 + ma + mb)      if ma + mb <  1
+    P = 2^(ka+kb+1) · (ma + mb)        if ma + mb >= 1
+
+With the raw mantissa bits Ma = A − 2^ka, the denominators cancel:
+2^(ka+kb)·(ma+mb) = (Ma << kb) + (Mb << ka). Both branches become
+shift-and-add, and the carry test reuses the same quantity. Since
+log₂(1+m) ≥ m on both operands, Mitchell **always underestimates**; worst case
+is about −11.1%, when both mantissas sit near 0.44.
+
+**DRUM(k).** Truncate both operands to their k most significant bits starting
+at the leading one, multiply *exactly* in a k×k core, shift back up. The core
+is k×k regardless of w, which is where the saving comes from. DRUM applies
+**unbiased rounding**: the dropped bits are roughly uniform on [0, 2^s), so
+their expected value is half a unit in the last place of the truncated field —
+forcing the LSB high adds precisely that. In hardware the wire is tied high and
+the core shrinks to (k−1) effective input bits.
+
+The correction fires **only when s > 0**. Guarding on `s` rather than on the
+leading-one position is what makes DRUM degenerate correctly to exact
+multiplication at k == w — which is the strongest single test in the suite.
+
+Unlike everything else here, DRUM is unbiased *by construction*. Mitchell and
+`dlzs_floor` are strictly negative-biased, `dlzs_ceil` strictly positive, and
+the nearest modes roughly balanced but not by design. That distinction matters
+for the Week 10 ranking study, where a uniform bias largely cancels but
+variance does not.
+
+---
+
+## 4. Error metrics
+
+Let P be the exact product and P̂ the approximate one, over N input pairs.
+
+| Metric | Definition | Note |
+|--------|-----------|------|
+| RED | \|P̂ − P\| / P | undefined at P = 0 |
+| MRED | mean(RED) | scale-invariant; dominated by small products |
+| max RED | max(RED) | worst-case relative error |
+| bias | mean((P̂ − P) / P) | **signed** — the sign is the whole point |
+| NMED | mean(\|P̂ − P\|) / P_max | normalized by the *maximum* product, not per-sample, so it is comparable across designs at equal width |
+| max AED | max(\|P̂ − P\|) | worst-case absolute error |
+| error rate | fraction with P̂ ≠ P | |
+
+**Zero-product handling.** RED is 0/0 when P = 0. This is a removable
+singularity, not missing information — every design guards zero operands and
+returns exactly 0, so the true error there is zero. The formula is defective,
+the data is not. Accordingly: RED-based metrics are computed over the non-zero
+subset with `n_red` always reported alongside; absolute metrics and error rate
+use the full set. At w=8 exhaustive that is n_total = 65,536 and n_red = 65,025.
+
+**Caveat for the Week 10 study.** RED explodes for small P even when the
+absolute error is tiny. Real attention scores can sit near zero, so MRED may
+look poor while top-k overlap stays high. That gap is expected — it is a
+property of the metric, not of the hardware.
+
+---
+
+## 5. Results so far
+
+### 8-bit exhaustive — all 65,536 ordered pairs
+
+```
+design                   MRED   maxRED      bias      NMED      maxAED err_rate
+-------------------------------------------------------------------------------
+dlzs_floor            0.29855  0.49804  -0.29855  0.082682       32385  0.96107
+dlzs_ceil             0.37153  0.98450  +0.37153  0.082682       32385  0.96107
+dlzs_nearest_linear   0.16918  0.33333  -0.00964  0.041828       16320  0.96107
+dlzs_nearest_log      0.17364  0.40659  +0.03890  0.042961       18870  0.96107
+mitchell              0.03788  0.11111  -0.03788  0.009326        4096  0.93092
+drum4                 0.05887  0.26562  +0.01596  0.014238        7425  0.97717
+drum6                 0.01301  0.06348  +0.00571  0.003581        2000  0.85431
+```
+
+How to read this:
+
+- **`floor` and `ceil` are unusable as specs.** Their bias equals their MRED
+  exactly — every single error points the same way. They stay in the model as
+  characterization baselines.
+- **`nearest_linear` wins the DLZS family on both axes.** Lower MRED (0.169 vs
+  0.174), lower max RED (0.333 vs 0.407), lower NMED, and a bias 4× closer to
+  zero — while also being the cheaper snap in hardware. There is no trade to
+  argue about here.
+- **`nearest_log`'s measured max RED is 0.4066, not its +0.414 asymptote,**
+  because integer A cannot sit exactly on the √2 threshold. The worst case is
+  A = 91 → 128. Do not quote this mode as "±0.293" in the report.
+- **Mitchell beats DLZS on every error metric,** by roughly 4×. This is stated
+  plainly because it is true. DLZS is not an accuracy play — its case is
+  hardware cost (shift-only datapath, no mantissa adder, no carry branch), and
+  that case is **unproven until the Week 6–7 LUT numbers exist**.
+
+### Chosen specification
+
+**DLZS nearest-linear, ties round up.** Unsigned 16×16 → 32 core, with a
+sign-magnitude wrapper for signed operands.
+
+---
+
+## 6. RTL
+
+    rtl/lzc_8.sv          8-bit leading-one detector (casez priority encoder)
+    rtl/lzc_16.sv         16-bit LZE, two cascaded lzc_8 blocks
+    rtl/dlzc_mult.sv      unsigned 16x16 -> 32 DLZS core, nearest-linear
+    rtl/dlzc_mult_top.sv  sign-magnitude wrapper (XOR sign, conditional negate)
+
+Things that are easy to get wrong and were got right:
+
+- **`output_power` is not a leading-zero count** despite the module name. It is
+  ⌊log₂ x⌋ = (w−1) − LZC(x), which is exactly the shift amount the datapath
+  consumes. The testbench checks it as such, so a future revision to a true
+  zero-count fails loudly rather than silently shifting by the wrong amount.
+- **`shamt` is 5 bits, not 4.** It reaches 16 when `lead_a == 15` and
+  `round_up` fires. A 4-bit sum wraps to 0 there and silently drops the shift.
+- **The zero guard is explicit on operand A.** `b == 0` falls out of the shift
+  naturally; `a == 0` does not, because `lead_a` is meaningless there. A
+  missing zero path is the most common source of model/RTL divergence.
+- **`abs_value1/2` are deliberately unsigned.** `abs(−32768) == 32768` fits
+  16-bit storage but not the signed *range*; declaring those nets `signed`
+  would break the design. A directed corner test covers that vector.
+- **Signed overflow bound.** The product magnitude never reaches 2³¹, because
+  `shamt == 16` requires `lead_one == 15` *and* a round-up, and the only
+  magnitude with `lead_one == 15` is 32768 — an exact power of two, which never
+  rounds up. This is load-bearing and non-obvious, so it is asserted directly
+  rather than argued on paper.
+
+---
+
+## 7. Repository layout
+
+    src/golden_model.py         bit-exact reference models; no float in any datapath
+    src/metrics.py              MRED, NMED, max RED, signed bias, error rate
+    src/sweep.py                8-bit exhaustive + 16-bit sampled sweeps
+    tests/test_golden_model.py  16-test regression suite
+    rtl/                        SystemVerilog sources
+    tb/                         cocotb testbenches + verification wrappers
+    results/                    generated tables and plots (git-ignored)
+
+The golden model is the **authority**. RTL is verified against the model, not
+against the exact product — an approximate multiplier that matched the exact
+product would be a bug.
+
+---
+
+## 8. Running it
+
+Regression suite (note the `PYTHONPATH` — see Known issues):
+
+    PYTHONPATH=. python3 tests/test_golden_model.py
+
+Error sweeps:
+
+    python3 src/sweep.py              # both
+    python3 src/sweep.py --w8         # 8-bit exhaustive only
+    python3 src/sweep.py --w16        # 16-bit sampled only
+    python3 src/sweep.py --n 2000000  # override 16-bit sample size
+
+Outputs land in `results/` as both `.csv` and a formatted `.txt`, each with a
+provenance header recording width, input-set kind, sample size and seed. A
+table with no width and no seed on it is unusable six months later.
+
+RTL simulation (cocotb + Icarus), from `tb/`:
+
+    make                     # run
+    make lint                # Verilator lint only
+    make MULT_N_RANDOM=1000  # short smoke run
+    make WAVES=1             # dump waveforms
+    make clean
+
+### Reproducibility
+
+The 8-bit sweep is exhaustive — all 65,536 ordered pairs, no sampling, nothing
+to seed. The 16-bit sweep cannot be exhaustive (4.3e9 pairs), so it combines a
+fixed-seed uniform sample (seed **20260828**, recorded in the output header)
+with an explicit corner-case set: zeros, ones, all-ones, exact powers of two,
+values one below and above each power, and the linear-nearest tie values 1.5·2^k.
+
+The corner set is deliberately non-uniform and skews sampled metrics slightly
+toward boundary behaviour. The header says so, so the number is not misread as
+an unbiased estimate.
+
+**DLZS is asymmetric in its operands** — A is snapped, B is shifted — so pairs
+are **ordered**. (a,b) and (b,a) are different experiments and both appear. Do
+not deduplicate them.
+
+The testbenches import their 16-bit stimulus from `sweep.sampled_pairs()`
+directly rather than reconstructing it, so the verified vectors and the
+published error tables are provably the same set.
+
+---
+
+## 9. Known issues
+
+Current, verified against commit `62de93e`:
+
+1. **`tb/test_mult.py` cannot be imported.** It imports `signed_wrap` and
+   `to_signed` from `golden_model`, and neither is defined there. The
+   multiplier testbench cannot execute as committed. Only `test_lzc.py`
+   imports cleanly.
+2. **`tests/test_golden_model.py` needs `PYTHONPATH=.`.** It inserts `src/`
+   into `sys.path` but then imports `from src.golden_model` — mutually
+   inconsistent. All 16 tests pass once the path is right.
+3. **The RTL is fixed 16-bit, not parameterizable.** The exhaustive 8-bit
+   model/RTL equivalence check (all 65,536 pairs) has therefore not been run.
+   Week 6–7 needs 8-bit synthesis numbers anyway, so parameterizing pays twice.
+4. **No simulation log is committed.** Nothing in the repo yet demonstrates a
+   simulator was run against the multiplier.
+5. **`tb/Makefile` is internally inconsistent** — its header documents a
+   `Makefile.mult` / separate LZC makefile split that does not exist, and
+   `dump_waves.v` dumps `lzc_tb_top` while `TOPLEVEL` is `mult_tb_top`, so
+   `WAVES=1` dumps the wrong hierarchy.
+
+---
+
+## 10. Roadmap
+
+| Week | Scope | Status |
+|------|-------|--------|
+| 1–2 | Literature lock + golden model | done |
+| 3–5 | DLZS RTL + verification | done, with open carry-over (§9) |
+| 6–7 | DRUM + Mitchell baselines, OOC LUT-only synthesis, first full comparison table | **current** |
+| 8–9 | AXI-Lite wrapper, PYNQ-Z2 overlay, ≥10,000 vectors hardware-vs-sim | |
+| 10–11 | Attention Q/K from DistilBERT, top-k index overlap vs hardware cost | |
+| 12–13 | MBM-style error compensation, accuracy-vs-LUTs Pareto front | |
+| 14 | Buffer, thesis writeup, defense dry-run | |
+
+Scope is cut from the **top tier down** if the schedule slips — compensation
+first, then the application study — never the baseline characterization.
+
+### Deliberately deferred
+
+An **adaptive DLZS variant** (snap whichever operand has the smaller mantissa)
+is not implemented. It costs a comparator plus two muxes on the wide datapath,
+and that trade cannot be judged until the fixed-choice LUT numbers exist.
+
+### Designed-in test hook for Week 12
+
+The compensation LUT must reduce to uncompensated DLZS when the LUT is all
+zeros. That degenerate-parameter property test is the same shape as
+`test_drum_degenerates_to_exact_at_k_equals_w` — the strongest test in the
+current suite — and it should exist from the compensation module's first
+commit, not be retrofitted.
+
+---
+
+## 11. Environment
+
+- **Board:** PYNQ-Z2 (primary); Arty A7-100T (optional stretch)
+- **Tools:** Vivado, Icarus Verilog / Verilator, cocotb, Python 3, PyTorch
+- **Synthesis constraints (Week 6–7 onward):** out-of-context, `USE_DSP="no"`,
+  matched bit-widths, identical input distributions across all designs. The
+  exact multiplier is reported twice — LUT-only, and DSP-mapped as a separate
+  reference row.
+
+---
+
+## 12. References
+
+1. J. N. Mitchell, "Computer Multiplication and Division Using Binary
+   Logarithms," *IRE Transactions on Electronic Computers*, 1962.
+2. S. Hashemi, R. I. Bahar, S. Reda, "DRUM: A Dynamic Range Unbiased
+   Multiplier for Approximate Applications," *ICCAD*, 2015.
+3. Wang et al., "SOFA: A Compute-Memory Optimized Sparsity Accelerator via
+   Cross-Stage Coordinated Tiling," *MICRO*, 2024. — origin of the DLZS scheme.
+4. MBM (Mitchell-based multiplier with error compensation) — the model for the
+   Week 12–13 compensation tier.
+
+Related work also includes power-of-two weight quantization, against which this
+scheme must be positioned rather than compared favourably by default.
