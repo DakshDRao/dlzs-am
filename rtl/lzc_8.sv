@@ -1,5 +1,5 @@
 module lzc_8(
-    input logic [7:0] input_operand,
+    input wire logic [7:0] input_operand,
     output logic [2:0] output_power,
     output logic all_zero
 );

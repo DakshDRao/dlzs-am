@@ -1,0 +1,24 @@
+#-----------------------------------------------------------
+# Vivado v2025.2 (64-bit)
+# SW Build 6299465 on Fri Nov 14 19:35:11 GMT 2025
+# IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+# SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+# Start of session at: Fri Sep  4 18:33:36 2026
+# Process ID         : 29172
+# Current directory  : C:/projects/major_project
+# Command line       : vivado.exe -mode batch -source synth/synth_ooc.tcl
+# Log file           : C:/projects/major_project/vivado.log
+# Journal file       : C:/projects/major_project\vivado.jou
+# Running On         : LAPTOP-OO671G6K
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 26200
+# Processor Detail   : 13th Gen Intel(R) Core(TM) i7-13650HX
+# CPU Frequency      : 2803 MHz
+# CPU Physical cores : 14
+# CPU Logical cores  : 20
+# Host memory        : 16780 MB
+# Swap memory        : 8589 MB
+# Total Virtual      : 25370 MB
+# Available Virtual  : 3864 MB
+#-----------------------------------------------------------
+source synth/synth_ooc.tcl

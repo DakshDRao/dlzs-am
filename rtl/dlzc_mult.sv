@@ -5,8 +5,8 @@
 // golden_model.dlzs_nearest_linear); operand B is shifted. Snap direction and
 // tie-break must match the model bit-for-bit.
 module dlzc_mult(
-    input  logic [15:0] a,
-    input  logic [15:0] b,
+    input  wire logic [15:0] a,
+    input  wire logic [15:0] b,
     output logic [31:0] mul_out
 );
 

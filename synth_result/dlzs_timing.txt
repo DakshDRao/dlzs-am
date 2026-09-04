@@ -1,0 +1,87 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
+| Date         : Fri Sep  4 18:34:06 2026
+| Host         : LAPTOP-OO671G6K running 64-bit major release  (build 9200)
+| Command      : report_timing -file synth_result/dlzs_timing.txt
+| Design       : dlzc_mult_top
+| Device       : 7z020-clg400
+| Speed File   : -1  PRODUCTION 1.12 2019-11-22
+| Design State : Synthesized
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack:                    inf
+  Source:                 operand1[0]
+                            (input port)
+  Destination:            output_mul[29]
+                            (output port)
+  Path Group:             (none)
+  Path Type:              Max at Slow Process Corner
+  Data Path Delay:        13.158ns  (logic 4.061ns (30.863%)  route 9.097ns (69.137%))
+  Logic Levels:           21  (CARRY4=11 LUT1=1 LUT2=1 LUT3=2 LUT4=1 LUT6=5)
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                                                      0.000     0.000 f  operand1[0] (IN)
+                         net (fo=2, unset)            0.973     0.973    operand1[0]
+                         LUT1 (Prop_lut1_I0_O)        0.124     1.097 r  output_mul[28]_INST_0_i_112/O
+                         net (fo=1, unplaced)         0.333     1.430    p_0_in[0]
+                         CARRY4 (Prop_carry4_CYINIT_CO[3])
+                                                      0.595     2.025 r  output_mul[28]_INST_0_i_93/CO[3]
+                         net (fo=1, unplaced)         0.009     2.034    output_mul[28]_INST_0_i_93_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117     2.151 r  output_mul[28]_INST_0_i_92/CO[3]
+                         net (fo=1, unplaced)         0.000     2.151    output_mul[28]_INST_0_i_92_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117     2.268 r  output_mul[28]_INST_0_i_95/CO[3]
+                         net (fo=1, unplaced)         0.000     2.268    output_mul[28]_INST_0_i_95_n_0
+                         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.337     2.605 r  output_mul[28]_INST_0_i_59/O[1]
+                         net (fo=3, unplaced)         0.330     2.935    abs_value10[14]
+                         LUT3 (Prop_lut3_I0_O)        0.298     3.233 r  output_mul[28]_INST_0_i_91/O
+                         net (fo=3, unplaced)         0.920     4.153    sel0[6]
+                         LUT3 (Prop_lut3_I0_O)        0.124     4.277 f  output_mul[28]_INST_0_i_86/O
+                         net (fo=1, unplaced)         0.902     5.179    output_mul[28]_INST_0_i_86_n_0
+                         LUT6 (Prop_lut6_I2_O)        0.124     5.303 f  output_mul[28]_INST_0_i_47/O
+                         net (fo=12, unplaced)        0.950     6.253    mult1/lead_a[0]
+                         LUT6 (Prop_lut6_I2_O)        0.124     6.377 r  output_mul[28]_INST_0_i_77/O
+                         net (fo=2, unplaced)         0.913     7.290    output_mul[28]_INST_0_i_77_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.124     7.414 r  output_mul[28]_INST_0_i_44/O
+                         net (fo=3, unplaced)         0.920     8.334    output_mul[28]_INST_0_i_44_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.124     8.458 r  output_mul[28]_INST_0_i_21/O
+                         net (fo=22, unplaced)        0.481     8.939    shamt[2]
+                         LUT2 (Prop_lut2_I0_O)        0.150     9.089 r  output_mul[24]_INST_0_i_14/O
+                         net (fo=4, unplaced)         0.926    10.015    output_mul[24]_INST_0_i_14_n_0
+                         LUT6 (Prop_lut6_I2_O)        0.124    10.139 r  output_mul[20]_INST_0_i_7/O
+                         net (fo=3, unplaced)         0.467    10.606    output_mul[20]_INST_0_i_7_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.124    10.730 r  output_mul[4]_INST_0_i_3/O
+                         net (fo=1, unplaced)         0.000    10.730    output_mul[4]_INST_0_i_3_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.533    11.263 r  output_mul[4]_INST_0/CO[3]
+                         net (fo=1, unplaced)         0.000    11.263    output_mul[4]_INST_0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    11.380 r  output_mul[8]_INST_0/CO[3]
+                         net (fo=1, unplaced)         0.000    11.380    output_mul[8]_INST_0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    11.497 r  output_mul[12]_INST_0/CO[3]
+                         net (fo=1, unplaced)         0.000    11.497    output_mul[12]_INST_0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    11.614 r  output_mul[16]_INST_0/CO[3]
+                         net (fo=1, unplaced)         0.000    11.614    output_mul[16]_INST_0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    11.731 r  output_mul[20]_INST_0/CO[3]
+                         net (fo=1, unplaced)         0.000    11.731    output_mul[20]_INST_0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    11.848 r  output_mul[24]_INST_0/CO[3]
+                         net (fo=1, unplaced)         0.000    11.848    output_mul[24]_INST_0_n_0
+                         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.337    12.185 r  output_mul[28]_INST_0/O[1]
+                         net (fo=0)                   0.973    13.158    output_mul[29]
+                                                                      r  output_mul[29] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+
+
+

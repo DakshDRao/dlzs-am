@@ -1,6 +1,7 @@
+(*use_dsp = "no" *)
 module dlzc_mult_top(
-    input  logic [15:0] operand1,
-    input  logic [15:0] operand2,
+    input  wire logic [15:0] operand1,
+    input  wire logic [15:0] operand2,
     output logic [31:0] output_mul
 );
 

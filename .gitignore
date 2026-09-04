@@ -26,3 +26,7 @@ results/
 # OS
 .DS_Store
 Thumbs.db
+
+#vivado
+*.jou
+*.log
