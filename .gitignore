@@ -31,3 +31,4 @@ Thumbs.db
 *.jou
 *.log
 .Xil/
+dfx_runtime.txt
