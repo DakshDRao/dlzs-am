@@ -30,3 +30,4 @@ Thumbs.db
 #vivado
 *.jou
 *.log
+.Xil/
