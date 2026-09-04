@@ -27,8 +27,36 @@ results/
 .DS_Store
 Thumbs.db
 
-#vivado
+# ========================================
+# Vivado & Xilinx Ignore Rules
+# ========================================
 *.jou
 *.log
+*.str
+*.dmp
+*.pb
 .Xil/
 dfx_runtime.txt
+usage_statistics_webtalk.*
+
+# Ignore GUI project directories and IP caches (if generated later)
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+
+# XSim simulation files (if you use XSim instead of Icarus)
+xsim.dir/
+xsim.jou
+xsim.log
+xvlog.pb
+xvhdl.pb
+xelab.pb
+
+# ========================================
+# EXPLICIT KEEP RULES
+# ========================================
+# Do not ignore the Vivado Out-of-Context synthesis reports!
+!synth_result/
+!synth_result/*

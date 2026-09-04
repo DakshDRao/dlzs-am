@@ -6,7 +6,7 @@ read_verilog -sv [glob ./rtl/*.sv]
 read_xdc ./constraint/ooc_clock.xdc
 
 # 3. Synthesize OUT OF CONTEXT
-synth_design -top dlzc_mult_top -mode out_of_context
+synth_design -top dlzc_wrapper_test -mode out_of_context
 
 file mkdir synth_result
 
