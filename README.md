@@ -211,13 +211,43 @@ Things that are easy to get wrong and were got right:
 
 ## 7. Repository layout
 
-    src/golden_model.py         bit-exact reference models; no float in any datapath
-    src/metrics.py              MRED, NMED, max RED, signed bias, error rate
-    src/sweep.py                8-bit exhaustive + 16-bit sampled sweeps
-    tests/test_golden_model.py  16-test regression suite
-    rtl/                        SystemVerilog sources
-    tb/                         cocotb testbenches + verification wrappers
-    results/                    generated tables and plots (git-ignored)
+    rtl/                          DLZS design sources (yours)
+      lzc_8.sv                    8-bit leading-one detector
+      lzc_16.sv                   16-bit LZE, two cascaded lzc_8 blocks
+      dlzc_mult.sv                unsigned 16x16 -> 32 DLZS core, nearest-linear
+      dlzc_mult_top.sv            sign-magnitude wrapper
+
+    baselines/drum/               vendored DRUM cores, separate upstream licence
+      DRUM4_16_u.v DRUM6_16_u.v   upstream, unmodified
+      drum_signed_top.sv          sign-magnitude shell, K-parameterised
+      LICENSE.upstream
+
+    synth/
+      synth_ooc.tcl               OOC LUT-only synthesis of every design
+      constraints/ooc_clock.xdc
+      wrappers/                   OOC harnesses -- ours, and not part of the
+        dlzc_wrapper_test.sv        design, so they live with the synthesis
+        drum_wrapper_test.sv        flow rather than in rtl/
+
+    tb/
+      dirs.mk  common.mk          shared cocotb plumbing
+      lzc/  mult/  drum/          one directory per bench: Makefile + tb top + test
+
+    src/golden_model.py           bit-exact reference models; no float in any datapath
+    src/metrics.py                MRED, NMED, max RED, signed bias, error rate
+    src/sweep.py                  8-bit exhaustive + 16-bit sampled sweeps
+    tests/test_golden_model.py    16-test regression suite
+    synth_result/<design>/        committed synthesis reports
+    results/                      generated tables and plots (git-ignored)
+    docs/progress.md
+
+Two placement rules the layout encodes. Vendored code stays under `baselines/`
+so its licence stays scoped to the files it actually covers. Synthesis
+harnesses stay under `synth/` because they are scaffolding, not design — an
+OOC wrapper in `rtl/` reads like something that gets taped out.
+
+Each bench owns its own `sim_build`. That is correctness, not tidiness: see
+Known issues.
 
 The golden model is the **authority**. RTL is verified against the model, not
 against the exact product — an approximate multiplier that matched the exact
@@ -227,9 +257,20 @@ product would be a bug.
 
 ## 8. Running it
 
-Regression suite (note the `PYTHONPATH` — see Known issues):
+Everything is driven from the repo root:
 
-    PYTHONPATH=. python3 tests/test_golden_model.py
+    make test      # golden-model regression suite (16 tests)
+    make sweep     # error sweeps -> results/
+    make sim       # all three cocotb benches
+    make lint      # Verilator lint on all three
+    make smoke     # fast test + sim, for the pre-commit loop
+    make synth     # Vivado OOC synthesis -> synth_result/
+    make clean
+
+Regression suite directly — no `PYTHONPATH` needed:
+
+    python3 tests/test_golden_model.py
+    python3 -m pytest tests/
 
 Error sweeps:
 
@@ -242,13 +283,21 @@ Outputs land in `results/` as both `.csv` and a formatted `.txt`, each with a
 provenance header recording width, input-set kind, sample size and seed. A
 table with no width and no seed on it is unusable six months later.
 
-RTL simulation (cocotb + Icarus), from `tb/`:
+RTL simulation (cocotb + Icarus). Each bench is a directory with a plain
+`Makefile`, so it runs from the root or from inside the bench:
 
-    make                     # run
-    make lint                # Verilator lint only
-    make MULT_N_RANDOM=1000  # short smoke run
-    make WAVES=1             # dump waveforms
-    make clean
+    make -C tb/mult                    # or: cd tb/mult && make
+    make -C tb/mult lint
+    make -C tb/mult MULT_N_RANDOM=1000 # short smoke run
+    make -C tb/mult WAVES=1            # -> tb/mult/sim_build/mult_tb_top.fst
+    make -C tb/mult clean
+
+Same for `tb/drum` (`DRUM_N_RANDOM`) and `tb/lzc` (`LZC_N_RANDOM`).
+
+Synthesis runs from the repo root, since every path in the script is relative
+to it:
+
+    vivado -mode batch -source synth/synth_ooc.tcl
 
 ### Reproducibility
 
@@ -274,24 +323,45 @@ published error tables are provably the same set.
 
 ## 9. Known issues
 
-Current, verified against commit `62de93e`:
+Re-verified after the repository reorganisation. Items 1, 2, 5 and 6 of the
+previous list are fixed; what follows is what is actually still open.
 
-1. **`tb/test_mult.py` cannot be imported.** It imports `signed_wrap` and
-   `to_signed` from `golden_model`, and neither is defined there. The
-   multiplier testbench cannot execute as committed. Only `test_lzc.py`
-   imports cleanly.
-2. **`tests/test_golden_model.py` needs `PYTHONPATH=.`.** It inserts `src/`
-   into `sys.path` but then imports `from src.golden_model` — mutually
-   inconsistent. All 16 tests pass once the path is right.
-3. **The RTL is fixed 16-bit, not parameterizable.** The exhaustive 8-bit
+**Fixed, kept here so the record is honest:**
+
+- *"`tb/test_mult.py` cannot be imported — `signed_wrap`/`to_signed` are
+  undefined."* Stale. Both are defined in `golden_model.py`. The multiplier
+  bench runs and passes 5/5.
+- *"`tests/test_golden_model.py` needs `PYTHONPATH=.`."* Fixed: it inserted
+  `src/` on the path and then imported `from src.golden_model`, which needed
+  the repo root too. Now imports `from golden_model`, so the insert is
+  sufficient on its own.
+- *"`WAVES=1` dumps the wrong hierarchy."* Fixed by deleting the hand-rolled
+  `dump_waves.v` entirely — cocotb >= 2.0 implements `WAVES=1` natively
+  against the real `TOPLEVEL`.
+- *"`tb/Makefile` documents a split that does not exist."* Fixed: the split
+  now exists, one directory per bench.
+
+**Open:**
+
+1. **The benches shared one `tb/sim_build`.** cocotb's `Makefile.sim` only
+   relinks when sources are newer than `sim_build/sim.vvp`, so running the
+   multiplier bench and then the DRUM bench re-executed the *multiplier*
+   binary and reported a full DRUM pass against the wrong DUT. Fixed by
+   giving each bench its own `SIM_BUILD`, but it is listed here because it
+   invalidates any simulation result recorded before this change — those runs
+   have to be redone, not trusted.
+2. **The RTL is fixed 16-bit, not parameterizable.** The exhaustive 8-bit
    model/RTL equivalence check (all 65,536 pairs) has therefore not been run.
    Week 6–7 needs 8-bit synthesis numbers anyway, so parameterizing pays twice.
-4. **No simulation log is committed.** Nothing in the repo yet demonstrates a
+3. **No simulation log is committed.** Nothing in the repo yet demonstrates a
    simulator was run against the multiplier.
-5. **`tb/Makefile` is internally inconsistent** — its header documents a
-   `Makefile.mult` / separate LZC makefile split that does not exist, and
-   `dump_waves.v` dumps `lzc_tb_top` while `TOPLEVEL` is `mult_tb_top`, so
-   `WAVES=1` dumps the wrong hierarchy.
+4. **The DLZS row's timing is not met.** `synth_result/dlzs_signed/summary.txt`
+   records `slack_ns -1.825`. The LUT count is reportable; the frequency claim
+   is not, until the constraint is either met or explicitly relaxed and stated.
+5. **Vendored DRUM lint warnings are waived, not fixed** — `WIDTHEXPAND` and
+   `UNUSEDSIGNAL`, scoped to `tb/drum` via `LINT_ARGS`. Correct for code we do
+   not own, but it means `make lint` is not a full clean bill of health on
+   `baselines/`.
 
 ---
 

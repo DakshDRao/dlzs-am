@@ -1,7 +1,8 @@
 # synth_ooc.tcl -- out-of-context, LUT-only synthesis of every design in the
 # comparison, under identical constraints.
 #
-#   vivado -mode batch -source synth/synth_ooc.tcl
+#   vivado -mode batch -source synth/synth_ooc.tcl        (run from the REPO ROOT;
+#                                                         all paths below are relative to it)
 #
 # Replaces the single-design version. Three things changed and each is
 # load-bearing for the Week 6-7 gate:
@@ -29,16 +30,21 @@ set_part $part
 
 set rtl_dir     ./rtl
 set drum_dir    ./baselines/drum
-set constraints ./constraint/ooc_clock.xdc
+set wrap_dir    ./synth/wrappers
+set constraints ./synth/constraints/ooc_clock.xdc
 
-# design name -> list of source files
-# NOTE both DLZS entries: dlzc_wrapper_test wraps the UNSIGNED core, so it is
-# NOT comparable to the signed DRUM rows. dlzs_signed_wrapper_test must exist
-# before the signed table can be written. See baselines/drum/README.md section 4.
+# design name -> list of source files.
+#
+# NOTE on signedness, corrected: dlzc_wrapper_test instantiates dlzc_mult_top,
+# which IS the sign-magnitude shell (XOR sign, conditional negate) around the
+# unsigned dlzc_mult core -- not the bare core. The dlzs_signed row is
+# therefore signed-vs-signed comparable to the DRUM rows as it stands. An
+# earlier comment here and in drum_wrapper_test.sv claimed otherwise and
+# blocked the comparison table for no reason.
 set designs [dict create \
-    dlzs_signed   {./rtl/lzc_8.sv ./rtl/lzc_16.sv ./rtl/dlzc_mult.sv ./rtl/dlzc_mult_top.sv ./rtl/dlzc_wrapper_test.sv} \
-    drum6_signed  {./baselines/drum/DRUM6_16_u.v ./baselines/drum/DRUM4_16_u.v ./baselines/drum/drum_signed_top.sv ./baselines/drum/drum_wrapper_test.sv} \
-    drum4_signed  {./baselines/drum/DRUM6_16_u.v ./baselines/drum/DRUM4_16_u.v ./baselines/drum/drum_signed_top.sv ./baselines/drum/drum_wrapper_test.sv} \
+    dlzs_signed   [list $rtl_dir/lzc_8.sv $rtl_dir/lzc_16.sv $rtl_dir/dlzc_mult.sv $rtl_dir/dlzc_mult_top.sv $wrap_dir/dlzc_wrapper_test.sv] \
+    drum6_signed  [list $drum_dir/DRUM6_16_u.v $drum_dir/DRUM4_16_u.v $drum_dir/drum_signed_top.sv $wrap_dir/drum_wrapper_test.sv] \
+    drum4_signed  [list $drum_dir/DRUM6_16_u.v $drum_dir/DRUM4_16_u.v $drum_dir/drum_signed_top.sv $wrap_dir/drum_wrapper_test.sv] \
 ]
 
 set tops [dict create \
@@ -95,7 +101,6 @@ dict for {name sources} $designs {
 
     # Machine-readable one-liner for the comparison table, so the numbers are
     # transcribed by the tool rather than by hand.
-    set luts [get_property SLICE [get_cells -hier -filter {PRIMITIVE_GROUP == LUT}] ]
     set n_lut  [llength [get_cells -hier -filter {PRIMITIVE_GROUP == LUT}]]
     set n_ff   [llength [get_cells -hier -filter {PRIMITIVE_GROUP == FLOP_LATCH}]]
     set n_dsp  [llength [get_cells -hier -filter {PRIMITIVE_GROUP == ARITHMETIC}]]

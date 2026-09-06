@@ -52,8 +52,12 @@ import sys
 import cocotb
 from cocotb.triggers import Timer
 
-_HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(_HERE, "..", "src"))
+# src/ is put on PYTHONPATH by tb/common.mk, so the golden model and the sweep
+# stimulus resolve without per-file sys.path surgery. Kept as a fallback so the
+# file still imports when opened directly by an editor or pytest.
+_SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "src")
+if _SRC not in sys.path:
+    sys.path.insert(0, _SRC)
 
 from golden_model import lead_one          # noqa: E402
 from sweep import sampled_pairs            # noqa: E402

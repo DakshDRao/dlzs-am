@@ -4,13 +4,12 @@ __pycache__/
 .venv/
 venv/
 
-# cocotb / simulation
-tb/sim_build/
-tb/results.xml
-tb/*.fst
-tb/*.vcd
+# cocotb / simulation -- benches now live in tb/<name>/, each with its own
+# sim_build, so these need to match one level deeper as well.
 sim_build/
 results.xml
+*.fst
+*.vcd
 
 # Verilator
 obj_dir/

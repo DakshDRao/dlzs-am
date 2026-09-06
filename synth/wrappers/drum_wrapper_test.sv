@@ -1,16 +1,17 @@
 // drum_wrapper_test.sv -- OOC synthesis harness for the DRUM baselines.
 //
-// Structurally identical to rtl/dlzc_wrapper_test.sv: same two 16-bit input
+// Structurally identical to synth/wrappers/dlzc_wrapper_test.sv: same two 16-bit input
 // registers, same 32-bit output register, same clock. The register count is
 // therefore the same 64 FFs on both designs and drops out of the LUT
 // comparison, which is the point -- a harness that differs between designs
 // contaminates the number it exists to produce.
 //
-// NOTE the difference from dlzc_wrapper_test: that harness instantiates the
-// UNSIGNED core dlzc_mult, so the DLZS row currently in synth_result/ is for
-// the unsigned datapath with no sign-magnitude shell. Synthesize like against
-// like -- either add a signed DLZS harness, or report the unsigned DRUM core
-// here. Do not compare signed DRUM against unsigned DLZS.
+// CORRECTION to an earlier note here: dlzc_wrapper_test instantiates
+// dlzc_mult_top, which is the sign-magnitude shell, NOT the bare unsigned
+// dlzc_mult core. Both harnesses are signed-in/signed-out, so the DLZS and
+// DRUM rows in synth_result/ are like-for-like and the comparison table is
+// not blocked. Re-check this claim against the instantiation, not against
+// this comment, if either wrapper is ever edited.
 
 `default_nettype none
 
