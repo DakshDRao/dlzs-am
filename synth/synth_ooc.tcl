@@ -1,16 +1,121 @@
-# 1. Set part (PYNQ-Z2 is xc7z020clg400-1)
-set_part xc7z020clg400-1
+# synth_ooc.tcl -- out-of-context, LUT-only synthesis of every design in the
+# comparison, under identical constraints.
+#
+#   vivado -mode batch -source synth/synth_ooc.tcl
+#
+# Replaces the single-design version. Three things changed and each is
+# load-bearing for the Week 6-7 gate:
+#
+#   1. -max_dsp 0 on every run. DRUM's core contains a real k x k multiply
+#      (`assign tmp = mm*nn;`), which Vivado will map to a DSP48 given the
+#      chance. DLZS has no multiply at all, so a DSP-mapped DRUM against a
+#      LUT-only DLZS would understate DRUM's LUT cost and the comparison would
+#      be meaningless. The (* use_dsp = "no" *) attributes stay in the RTL as
+#      belt-and-braces, but attribute inheritance across module boundaries is
+#      not something to rely on for a headline number.
+#
+#   2. Each design gets its own report directory, and the DSP row is checked
+#      programmatically rather than eyeballed. The gate asks for PROOF the runs
+#      were LUT-only -- a script that fails loudly is proof; a claim is not.
+#
+#   3. Every design runs through a structurally identical pipelined harness
+#      (two 16-bit input registers, one 32-bit output register, one clock), so
+#      the 64 flip-flops are common to all rows and drop out of the delta.
+#
+# Reports land in synth_result/<design>/.
 
-# 2. Read RTL and Constraints
-read_verilog -sv [glob ./rtl/*.sv]
-read_xdc ./constraint/ooc_clock.xdc
+set part xc7z020clg400-1
+set_part $part
 
-# 3. Synthesize OUT OF CONTEXT
-synth_design -top dlzc_wrapper_test -mode out_of_context
+set rtl_dir     ./rtl
+set drum_dir    ./baselines/drum
+set constraints ./constraint/ooc_clock.xdc
+
+# design name -> list of source files
+# NOTE both DLZS entries: dlzc_wrapper_test wraps the UNSIGNED core, so it is
+# NOT comparable to the signed DRUM rows. dlzs_signed_wrapper_test must exist
+# before the signed table can be written. See baselines/drum/README.md section 4.
+set designs [dict create \
+    dlzs_signed   {./rtl/lzc_8.sv ./rtl/lzc_16.sv ./rtl/dlzc_mult.sv ./rtl/dlzc_mult_top.sv ./rtl/dlzc_wrapper_test.sv} \
+    drum6_signed  {./baselines/drum/DRUM6_16_u.v ./baselines/drum/DRUM4_16_u.v ./baselines/drum/drum_signed_top.sv ./baselines/drum/drum_wrapper_test.sv} \
+    drum4_signed  {./baselines/drum/DRUM6_16_u.v ./baselines/drum/DRUM4_16_u.v ./baselines/drum/drum_signed_top.sv ./baselines/drum/drum_wrapper_test.sv} \
+]
+
+set tops [dict create \
+    dlzs_signed   {dlzc_wrapper_test {}} \
+    drum6_signed  {drum_wrapper_test {K=6}} \
+    drum4_signed  {drum_wrapper_test {K=4}} \
+]
+
+proc check_no_dsp {name util_file} {
+    # Parse the DSP row rather than trusting the constraint. A silent DSP
+    # inference is the one failure mode that would invalidate every LUT number
+    # in the comparison table without producing any other visible symptom.
+    set fh [open $util_file r]
+    set text [read $fh]
+    close $fh
+    if {[regexp {\|\s*DSPs\s*\|\s*(\d+)\s*\|} $text -> n]} {
+        if {$n != 0} {
+            error "FAIL: $name inferred $n DSP(s); the LUT-only claim is void"
+        }
+        puts "  DSP check: $name uses 0 DSPs (LUT-only confirmed)"
+    } else {
+        puts "  WARNING: no DSP row found in $util_file -- check the report manually"
+    }
+}
 
 file mkdir synth_result
 
-# 4. Generate Reports
-report_utilization -file synth_result/dlzs_utilization.txt
-report_timing -file synth_result/dlzs_timing.txt
-report_power -file synth_result/dlzs_power.txt
+dict for {name sources} $designs {
+    puts "=========================================================="
+    puts "Synthesizing $name"
+    puts "=========================================================="
+
+    lassign [dict get $tops $name] top generics
+
+    # Fresh in-memory project per design. Without this, leaf modules from a
+    # previous read_verilog stay resident and a design can silently pick up
+    # the wrong LOD or P_Encoder.
+    close_project -quiet
+    create_project -in_memory -part $part
+
+    foreach f $sources { read_verilog -sv $f }
+    read_xdc $constraints
+
+    set args [list -top $top -mode out_of_context -max_dsp 0]
+    if {[llength $generics]} { lappend args -generic $generics }
+    synth_design {*}$args
+
+    set outdir synth_result/$name
+    file mkdir $outdir
+
+    report_utilization -file $outdir/utilization.txt
+    report_timing      -file $outdir/timing.txt
+    report_power       -file $outdir/power.txt
+
+    # Machine-readable one-liner for the comparison table, so the numbers are
+    # transcribed by the tool rather than by hand.
+    set luts [get_property SLICE [get_cells -hier -filter {PRIMITIVE_GROUP == LUT}] ]
+    set n_lut  [llength [get_cells -hier -filter {PRIMITIVE_GROUP == LUT}]]
+    set n_ff   [llength [get_cells -hier -filter {PRIMITIVE_GROUP == FLOP_LATCH}]]
+    set n_dsp  [llength [get_cells -hier -filter {PRIMITIVE_GROUP == ARITHMETIC}]]
+    set slack  [get_property SLACK [get_timing_paths -delay_type max]]
+
+    set fh [open $outdir/summary.txt w]
+    puts $fh "design    $name"
+    puts $fh "top       $top"
+    puts $fh "generics  $generics"
+    puts $fh "part      $part"
+    puts $fh "luts      $n_lut"
+    puts $fh "ffs       $n_ff"
+    puts $fh "dsps      $n_dsp"
+    puts $fh "slack_ns  $slack"
+    close $fh
+    puts "  luts=$n_lut ffs=$n_ff dsps=$n_dsp slack=$slack ns"
+
+    check_no_dsp $name $outdir/utilization.txt
+}
+
+puts "=========================================================="
+puts "All designs synthesized. Summaries in synth_result/*/summary.txt"
+puts "=========================================================="

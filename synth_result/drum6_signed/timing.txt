@@ -1,0 +1,121 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
+| Date         : Sun Sep  6 15:37:50 2026
+| Host         : LAPTOP-OO671G6K running 64-bit major release  (build 9200)
+| Command      : report_timing -file synth_result/drum6_signed/timing.txt
+| Design       : drum_wrapper_test
+| Device       : 7z020-clg400
+| Speed File   : -1  PRODUCTION 1.12 2019-11-22
+| Design State : Synthesized
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (VIOLATED) :        -7.829ns  (required time - arrival time)
+  Source:                 a_reg_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            p_reg[28]/D
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
+  Data Path Delay:        17.822ns  (logic 6.693ns (37.555%)  route 11.129ns (62.445%))
+  Logic Levels:           25  (CARRY4=9 LUT1=1 LUT3=1 LUT4=2 LUT5=2 LUT6=10)
+  Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=63, unset)           0.973     0.973    clk
+                         FDRE                                         r  a_reg_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 f  a_reg_reg[0]/Q
+                         net (fo=9, unplaced)         0.352     1.843    u_drum/g_k6.u_core/a_reg[0]
+                         LUT1 (Prop_lut1_I0_O)        0.295     2.138 r  u_drum/g_k6.u_core/tmp__0_carry__0_i_25/O
+                         net (fo=1, unplaced)         0.333     2.471    u_drum/g_k6.u_core/p_0_in[0]
+                         CARRY4 (Prop_carry4_CYINIT_CO[3])
+                                                      0.595     3.066 r  u_drum/g_k6.u_core/tmp__0_carry__0_i_17/CO[3]
+                         net (fo=1, unplaced)         0.009     3.075    u_drum/g_k6.u_core/tmp__0_carry__0_i_17_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117     3.192 r  u_drum/g_k6.u_core/tmp__0_carry__0_i_9/CO[3]
+                         net (fo=1, unplaced)         0.000     3.192    u_drum/g_k6.u_core/tmp__0_carry__0_i_9_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.331     3.523 r  u_drum/g_k6.u_core/tmp__0_carry_i_60/O[3]
+                         net (fo=2, unplaced)         0.629     4.152    u_drum/g_k6.u_core/abs_value10[12]
+                         LUT3 (Prop_lut3_I0_O)        0.307     4.459 r  u_drum/g_k6.u_core/tmp__0_carry_i_59/O
+                         net (fo=6, unplaced)         0.934     5.393    u_drum/g_k6.u_core/tmp__0_carry_i_59_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     5.517 r  u_drum/g_k6.u_core/tmp__0_carry_i_43/O
+                         net (fo=5, unplaced)         0.477     5.994    u_drum/g_k6.u_core/tmp__0_carry_i_43_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.124     6.118 r  u_drum/g_k6.u_core/tmp__0_carry__0_i_10/O
+                         net (fo=6, unplaced)         0.934     7.052    u_drum/g_k6.u_core/tmp__0_carry__0_i_10_n_0
+                         LUT6 (Prop_lut6_I2_O)        0.124     7.176 r  u_drum/g_k6.u_core/p[3]_i_4/O
+                         net (fo=15, unplaced)        0.718     7.894    u_drum/g_k6.u_core/p[3]_i_4_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.124     8.018 r  u_drum/g_k6.u_core/tmp__0_carry_i_16/O
+                         net (fo=2, unplaced)         0.913     8.931    u_drum/g_k6.u_core/tmp__0_carry_i_16_n_0
+                         LUT5 (Prop_lut5_I1_O)        0.124     9.055 r  u_drum/g_k6.u_core/tmp__0_carry_i_12/O
+                         net (fo=11, unplaced)        0.948    10.003    u_drum/g_k6.u_core/tmp__0_carry_i_12_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.124    10.127 r  u_drum/g_k6.u_core/tmp__0_carry__0_i_4/O
+                         net (fo=2, unplaced)         0.676    10.803    u_drum/g_k6.u_core/tmp__0_carry__0_i_4_n_0
+                         LUT6 (Prop_lut6_I2_O)        0.124    10.927 r  u_drum/g_k6.u_core/tmp__0_carry__0_i_8/O
+                         net (fo=1, unplaced)         0.000    10.927    u_drum/g_k6.u_core/tmp__0_carry__0_i_8_n_0
+                         CARRY4 (Prop_carry4_S[0]_O[2])
+                                                      0.544    11.471 r  u_drum/g_k6.u_core/tmp__0_carry__0/O[2]
+                         net (fo=3, unplaced)         0.470    11.941    u_drum/g_k6.u_core/tmp__0_carry__0_n_5
+                         LUT6 (Prop_lut6_I0_O)        0.301    12.242 r  u_drum/g_k6.u_core/tmp__24_carry__0_i_16/O
+                         net (fo=1, unplaced)         0.449    12.691    u_drum/g_k6.u_core/tmp__24_carry__0_i_16_n_0
+                         LUT6 (Prop_lut6_I4_O)        0.124    12.815 r  u_drum/g_k6.u_core/tmp__24_carry__0_i_3/O
+                         net (fo=1, unplaced)         0.639    13.454    u_drum/g_k6.u_core/tmp__24_carry__0_i_3_n_0
+                         CARRY4 (Prop_carry4_DI[1]_O[3])
+                                                      0.629    14.083 f  u_drum/g_k6.u_core/tmp__24_carry__0/O[3]
+                         net (fo=5, unplaced)         0.646    14.729    u_drum/g_k6.u_core/tmp[9]
+                         LUT4 (Prop_lut4_I3_O)        0.307    15.036 r  u_drum/g_k6.u_core/p[27]_i_4/O
+                         net (fo=2, unplaced)         0.430    15.466    u_drum/g_k6.u_core/p[27]_i_4_n_0
+                         LUT5 (Prop_lut5_I0_O)        0.124    15.590 r  u_drum/g_k6.u_core/p[29]_i_5/O
+                         net (fo=4, unplaced)         0.473    16.063    u_drum/g_k6.u_core/p[29]_i_5_n_0
+                         LUT6 (Prop_lut6_I5_O)        0.124    16.187 r  u_drum/g_k6.u_core/p[29]_i_3/O
+                         net (fo=6, unplaced)         0.481    16.668    u_drum/g_k6.u_core/p[29]_i_3_n_0
+                         LUT4 (Prop_lut4_I0_O)        0.124    16.792 r  u_drum/g_k6.u_core/p[16]_i_8/O
+                         net (fo=1, unplaced)         0.000    16.792    u_drum/g_k6.u_core/p[16]_i_8_n_0
+                         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.513    17.305 r  u_drum/g_k6.u_core/p_reg[16]_i_2/CO[3]
+                         net (fo=1, unplaced)         0.000    17.305    u_drum/g_k6.u_core/p_reg[16]_i_2_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    17.422 r  u_drum/g_k6.u_core/p_reg[20]_i_2/CO[3]
+                         net (fo=1, unplaced)         0.000    17.422    u_drum/g_k6.u_core/p_reg[20]_i_2_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    17.539 r  u_drum/g_k6.u_core/p_reg[24]_i_2/CO[3]
+                         net (fo=1, unplaced)         0.000    17.539    u_drum/g_k6.u_core/p_reg[24]_i_2_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.331    17.870 r  u_drum/g_k6.u_core/p_reg[28]_i_2/O[3]
+                         net (fo=1, unplaced)         0.618    18.488    u_drum/g_k6.u_core/output_mul0[28]
+                         LUT6 (Prop_lut6_I0_O)        0.307    18.795 r  u_drum/g_k6.u_core/p[28]_i_1/O
+                         net (fo=1, unplaced)         0.000    18.795    p_comb[28]
+                         FDRE                                         r  p_reg[28]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)       10.000    10.000 r  
+                                                      0.000    10.000 r  clk (IN)
+                         net (fo=63, unset)           0.924    10.924    clk
+                         FDRE                                         r  p_reg[28]/C
+                         clock pessimism              0.000    10.924    
+                         clock uncertainty           -0.035    10.889    
+                         FDRE (Setup_fdre_C_D)        0.077    10.966    p_reg[28]
+  -------------------------------------------------------------------
+                         required time                         10.966    
+                         arrival time                         -18.795    
+  -------------------------------------------------------------------
+                         slack                                 -7.829    
+
+
+
+

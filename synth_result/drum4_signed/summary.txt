@@ -1,0 +1,8 @@
+design    drum4_signed
+top       drum_wrapper_test
+generics  K=4
+part      xc7z020clg400-1
+luts      249
+ffs       64
+dsps      0
+slack_ns  -4.474
