@@ -1,7 +1,8 @@
 """
 test_golden_model.py — Regression suite for the golden model.
 
-Run with `python -m pytest tests/` or directly as `python tests/test_golden_model.py`.
+Run with `python3 -m pytest tests/` or directly as `python3 tests/test_golden_model.py`.
+No PYTHONPATH needed.
 
 Two kinds of test appear here and both matter:
 
@@ -23,7 +24,11 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from src.golden_model import (  # noqa: E402
+# Import WITHOUT the `src.` prefix: the line above puts src/ itself on the path,
+# so `src.golden_model` additionally required the repo root on the path and the
+# suite only ran under `PYTHONPATH=. python3 tests/...`. The two were mutually
+# inconsistent; this makes the insert above sufficient on its own.
+from golden_model import (  # noqa: E402
     lead_one,
     exact,
     dlzs_floor,
