@@ -6,3 +6,5 @@ module dlzs_b_prep(
 );
 assign bp = a_zero ? 17'b0 : a_neg ? ~{b[15], b} + 1'b1 : {b[15], b};
 endmodule
+`default_nettype wire
+

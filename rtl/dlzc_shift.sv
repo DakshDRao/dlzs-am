@@ -1,5 +1,5 @@
 `default_nettype none
-module dlzs_shift(
+module dlzc_shift(
     input logic [16:0] bp,
     input logic [3:0] e,
     output logic [31:0] p
@@ -24,3 +24,4 @@ always_comb begin
     endcase
 end
 endmodule
+`default_nettype wire

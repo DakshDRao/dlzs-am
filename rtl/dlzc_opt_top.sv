@@ -8,10 +8,12 @@ module dlzc_opt_top(
 logic a_zero;
 logic [3:0] e;
 logic [16:0] bp;
-dlzc_snap_exp snap(
-    .m(operand1),
-    .e(e),
-    .all_zero(a_zero)
+logic [15 : 0] operandA;
+assign operandA = operand1[15] ? ~operand1 + 1'b1 : operand1;
+assign a_zero = !(operand1 || 1'b0);
+dlzs_snap_exp snap(
+    .m(operandA),
+    .e(e)
 );
 dlzs_b_prep b_p(
     .b(operand2),
@@ -19,9 +21,10 @@ dlzs_b_prep b_p(
     .a_zero(a_zero),
     .bp(bp)
 );
-dlzs_shift shft(
+dlzc_shift shft(
     .bp(bp),
     .e(e),
     .p(output_mul)
 );
 endmodule
+`default_nettype wire

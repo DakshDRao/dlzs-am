@@ -1,10 +1,10 @@
 `default_nettype none
-module dlzc_snap_exp(
+module dlzs_snap_exp(
     input logic [15:0] m,
-    output logic [3:0] e,
-    output logic all_zero
+    output logic [3:0] e
 );
 logic [15:0] v;
+logic all_zero;
 assign v = m | ((m & (m >> 1)) << 2);
 lzc_16 lead1(
     .input_operand(v),
@@ -14,4 +14,4 @@ lzc_16 lead1(
 
 
 endmodule
-`default_nettype wire ;
+`default_nettype wire
