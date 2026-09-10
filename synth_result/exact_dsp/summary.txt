@@ -1,0 +1,27 @@
+design    exact_dsp
+top       exact_wrapper
+generics  
+part      xc7z020clg400-1
+period_ns 10.0
+stage     impl
+dsp_policy dsp
+synth_luts   0
+synth_ffs    0
+synth_dsps   1
+synth_wns_ns n/a
+synth_fmax_mhz n/a
+synth_logic_levels 0
+synth_worst_from operand1[0]
+synth_worst_to   mul_out_reg/A[0]
+impl_luts    0
+impl_ffs     0
+impl_dsps    1
+impl_wns_ns  n/a
+impl_whs_ns  n/a
+impl_fmax_mhz 257.47
+impl_fmax_limit min_period
+impl_min_period_ns 3.884
+impl_min_period_pin DSP48E1/CLK
+impl_logic_levels 0
+impl_worst_from operand1[0]
+impl_worst_to   mul_out_reg/A[0]
