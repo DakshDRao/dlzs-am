@@ -5,4 +5,8 @@ part      xc7z020clg400-1
 luts      332
 ffs       64
 dsps      0
+dsp_policy none
 slack_ns  -7.829
+worst_from a_reg_reg[0]/C
+worst_to   p_reg[28]/D
+logic_levels 25

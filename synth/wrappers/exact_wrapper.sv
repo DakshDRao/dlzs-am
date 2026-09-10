@@ -14,6 +14,6 @@ exact ex1(
 always_ff@(posedge clk) begin
     a_reg <= operand1;
     b_reg <= operand2;
-    p_comb <= mul_out;
+    mul_out <= p_comb;
 end
 endmodule

@@ -13,3 +13,9 @@ ROOT    := $(abspath $(TBDIR)/../..)
 RTLDIR  := $(ROOT)/rtl
 DRUMDIR := $(ROOT)/baselines/drum
 SRCDIR  := $(ROOT)/src
+EXACTDIR:= $(ROOT)/baselines/exact
+
+# The synthesis harnesses live here rather than under tb/. tb/exact simulates
+# exact_wrapper.sv from this directory directly, so the file that is verified
+# is the same file Vivado reads -- no second copy to drift.
+WRAPDIR := $(ROOT)/synth/wrappers

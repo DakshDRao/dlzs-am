@@ -3,14 +3,17 @@
 #
 #   make test     golden-model regression suite
 #   make sweep    error sweeps -> results/
-#   make sim      all three cocotb testbenches
-#   make lint     Verilator lint on all three
+#   make sim      all four cocotb testbenches
+#   make lint     Verilator lint on all four
 #   make smoke    fast versions of test + sim, for pre-commit
-#   make synth    Vivado OOC synthesis of every design -> synth_result/
+#   make synth    Vivado OOC synth + implementation -> synth_result/
+#   make synth-only   stop after synthesis (fast, timing NOT comparable)
+#   make synth-one DESIGN=dlzs_signed    build a single design
+#   make designs  list the buildable design names
 #   make clean
 
 PYTHON ?= python3
-BENCHES := lzc mult drum
+BENCHES := lzc mult drum exact
 
 test:
 	$(PYTHON) tests/test_golden_model.py
@@ -34,14 +37,34 @@ smoke:
 	$(PYTHON) tests/test_golden_model.py
 	$(MAKE) -C tb/lzc  LZC_N_RANDOM=1000
 	$(MAKE) -C tb/mult MULT_N_RANDOM=1000
-	$(MAKE) -C tb/drum DRUM_N_RANDOM=1000
+	$(MAKE) -C tb/drum  DRUM_N_RANDOM=1000
+	$(MAKE) -C tb/exact EXACT_N_RANDOM=1000
+
+# Full flow: synth, place, route, post-route timing. Finished designs are
+# skipped, so adding a new algorithm rebuilds only that one. Pass EXTRA for
+# anything else, e.g. `make synth EXTRA="-period 15 -force"`.
+VIVADO ?= vivado
+EXTRA  ?=
 
 synth:
-	vivado -mode batch -source synth/synth_ooc.tcl
+	$(VIVADO) -mode batch -source synth/synth_ooc.tcl -tclargs $(EXTRA)
+
+# Estimated timing only -- nets are unplaced, so the WNS is NOT comparable
+# across designs. Useful for a quick LUT count, not for any number you quote.
+synth-only:
+	$(VIVADO) -mode batch -source synth/synth_ooc.tcl -tclargs -synth-only $(EXTRA)
+
+synth-one:
+	@test -n "$(DESIGN)" || { echo "usage: make synth-one DESIGN=<name>"; \
+	  echo "run 'make designs' for the list"; exit 1; }
+	$(VIVADO) -mode batch -source synth/synth_ooc.tcl -tclargs $(DESIGN) $(EXTRA)
+
+designs:
+	@$(VIVADO) -mode batch -source synth/synth_ooc.tcl -tclargs -list
 
 clean:
 	@for b in $(BENCHES); do $(MAKE) -C tb/$$b clean; done
 	rm -rf __pycache__ */__pycache__ */*/__pycache__ .pytest_cache
 	rm -f vivado*.jou vivado*.log
 
-.PHONY: test sweep sim lint smoke synth clean
+.PHONY: test sweep sim lint smoke synth synth-only synth-one designs clean

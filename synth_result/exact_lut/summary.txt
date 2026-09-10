@@ -1,0 +1,12 @@
+design    exact_lut
+top       exact_wrapper
+generics  
+part      xc7z020clg400-1
+luts      395
+ffs       64
+dsps      0
+dsp_policy none
+slack_ns  1.439
+worst_from b_reg_reg[11]/C
+worst_to   mul_out_reg[29]/D
+logic_levels 12
