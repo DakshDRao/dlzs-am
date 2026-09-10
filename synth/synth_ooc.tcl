@@ -140,8 +140,7 @@ set constraints ./synth/constraints/ooc_clock.xdc
 # Argument parsing
 # ---------------------------------------------------------------------------
 
-set opt_period 10.0
-set opt_stage  impl
+set opt_period [get_property PERIOD [get_clocks clk]]set opt_stage  impl
 set opt_force  0
 set opt_list   0
 set want       {}
