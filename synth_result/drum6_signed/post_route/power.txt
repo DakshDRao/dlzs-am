@@ -1,12 +1,12 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
-| Date             : Fri Sep 11 00:36:43 2026
+| Date             : Fri Sep 11 00:36:14 2026
 | Host             : LAPTOP-OO671G6K running 64-bit major release  (build 9200)
-| Command          : report_power -file synth_result/drum4_signed/power.txt
+| Command          : report_power -file synth_result/drum6_signed/post_route/power.txt
 | Design           : drum_wrapper_test
 | Device           : xc7z020clg400-1
-| Design State     : synthesized
+| Design State     : routed
 | Grade            : commercial
 | Process          : typical
 | Characterization : Production
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.108        |
+| Total On-Chip Power (W)  | 0.111        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 0.005        |
+| Dynamic (W)              | 0.009        |
 | Device Static (W)        | 0.103        |
 | Effective TJA (C/W)      | 11.5         |
-| Max Ambient (C)          | 83.8         |
-| Junction Temperature (C) | 26.2         |
+| Max Ambient (C)          | 83.7         |
+| Junction Temperature (C) | 26.3         |
 | Confidence Level         | Medium       |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -53,14 +53,14 @@ Table of Contents
 | On-Chip        | Power (W) | Used     | Available | Utilization (%) |
 +----------------+-----------+----------+-----------+-----------------+
 | Clocks         |    <0.001 |        3 |       --- |             --- |
-| Slice Logic    |     0.002 |      335 |       --- |             --- |
-|   LUT as Logic |     0.002 |      241 |     53200 |            0.45 |
-|   CARRY4       |    <0.001 |       18 |     13300 |            0.14 |
+| Slice Logic    |     0.003 |      455 |       --- |             --- |
+|   LUT as Logic |     0.003 |      364 |     53200 |            0.68 |
+|   CARRY4       |    <0.001 |       22 |     13300 |            0.17 |
 |   Register     |    <0.001 |       64 |    106400 |            0.06 |
 |   Others       |     0.000 |        4 |       --- |             --- |
-| Signals        |     0.002 |      326 |       --- |             --- |
+| Signals        |     0.004 |      384 |       --- |             --- |
 | Static Power   |     0.103 |          |           |                 |
-| Total          |     0.108 |          |           |                 |
+| Total          |     0.111 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -70,7 +70,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     0.013 |       0.005 |      0.007 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     0.016 |       0.009 |      0.007 |       NA    | Unspecified | NA         |
 | Vccaux    |       1.800 |     0.010 |       0.000 |      0.010 |       NA    | Unspecified | NA         |
 | Vcco33    |       3.300 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -99,7 +99,7 @@ Table of Contents
 +-----------------------------+------------+------------------------------------------------+------------------------------------------------------------------------------------------------------------+
 | User Input Data             | Confidence | Details                                        | Action                                                                                                     |
 +-----------------------------+------------+------------------------------------------------+------------------------------------------------------------------------------------------------------------+
-| Design implementation state | Low        | Design is synthesized                          | Accuracy of the tool is not optimal until design is fully placed and routed                                |
+| Design implementation state | High       | Design is routed                               |                                                                                                            |
 | Clock nodes activity        | High       | User specified more than 95% of clocks         |                                                                                                            |
 | I/O nodes activity          | High       | User specified more than 95% of inputs         |                                                                                                            |
 | Internal nodes activity     | Medium     | User specified less than 25% of internal nodes | Provide missing internal nodes activity with simulation results or by editing the "By Resource Type" views |
@@ -146,9 +146,9 @@ Table of Contents
 +-------------------+-----------+
 | Name              | Power (W) |
 +-------------------+-----------+
-| drum_wrapper_test |     0.005 |
-|   u_drum          |     0.004 |
-|     g_k4.u_core   |     0.004 |
+| drum_wrapper_test |     0.009 |
+|   u_drum          |     0.008 |
+|     g_k6.u_core   |     0.008 |
 +-------------------+-----------+
 
 

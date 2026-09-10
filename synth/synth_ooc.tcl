@@ -132,6 +132,19 @@ dict set DESIGNS exact_lut {
         ./synth/wrappers/exact_wrapper.sv
     }
 }
+dict set DESIGNS dlzs_opt {
+    top     dlzc_opt_wrapper
+    generic {}
+    sources {
+        ./rtl/lzc_8.sv
+        ./rtl/lzc_16.sv
+        ./rtl/dlzs_snap_exp.sv
+        ./rtl/dlzs_b_prep.sv
+        ./rtl/dlzc_shift.sv
+        ./rtl/dlzc_opt_top.sv
+        ./synth/wrappers/dlzc_opt_wrapper.sv
+    }
+}
 
 set part        xc7z020clg400-1
 set constraints ./synth/constraints/ooc_clock.xdc

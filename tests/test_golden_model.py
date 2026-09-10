@@ -34,6 +34,7 @@ from golden_model import (  # noqa: E402
     dlzs_floor,
     dlzs_ceil,
     dlzs_nearest_linear,
+    dlzs_snap_exponent,
     dlzs_nearest_log,
     mitchell,
     drum,
@@ -92,6 +93,41 @@ def test_dlzs_nearest_linear_tie_values():
     for k in range(1, W):
         a = (1 << k) + (1 << (k - 1))     # 3, 6, 12, 24, 48, 96, 192
         assert dlzs_nearest_linear(a, 1, W) == 1 << (k + 1)
+
+
+def test_snap_exponent_matches_nearest_linear():
+    """PROPERTY: the exponent helper IS the snap inside dlzs_nearest_linear.
+
+    Exhaustive over a at w=8 against several b, and over every a at w=16 with
+    b == 1 (where the product is 2^e itself). This is what licenses the RTL
+    bench to check dlzs_snap_exp against the helper instead of the multiplier.
+    """
+    for a in range(1, 1 << W):
+        for b in (1, 3, 127, 255):
+            assert dlzs_nearest_linear(a, b, W) == b << dlzs_snap_exponent(a, W)
+    for a in range(1, 1 << 16):
+        assert dlzs_nearest_linear(a, 1, 16) == 1 << dlzs_snap_exponent(a, 16)
+
+
+def test_snap_exponent_signed_bound():
+    """PROPERTY: over every signed 16-bit magnitude 1..32768 the snapped
+    exponent never exceeds 15, and 15 is reached. The 4-bit `e` bus in
+    rtl/dlzs_snap_exp.sv and the two-level shifter both depend on this."""
+    exps = [dlzs_snap_exponent(m, 16) for m in range(1, (1 << 15) + 1)]
+    assert max(exps) == 15
+    # 32768 is an exact power of two: lead_one 15, no round-up.
+    assert dlzs_snap_exponent(1 << 15, 16) == 15
+    # The first magnitude that rounds up into 2^15 is the tie 1.5 * 2^14.
+    assert dlzs_snap_exponent(0x6000, 16) == 15
+    assert dlzs_snap_exponent(0x5FFF, 16) == 14
+
+
+def test_snap_exponent_zero_raises():
+    try:
+        dlzs_snap_exponent(0, 16)
+    except ValueError:
+        return
+    raise AssertionError("dlzs_snap_exponent(0) must raise, like lead_one")
 
 
 def test_dlzs_nearest_log():

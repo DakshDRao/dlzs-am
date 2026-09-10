@@ -1,7 +1,7 @@
 `default_nettype none
 module dlzc_shift(
-    input logic [16:0] bp,
-    input logic [3:0] e,
+    input wire logic [16:0] bp,
+    input wire logic [3:0] e,
     output logic [31:0] p
 );
 logic [31:0] s1;

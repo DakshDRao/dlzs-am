@@ -44,6 +44,7 @@ __all__ = [
     "dlzs_floor",
     "dlzs_ceil",
     "dlzs_nearest_linear",
+    "dlzs_snap_exponent",
     "dlzs_nearest_log",
     "mitchell",
     "drum_extract",
@@ -137,6 +138,30 @@ def dlzs_nearest_linear(a, b, w):
     if k > 0 and (a >> (k - 1)) & 1:
         k = k + 1
     return b << k
+
+
+def dlzs_snap_exponent(m, w):
+    """Exponent that dlzs_nearest_linear snaps a magnitude `m` to.
+
+    Returns lead_one(m) + 1 when the bit below the leading one is set (ties
+    round UP), else lead_one(m). By construction
+        dlzs_nearest_linear(a, b, w) == b << dlzs_snap_exponent(a, w)
+    for every a >= 1, and tests/test_golden_model.py asserts exactly that.
+
+    Deliberately written the REFERENCE way -- the same lead_one + bit test as
+    dlzs_nearest_linear -- and NOT with the merged-round vector
+        V = m | ((m & (m >> 1)) << 2),  e = lead_one(V)
+    that rtl/dlzs_snap_exp.sv uses. The RTL is checked against this function,
+    so it must be an independent definition; re-deriving the RTL's trick here
+    would test the trick against itself.
+
+    Undefined at m == 0, like lead_one: the hardware masks A == 0 through the
+    B branch (bp = 0), so the exponent's value there is never observed.
+    """
+    k = lead_one(m, w)
+    if k > 0 and (m >> (k - 1)) & 1:
+        k = k + 1
+    return k
 
 
 def dlzs_nearest_log(a, b, w):

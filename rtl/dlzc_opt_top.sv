@@ -10,7 +10,7 @@ logic [3:0] e;
 logic [16:0] bp;
 logic [15 : 0] operandA;
 assign operandA = operand1[15] ? ~operand1 + 1'b1 : operand1;
-assign a_zero = !(operand1 || 1'b0);
+assign a_zero = ~|operand1;
 dlzs_snap_exp snap(
     .m(operandA),
     .e(e)

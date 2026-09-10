@@ -1,0 +1,23 @@
+design    dlzs_opt
+top       dlzc_opt_wrapper
+generics  
+part      xc7z020clg400-1
+period_ns 10.0
+stage     impl
+synth_luts   169
+synth_ffs    64
+synth_dsps   0
+synth_wns_ns 2.020
+synth_fmax_mhz 125.31
+synth_logic_levels 9
+synth_worst_from a_reg_reg[0]/C
+synth_worst_to   p_reg[23]/D
+impl_luts    169
+impl_ffs     64
+impl_dsps    0
+impl_wns_ns  1.770
+impl_whs_ns  0.696
+impl_fmax_mhz 121.51
+impl_logic_levels 8
+impl_worst_from a_reg_reg[0]/C
+impl_worst_to   p_reg[1]/D

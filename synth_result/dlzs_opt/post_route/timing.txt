@@ -1,0 +1,80 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
+| Date         : Fri Sep 11 00:22:03 2026
+| Host         : LAPTOP-OO671G6K running 64-bit major release  (build 9200)
+| Command      : report_timing -file synth_result/dlzs_opt/post_route/timing.txt
+| Design       : dlzc_opt_wrapper
+| Device       : 7z020-clg400
+| Speed File   : -1  PRODUCTION 1.12 2019-11-22
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (MET) :             1.770ns  (required time - arrival time)
+  Source:                 a_reg_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            p_reg[1]/D
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
+  Data Path Delay:        8.175ns  (logic 2.931ns (35.855%)  route 5.244ns (64.145%))
+  Logic Levels:           8  (CARRY4=2 LUT1=1 LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=63, unset)           0.973     0.973    clk
+    SLICE_X27Y55         FDRE                                         r  a_reg_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X27Y55         FDRE (Prop_fdre_C_Q)         0.456     1.429 f  a_reg_reg[0]/Q
+                         net (fo=5, routed)           0.443     1.872    u_dlzc_opt/b_p/a_reg[0]
+    SLICE_X29Y55         LUT1 (Prop_lut1_I0_O)        0.118     1.990 r  u_dlzc_opt/b_p/p[30]_i_54/O
+                         net (fo=1, routed)           0.618     2.608    u_dlzc_opt/b_p/p_0_in[0]
+    SLICE_X27Y55         CARRY4 (Prop_carry4_CYINIT_CO[3])
+                                                      0.782     3.390 r  u_dlzc_opt/b_p/p_reg[30]_i_31/CO[3]
+                         net (fo=1, routed)           0.000     3.390    u_dlzc_opt/b_p/p_reg[30]_i_31_n_0
+    SLICE_X27Y56         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.313     3.703 r  u_dlzc_opt/b_p/p_reg[30]_i_27/O[3]
+                         net (fo=2, routed)           0.894     4.597    u_dlzc_opt/b_p/operandA0[8]
+    SLICE_X28Y56         LUT3 (Prop_lut3_I0_O)        0.332     4.929 r  u_dlzc_opt/b_p/p[30]_i_30/O
+                         net (fo=3, routed)           0.811     5.740    u_dlzc_opt/b_p/operandA[8]
+    SLICE_X28Y55         LUT6 (Prop_lut6_I3_O)        0.326     6.066 r  u_dlzc_opt/b_p/p[30]_i_14/O
+                         net (fo=15, routed)          0.636     6.702    u_dlzc_opt/b_p/p[30]_i_14_n_0
+    SLICE_X30Y56         LUT5 (Prop_lut5_I4_O)        0.124     6.826 f  u_dlzc_opt/b_p/p[30]_i_4/O
+                         net (fo=15, routed)          1.009     7.835    u_dlzc_opt/b_p/e[2]
+    SLICE_X33Y53         LUT3 (Prop_lut3_I1_O)        0.153     7.988 r  u_dlzc_opt/b_p/p[4]_i_2/O
+                         net (fo=4, routed)           0.833     8.821    u_dlzc_opt/b_p/s1[1]
+    SLICE_X33Y53         LUT4 (Prop_lut4_I1_O)        0.327     9.148 r  u_dlzc_opt/b_p/p[1]_i_1/O
+                         net (fo=1, routed)           0.000     9.148    p_comb[1]
+    SLICE_X33Y53         FDRE                                         r  p_reg[1]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)       10.000    10.000 r  
+                                                      0.000    10.000 r  clk (IN)
+                         net (fo=63, unset)           0.924    10.924    clk
+    SLICE_X33Y53         FDRE                                         r  p_reg[1]/C
+                         clock pessimism              0.000    10.924    
+                         clock uncertainty           -0.035    10.889    
+    SLICE_X33Y53         FDRE (Setup_fdre_C_D)        0.029    10.918    p_reg[1]
+  -------------------------------------------------------------------
+                         required time                         10.918    
+                         arrival time                          -9.148    
+  -------------------------------------------------------------------
+                         slack                                  1.770    
+
+
+
+
