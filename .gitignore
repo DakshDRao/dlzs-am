@@ -59,3 +59,8 @@ xelab.pb
 # Do not ignore the Vivado Out-of-Context synthesis reports!
 !synth_result/
 !synth_result/*
+
+# Routed checkpoints written by synth_ooc.tcl for synth/power.tcl. Build
+# products, ~1 MB each, regenerated with -force -- not committed. (Placed after
+# the synth_result keep rules on purpose: last match wins.)
+*.dcp

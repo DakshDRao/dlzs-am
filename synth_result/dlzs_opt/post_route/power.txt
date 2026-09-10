@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
-| Date             : Fri Sep 11 00:22:03 2026
+| Date             : Fri Sep 11 02:46:47 2026
 | Host             : LAPTOP-OO671G6K running 64-bit major release  (build 9200)
 | Command          : report_power -file synth_result/dlzs_opt/post_route/power.txt
 | Design           : dlzc_opt_wrapper

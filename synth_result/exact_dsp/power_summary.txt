@@ -1,0 +1,15 @@
+design            exact_dsp
+activity_toggle   50.0
+activity_sp       0.5
+period_ns         10.000
+unit              mW
+total             103.648
+dynamic           1.070
+static            102.579
+clocks            0.000
+slice_logic       0.000
+signals           n/a
+dsps              1.070
+dynamic_mw        1.070
+energy_pj_per_op  10.700
+confidence        Medium

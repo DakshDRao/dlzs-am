@@ -4,6 +4,7 @@ generics  K=3
 part      xc7z020clg400-1
 period_ns 10.0
 stage     impl
+dsp_policy lut
 synth_luts   224
 synth_ffs    64
 synth_dsps   0
@@ -18,6 +19,9 @@ impl_dsps    0
 impl_wns_ns  -1.502
 impl_whs_ns  0.884
 impl_fmax_mhz 86.94
+impl_fmax_limit data_path
+impl_min_period_ns 1.000
+impl_min_period_pin FDRE/C
 impl_logic_levels 16
 impl_worst_from b_reg_reg[0]/C
 impl_worst_to   p_reg[10]/D

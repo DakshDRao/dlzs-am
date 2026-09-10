@@ -10,6 +10,7 @@
 #   make synth-only   stop after synthesis (fast, timing NOT comparable)
 #   make synth-one DESIGN=dlzs_signed    build a single design
 #   make designs  list the buildable design names
+#   make power    activity-driven power of every routed design (needs routed.dcp)
 #   make clean
 
 PYTHON ?= python3
@@ -61,6 +62,11 @@ synth-one:
 	  echo "run 'make designs' for the list"; exit 1; }
 	$(VIVADO) -mode batch -source synth/synth_ooc.tcl -tclargs $(DESIGN) $(EXTRA)
 
+# Power from the routed checkpoints, at identical data-input activity for every
+# design. Pass EXTRA for options, e.g. `make power EXTRA="-toggle 25"`.
+power:
+	$(VIVADO) -mode batch -source synth/power.tcl -tclargs $(EXTRA)
+
 designs:
 	@$(VIVADO) -mode batch -source synth/synth_ooc.tcl -tclargs -list
 
@@ -69,4 +75,4 @@ clean:
 	rm -rf __pycache__ */__pycache__ */*/__pycache__ .pytest_cache
 	rm -f vivado*.jou vivado*.log
 
-.PHONY: test sweep sim lint smoke synth synth-only synth-one designs clean
+.PHONY: test sweep sim lint smoke synth synth-only synth-one power designs clean
