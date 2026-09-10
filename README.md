@@ -12,13 +12,16 @@ B.Tech ECE major project, NIT Andhra Pradesh.
 
 On a LUT-only Zynq-7020 (xc7z020clg400-1), post-route, 16×16 → 32 signed:
 
-| Design | Mean rel. error | Slice LUTs | Fmax (MHz) |
-|---|---|---|---|
-| Exact multiplier (LUT-only) | 0 | 265 | 104.3 |
-| **DLZS, optimized (`dlzs_opt`)** | 16.8 % | **145** (−45 %) | **121.5** (+16.5 %) |
+| Design | Mean rel. error | Slice LUTs | Fmax (MHz) | Energy / multiply* |
+|---|---|---|---|---|
+| Exact multiplier (LUT-only) | 0 | 265 | 104.3 | ≈ 50 pJ |
+| **DLZS, optimized (`dlzs_opt`)** | 16.8 % | **145** (−45 %) | **121.5** (+16.5 %) | **≈ 20 pJ** |
+
+\* Preliminary: Vivado's default activity estimate, rounded to 1 mW; see §7.
 
 `dlzs_opt` is the only approximate design in the comparison that beats the
-exact multiplier on **both** area and speed. It is bit-for-bit identical to
+exact multiplier on **both** area and speed, and it also has the lowest
+estimated energy per multiply. It is bit-for-bit identical to
 the original DLZS design, so it has exactly the same error; all of the gain
 comes from the architecture (§5). It is also the **least accurate** design in
 the comparison, and that trade is the whole story — see §7.
@@ -280,6 +283,13 @@ register. Fmax = 1000 / (10 − WNS).
 | `drum_opt6` | 318 | 327 | −3.864 | 72.13 | 20 | 64 % |
 | `drum_opt8` | 403 | 408 | −4.424 | 69.33 | 21 | 63 % |
 
+`exact_lut` is the exact multiplier built **without DSP blocks**:
+`$signed(a) * $signed(b)` under `-max_dsp 0`, with the DSP count parsed from
+the utilization report and confirmed 0 after both synthesis and routing. It is
+the fair reference for LUT-only approximate designs. A DSP-mapped exact row
+(one DSP48E1) is planned as a separate "what the FPGA gives you for free"
+reference and is deliberately not mixed into the LUT-only comparison.
+
 *Slice LUTs* (from `post_route/utilization.txt`) is the physical area and the
 column to quote. *LUT cells* is what `summary.txt` counts; dual-output LUT
 packing makes it larger, by 92 for the exact multiplier. `drum_opt8` reports
@@ -319,6 +329,57 @@ single-cycle):
    accuracy: 16.8 % mean error against 12.1 % for the cheapest DRUM. Whether
    that is acceptable is an application question, answered in Week 10–11.
 
+### Power
+
+Total on-chip power is 0.105–0.113 W for every row, but about 0.103 W of that
+is **device static power** — leakage of the whole Zynq-7020, identical for
+every design and unrelated to the multiplier. The comparison is in **dynamic**
+power, and most fairly in **energy per multiplication**:
+
+    E (pJ) = P_dynamic (mW) × clock period (ns)
+
+Energy per operation does not depend on the clock the estimate was made at, so
+it stays fair even though several designs miss the 10 ns target.
+
+**Preliminary figures** — Vivado's default vectorless estimate (12.5 % input
+toggle rate assumed), post-route, 10 ns clock:
+
+| Design | Dynamic power | Energy / multiply | vs exact |
+|---|---|---|---|
+| `exact_lut` | 5 mW | 50 pJ | — |
+| `dlzs_signed` | 4 mW | 40 pJ | −20 % |
+| **`dlzs_opt`** | **2 mW** | **20 pJ** | **−60 %** |
+| `drum4_signed` | 6 mW | 60 pJ | +20 % |
+| `drum6_signed` | 9 mW | 90 pJ | +80 % |
+| `drum_opt3` | 4 mW | 40 pJ | −20 % |
+| `drum_opt4` | 5 mW | 50 pJ | 0 % |
+| `drum_opt6` | 7 mW | 70 pJ | +40 % |
+| `drum_opt8` | 10 mW | 100 pJ | +100 % |
+
+Read these as a **ranking, not measurements**. `report_power` prints watts to
+three decimals, so every value is rounded to the nearest 1 mW — `dlzs_opt`'s
+"2 mW" means 1.5–2.5 mW and exact's "5 mW" means 4.5–5.5 mW, so the saving is
+somewhere between roughly 1.8× and 3.7×. The input activity is also Vivado's
+default guess, not the uniform random operands the error tables use. The
+pattern matches the area results: `dlzs_opt` lowest, the exact multiplier
+below every DRUM with K ≥ 4.
+
+**Refined run — `make power`** (script `synth/power.tcl`). It reopens each
+routed checkpoint and:
+
+- applies **identical activity** to the 32 data inputs of every design: 50 %
+  toggle rate and 0.5 static probability, which is what uniform random
+  operands produce (each bit changes with probability ½ per cycle);
+- reports in **microwatts** (`set_units -power mW`, three decimals), removing
+  the 1 mW rounding;
+- records dynamic, logic, signal and clock power, energy per multiply and
+  Vivado's confidence level in `synth_result/<design>/power_summary.txt`.
+
+Vivado typically rates activity propagated this way as "Medium" confidence.
+"High" needs a SAIF file from simulating the routed netlist with the same
+vectors; `power.tcl` is written so that swapping `set_switching_activity` for
+`read_saif` is the only change.
+
 ### Caveats on these numbers
 
 - **The two passing designs' Fmax is understated.** `exact_lut` and `dlzs_opt`
@@ -328,9 +389,7 @@ single-cycle):
 - **One placement per design.** Run-to-run variation is a few percent; the
   headline margins are larger than that, the `drum_opt4` vs `drum4_signed`
   difference is not.
-- **Power is not reported.** Vivado's vectorless estimate gives 0.105–0.113 W
-  for every row, almost all static. Meaningful dynamic power needs switching
-  activity from simulation (SAIF).
+- **Power is preliminary** — see "Power" below.
 - **`dlzs_opt` vs the DRUM rows is not shell-matched** — DRUM needs two input
   negates, DLZS one. That difference is algorithmic and is stated as such;
   `dlzs_signed` vs `drum4_signed` is the matched-shell comparison.
@@ -379,6 +438,7 @@ Things that are easy to get wrong and were got right:
       exact/                exact multiplier
     synth/
       synth_ooc.tcl         OOC LUT-only synthesis + place and route of every design
+      power.tcl             activity-driven power from the routed checkpoints
       constraints/ooc_clock.xdc
       wrappers/             identical register harnesses, one per design family
     tb/
@@ -409,6 +469,7 @@ From the repo root:
     make synth     # Vivado OOC synth + place and route -> synth_result/
     make designs   # list the buildable designs
     make synth-one DESIGN=dlzs_opt
+    make power     # activity-driven power from the routed checkpoints
 
 | Bench | Tests | Random-count variable |
 |---|---|---|
@@ -457,6 +518,8 @@ vectors and the published error tables are the same set.
 2. **Mitchell worst-case note.** `golden_model.py` says the −11.1 % worst case
    is at mantissas near 0.44; it is at exactly 0.5.
 3. **Fmax of passing designs is understated** (§7) — tighter-period run pending.
+   **Power is preliminary** (1 mW resolution, default activity) — `make power`
+   pending.
 4. **The RTL is fixed at 16 bits.** No 8-bit synthesis numbers and no
    exhaustive 8-bit model/RTL equivalence yet.
 5. **No simulation log is committed.**
