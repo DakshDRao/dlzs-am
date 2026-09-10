@@ -146,6 +146,21 @@ dict set DESIGNS dlzs_opt {
     }
 }
 
+set DRUM_OPT_SOURCES {
+    ./rtl/lzc_8.sv
+    ./rtl/lzc_16.sv
+    ./baselines/drum_opt/drum_opt_operand.sv
+    ./baselines/drum_opt/drum_opt_shift.sv
+    ./baselines/drum_opt/drum_opt_top.sv
+    ./synth/wrappers/drum_opt_wrapper.sv
+}
+foreach K {3 4 5 6 7 8} {
+    dict set DESIGNS drum_opt$K [dict create \
+        top     drum_opt_wrapper \
+        generic [list K=$K] \
+        sources $DRUM_OPT_SOURCES]
+}
+
 set part        xc7z020clg400-1
 set constraints ./synth/constraints/ooc_clock.xdc
 

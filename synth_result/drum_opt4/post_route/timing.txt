@@ -1,0 +1,101 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
+| Date         : Fri Sep 11 01:32:45 2026
+| Host         : LAPTOP-OO671G6K running 64-bit major release  (build 9200)
+| Command      : report_timing -file synth_result/drum_opt4/post_route/timing.txt
+| Design       : drum_opt_wrapper
+| Device       : 7z020-clg400
+| Speed File   : -1  PRODUCTION 1.12 2019-11-22
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (VIOLATED) :        -3.051ns  (required time - arrival time)
+  Source:                 b_reg_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            p_reg[23]/D
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
+  Data Path Delay:        12.999ns  (logic 4.379ns (33.688%)  route 8.620ns (66.312%))
+  Logic Levels:           17  (CARRY4=5 LUT1=1 LUT3=1 LUT4=1 LUT5=2 LUT6=7)
+  Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=63, unset)           0.973     0.973    clk
+    SLICE_X32Y87         FDRE                                         r  b_reg_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X32Y87         FDRE (Prop_fdre_C_Q)         0.518     1.491 f  b_reg_reg[0]/Q
+                         net (fo=3, routed)           0.166     1.657    u_drum_opt/u_op_b/u_lzc/b_reg[0]
+    SLICE_X33Y87         LUT1 (Prop_lut1_I0_O)        0.124     1.781 r  u_drum_opt/u_op_b/u_lzc/p[31]_i_122/O
+                         net (fo=1, routed)           0.471     2.252    u_drum_opt/u_op_b/u_lzc/p[31]_i_122_n_0
+    SLICE_X32Y87         CARRY4 (Prop_carry4_CYINIT_CO[3])
+                                                      0.595     2.847 r  u_drum_opt/u_op_b/u_lzc/p_reg[31]_i_100/CO[3]
+                         net (fo=1, routed)           0.000     2.847    u_drum_opt/u_op_b/u_lzc/p_reg[31]_i_100_n_0
+    SLICE_X32Y88         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117     2.964 r  u_drum_opt/u_op_b/u_lzc/p_reg[31]_i_101/CO[3]
+                         net (fo=1, routed)           0.000     2.964    u_drum_opt/u_op_b/u_lzc/p_reg[31]_i_101_n_0
+    SLICE_X32Y89         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.323     3.287 r  u_drum_opt/u_op_b/u_lzc/p_reg[31]_i_103/O[1]
+                         net (fo=4, routed)           0.342     3.630    u_drum_opt/u_op_b/u_lzc/p_reg[31]_i_103_n_6
+    SLICE_X34Y89         LUT3 (Prop_lut3_I0_O)        0.306     3.936 r  u_drum_opt/u_op_b/u_lzc/p[31]_i_93/O
+                         net (fo=5, routed)           0.897     4.832    u_drum_opt/u_op_b/u_lzc/lzc_8_1/x_mag[8]
+    SLICE_X34Y89         LUT6 (Prop_lut6_I5_O)        0.124     4.956 r  u_drum_opt/u_op_b/u_lzc/lzc_8_1/p[31]_i_60/O
+                         net (fo=2, routed)           0.416     5.373    u_drum_opt/u_op_b/u_lzc/output_power1[1]
+    SLICE_X35Y91         LUT6 (Prop_lut6_I2_O)        0.124     5.497 r  u_drum_opt/u_op_b/u_lzc/p[31]_i_22_comp/O
+                         net (fo=10, routed)          0.902     6.399    u_drum_opt/u_op_b/u_lzc/lzc_8_1/p[3]_i_24_0
+    SLICE_X35Y89         LUT6 (Prop_lut6_I5_O)        0.124     6.523 r  u_drum_opt/u_op_b/u_lzc/lzc_8_1/p[3]_i_24_comp/O
+                         net (fo=2, routed)           0.707     7.230    u_drum_opt/u_op_b/u_lzc/lzc_8_1/p[3]_i_24_n_0
+    SLICE_X33Y87         LUT6 (Prop_lut6_I5_O)        0.124     7.354 r  u_drum_opt/u_op_b/u_lzc/lzc_8_1/p[3]_i_13_comp/O
+                         net (fo=10, routed)          1.071     8.426    u_drum_opt/u_op_a/u_lzc/lzc_8_1/mm_b[2]
+    SLICE_X31Y87         LUT6 (Prop_lut6_I2_O)        0.124     8.550 r  u_drum_opt/u_op_a/u_lzc/lzc_8_1/p[4]_i_30_comp/O
+                         net (fo=2, routed)           0.532     9.081    u_drum_opt/u_op_b/u_lzc/lzc_8_1/p_reg[4]_i_19_0[0]
+    SLICE_X31Y89         CARRY4 (Prop_carry4_DI[0]_CO[3])
+                                                      0.526     9.607 r  u_drum_opt/u_op_b/u_lzc/lzc_8_1/p_reg[4]_i_19/CO[3]
+                         net (fo=3, routed)           0.755    10.363    u_drum_opt/u_op_b/u_lzc/lzc_8_1/p_reg[4]_i_19_n_0
+    SLICE_X29Y89         LUT5 (Prop_lut5_I4_O)        0.124    10.487 r  u_drum_opt/u_op_b/u_lzc/lzc_8_1/p[31]_i_67/O
+                         net (fo=3, routed)           0.307    10.794    u_drum_opt/u_op_b/u_lzc/lzc_8_1/p[31]_i_67_n_0
+    SLICE_X29Y90         LUT4 (Prop_lut4_I0_O)        0.124    10.918 r  u_drum_opt/u_op_b/u_lzc/lzc_8_1/p[31]_i_30/O
+                         net (fo=1, routed)           0.513    11.431    u_drum_opt/u_op_b/u_lzc/lzc_8_1/p[31]_i_30_n_0
+    SLICE_X30Y90         CARRY4 (Prop_carry4_DI[2]_O[3])
+                                                      0.447    11.878 r  u_drum_opt/u_op_b/u_lzc/lzc_8_1/p_reg[31]_i_8/O[3]
+                         net (fo=22, routed)          0.388    12.266    u_drum_opt/u_op_b/u_lzc/lzc_8_1/O[3]
+    SLICE_X29Y90         LUT6 (Prop_lut6_I0_O)        0.307    12.573 r  u_drum_opt/u_op_b/u_lzc/lzc_8_1/p[26]_i_3/O
+                         net (fo=3, routed)           0.319    12.892    u_drum_opt/u_op_b/u_lzc/lzc_8_1/p[26]_i_3_n_0
+    SLICE_X27Y90         LUT5 (Prop_lut5_I0_O)        0.124    13.016 r  u_drum_opt/u_op_b/u_lzc/lzc_8_1/p[26]_i_2/O
+                         net (fo=4, routed)           0.832    13.848    u_drum_opt/u_op_b/u_lzc/lzc_8_1/p[26]_i_2_n_0
+    SLICE_X27Y91         LUT6 (Prop_lut6_I4_O)        0.124    13.972 r  u_drum_opt/u_op_b/u_lzc/lzc_8_1/p[23]_i_1/O
+                         net (fo=1, routed)           0.000    13.972    p_comb[23]
+    SLICE_X27Y91         FDRE                                         r  p_reg[23]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)       10.000    10.000 r  
+                                                      0.000    10.000 r  clk (IN)
+                         net (fo=63, unset)           0.924    10.924    clk
+    SLICE_X27Y91         FDRE                                         r  p_reg[23]/C
+                         clock pessimism              0.000    10.924    
+                         clock uncertainty           -0.035    10.889    
+    SLICE_X27Y91         FDRE (Setup_fdre_C_D)        0.032    10.921    p_reg[23]
+  -------------------------------------------------------------------
+                         required time                         10.921    
+                         arrival time                         -13.972    
+  -------------------------------------------------------------------
+                         slack                                 -3.051    
+
+
+
+

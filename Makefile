@@ -3,8 +3,8 @@
 #
 #   make test     golden-model regression suite
 #   make sweep    error sweeps -> results/
-#   make sim      all five cocotb testbenches
-#   make lint     Verilator lint on all five
+#   make sim      all cocotb testbenches
+#   make lint     Verilator lint on all benches
 #   make smoke    fast versions of test + sim, for pre-commit
 #   make synth    Vivado OOC synth + implementation -> synth_result/
 #   make synth-only   stop after synthesis (fast, timing NOT comparable)
@@ -13,7 +13,7 @@
 #   make clean
 
 PYTHON ?= python3
-BENCHES := lzc mult drum exact opt
+BENCHES := lzc mult drum exact opt drum_opt
 
 test:
 	$(PYTHON) tests/test_golden_model.py
@@ -40,6 +40,7 @@ smoke:
 	$(MAKE) -C tb/drum  DRUM_N_RANDOM=1000
 	$(MAKE) -C tb/exact EXACT_N_RANDOM=1000
 	$(MAKE) -C tb/opt   OPT_N_RANDOM=1000
+	$(MAKE) -C tb/drum_opt DRUM_OPT_N_RANDOM=1000
 
 # Full flow: synth, place, route, post-route timing. Finished designs are
 # skipped, so adding a new algorithm rebuilds only that one. Pass EXTRA for
