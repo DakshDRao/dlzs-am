@@ -192,8 +192,8 @@ dict set DESIGNS mitchell {
     sources {
         ./rtl/lzc_8.sv
         ./rtl/lzc_16.sv
-        ./rtl/mitchell_mult.sv
-        ./rtl/mitchell_mult_top.sv
+        ./baselines/mitchell/mitchell_mult.sv
+        ./baselines/mitchell/mitchell_mult_top.sv
         ./synth/wrappers/mitchell_wrapper_test.sv
     }
 }

@@ -17,8 +17,8 @@ N_RANDOM     := 200000
 
 VERILOG_SOURCES := $(RTLDIR)/lzc_8.sv \
                    $(RTLDIR)/lzc_16.sv \
-                   $(RTLDIR)/mitchell_mult.sv \
-                   $(RTLDIR)/mitchell_mult_top.sv \
+                   $(MITCHELLDIR)/mitchell_mult.sv \
+                   $(MITCHELLDIR)/mitchell_mult_top.sv \
                    $(TBDIR)/mitchell_tb_top.sv
 
 include $(THIS)../common.mk

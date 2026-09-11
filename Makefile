@@ -14,7 +14,7 @@
 #   make clean
 
 PYTHON ?= python3
-BENCHES := lzc mult drum exact opt drum_opt
+BENCHES := lzc mult mitchell drum exact opt drum_opt
 
 test:
 	$(PYTHON) tests/test_golden_model.py
@@ -38,6 +38,7 @@ smoke:
 	$(PYTHON) tests/test_golden_model.py
 	$(MAKE) -C tb/lzc  LZC_N_RANDOM=1000
 	$(MAKE) -C tb/mult MULT_N_RANDOM=1000
+	$(MAKE) -C tb/mitchell MITCHELL_N_RANDOM=1000
 	$(MAKE) -C tb/drum  DRUM_N_RANDOM=1000
 	$(MAKE) -C tb/exact EXACT_N_RANDOM=1000
 	$(MAKE) -C tb/opt   OPT_N_RANDOM=1000
