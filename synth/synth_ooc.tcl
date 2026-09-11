@@ -186,6 +186,17 @@ dict set DESIGNS exact_dsp {
         ./synth/wrappers/exact_wrapper.sv
     }
 }
+dict set DESIGNS mitchell {
+    top     mitchell_wrapper_test
+    generic {}
+    sources {
+        ./rtl/lzc_8.sv
+        ./rtl/lzc_16.sv
+        ./rtl/mitchell_mult.sv
+        ./rtl/mitchell_mult_top.sv
+        ./synth/wrappers/mitchell_wrapper_test.sv
+    }
+}
 
 set part        xc7z020clg400-1
 set constraints ./synth/constraints/ooc_clock.xdc
