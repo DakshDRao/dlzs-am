@@ -14,14 +14,16 @@ On a LUT-only Zynq-7020 (xc7z020clg400-1), post-route, 16×16 → 32 signed:
 
 | Design | Mean rel. error | Slice LUTs | Fmax (MHz) | Energy / multiply* |
 |---|---|---|---|---|
-| Exact multiplier (LUT-only) | 0 | 265 | 104.3 | ≈ 50 pJ |
-| **DLZS, optimized (`dlzs_opt`)** | 16.8 % | **145** (−45 %) | **121.5** (+16.5 %) | **≈ 20 pJ** |
+| Exact multiplier (LUT-only) | 0 | 265 | 104.3 | 49.55 pJ |
+| **DLZS, optimized (`dlzs_opt`)** | 16.8 % | **145** (−45 %) | **121.5** (+16.5 %) | **21.20 pJ** |
 
-\* Preliminary: Vivado's default activity estimate, rounded to 1 mW; see §7.
+\* Vivado activity-driven estimate, 50 % input toggle rate, Medium confidence;
+see §7. These are estimates, not board measurements.
 
 `dlzs_opt` is the only approximate design in the comparison that beats the
 exact multiplier on **both** area and speed, and it also has the lowest
-estimated energy per multiply. It is bit-for-bit identical to
+estimated energy per multiply among the LUT-only designs with refined power
+reports. It is bit-for-bit identical to
 the original DLZS design, so it has exactly the same error; all of the gain
 comes from the architecture (§5). It is also the **least accurate** design in
 the comparison, and that trade is the whole story — see §7.
@@ -101,7 +103,8 @@ by construction. Two versions are compared:
 
 **Mitchell (1962).** Both operands to the log domain, log₂(1+m) ≈ m. Always
 underestimates; worst case −11.1 %, at mantissas of exactly 0.5 (e.g.
-192 × 192 at 8 bits). Golden model only — RTL not yet built.
+192 × 192 at 8 bits). RTL, a signed wrapper, a cocotb bench and post-route
+reports are now included.
 
 ---
 
@@ -119,9 +122,13 @@ operands give the same figures to within 0.03 %. Metrics are defined in
 | DRUM k=7 | 0.74 % | +0.03 % | 3.15 % |
 | DRUM k=6 | 1.49 % | +0.08 % | 6.35 % |
 | DRUM k=5 | 2.99 % | +0.21 % | 12.89 % |
+| Mitchell | 3.81 % | −3.81 % | 11.11 % |
 | DRUM k=4 | 6.00 % | +0.71 % | 26.56 % |
 | DRUM k=3 | 12.14 % | +2.43 % | 56.25 % |
 | **DLZS nearest-linear** | **16.84 %** | **−1.89 %** | **33.33 %** |
+
+The Mitchell row was regenerated from the committed golden model using the
+same 200,000 random pairs and 3,600 corners (seed 20260828).
 
 Cross-check: the DRUM paper reports 1.47 % mean relative error for DRUM6; the
 golden model gives 1.468 % on a pure random sample (the 1.49 % above includes
@@ -280,20 +287,34 @@ register. Fmax = 1000 / (10 − WNS).
 | `drum6_signed` (published) | 364 | 365 | −6.078 | 62.20 | 25 | 62 % |
 | `drum_opt3` | 233 | 236 | −1.502 | 86.94 | 16 | 63 % |
 | `drum_opt4` | 273 | 278 | −3.051 | 76.62 | 17 | 66 % |
+| `drum_opt5` | 308 | 313 | −2.879 | 77.65 | 18 | 61 % |
 | `drum_opt6` | 318 | 327 | −3.864 | 72.13 | 20 | 64 % |
+| `drum_opt7` | 346 | 366 | −4.030 | 71.28 | 19 | 64 % |
 | `drum_opt8` | 403 | 408 | −4.424 | 69.33 | 21 | 63 % |
+| `mitchell` | 464 | 496 | −5.696 | 63.71 | 26 | 56 % |
 
 `exact_lut` is the exact multiplier built **without DSP blocks**:
 `$signed(a) * $signed(b)` under `-max_dsp 0`, with the DSP count parsed from
 the utilization report and confirmed 0 after both synthesis and routing. It is
-the fair reference for LUT-only approximate designs. A DSP-mapped exact row
-(one DSP48E1) is planned as a separate "what the FPGA gives you for free"
+the fair reference for LUT-only approximate designs. The DSP-mapped exact result is a separate "what the FPGA gives you for free"
 reference and is deliberately not mixed into the LUT-only comparison.
+
+| Design | Slice LUTs | Slice FFs | DSP48E1 | WNS (ns) | Fmax (MHz) | Dynamic power | Energy / multiply |
+|---|---|---|---|---|---|---|---|
+| `exact_dsp` | 0 | 0 | 1 | n/a | 257.47* | 1.070 mW | 10.70 pJ |
+
+\* The reported limit is 1000 / 3.884 ns, from the DSP48E1 clock's minimum-period
+check. WNS is unavailable; this is not a register-to-register Fmax result like
+the LUT rows. The harness registers are absorbed into the DSP, so zero slice
+FFs does not mean an unregistered design. The DSP reference also has lower
+estimated energy than DLZS; the DLZS advantage is specific to LUT-only fabric.
 
 *Slice LUTs* (from `post_route/utilization.txt`) is the physical area and the
 column to quote. *LUT cells* is what `summary.txt` counts; dual-output LUT
 packing makes it larger, by 92 for the exact multiplier. `drum_opt8` reports
-65 flip-flops because the placer replicated one input register.
+65 flip-flops because the placer replicated one input register. `drum_opt7`
+and `mitchell` report 66 slice flip-flops each; the remaining LUT-only rows
+report 64.
 
 ### Head-to-head comparisons
 
@@ -312,7 +333,10 @@ packing makes it larger, by 92 for the exact multiplier. `drum_opt8` reports
 |---|---|---|---|---|
 | exact | 0 | 265 | 104.3 | — |
 | DRUM-opt k=8 | 0.37 % | 403 | 69.3 | nothing |
+| DRUM-opt k=7 | 0.74 % | 346 | 71.3 | nothing |
 | DRUM-opt k=6 | 1.49 % | 318 | 72.1 | nothing |
+| DRUM-opt k=5 | 2.99 % | 308 | 77.7 | nothing |
+| Mitchell | 3.81 % | 464 | 63.7 | nothing |
 | DRUM-opt k=4 | 6.00 % | 273 | 76.6 | nothing |
 | DRUM-opt k=3 | 12.14 % | 233 | 86.9 | area only |
 | **DLZS-opt** | **16.84 %** | **145** | **121.5** | **area and speed** |
@@ -341,28 +365,31 @@ power, and most fairly in **energy per multiplication**:
 Energy per operation does not depend on the clock the estimate was made at, so
 it stays fair even though several designs miss the 10 ns target.
 
-**Preliminary figures** — Vivado's default vectorless estimate (12.5 % input
-toggle rate assumed), post-route, 10 ns clock:
+**Activity-driven figures** — committed `power_summary.txt` reports, 50 % input
+toggle rate, 0.5 static probability, post-route, 10 ns clock:
 
 | Design | Dynamic power | Energy / multiply | vs exact |
 |---|---|---|---|
-| `exact_lut` | 5 mW | 50 pJ | — |
-| `dlzs_signed` | 4 mW | 40 pJ | −20 % |
-| **`dlzs_opt`** | **2 mW** | **20 pJ** | **−60 %** |
-| `drum4_signed` | 6 mW | 60 pJ | +20 % |
-| `drum6_signed` | 9 mW | 90 pJ | +80 % |
-| `drum_opt3` | 4 mW | 40 pJ | −20 % |
-| `drum_opt4` | 5 mW | 50 pJ | 0 % |
-| `drum_opt6` | 7 mW | 70 pJ | +40 % |
-| `drum_opt8` | 10 mW | 100 pJ | +100 % |
+| `exact_lut` | 4.955 mW | 49.55 pJ | — |
+| `dlzs_signed` | 4.462 mW | 44.62 pJ | −9.9 % |
+| **`dlzs_opt`** | **2.120 mW** | **21.20 pJ** | **−57.2 %** |
+| `drum4_signed` | 5.823 mW | 58.23 pJ | +17.5 % |
+| `drum6_signed` | 8.680 mW | 86.80 pJ | +75.2 % |
+| `drum_opt3` | 4.089 mW | 40.89 pJ | −17.5 % |
+| `drum_opt4` | 5.351 mW | 53.51 pJ | +8.0 % |
+| `drum_opt5` | 5.394 mW | 53.94 pJ | +8.9 % |
+| `drum_opt6` | 7.444 mW | 74.44 pJ | +50.2 % |
+| `drum_opt7` | 7.813 mW | 78.13 pJ | +57.7 % |
+| `drum_opt8` | 9.826 mW | 98.26 pJ | +98.3 % |
+| `mitchell` | ≈ 8 mW* | ≈ 80 pJ* | not comparable* |
 
-Read these as a **ranking, not measurements**. `report_power` prints watts to
-three decimals, so every value is rounded to the nearest 1 mW — `dlzs_opt`'s
-"2 mW" means 1.5–2.5 mW and exact's "5 mW" means 4.5–5.5 mW, so the saving is
-somewhere between roughly 1.8× and 3.7×. The input activity is also Vivado's
-default guess, not the uniform random operands the error tables use. The
-pattern matches the area results: `dlzs_opt` lowest, the exact multiplier
-below every DRUM with K ≥ 4.
+Read these as **estimates, not measurements**. The refined reports use mW to
+three decimals and report Medium confidence. DLZS-opt's estimated energy is
+57.2 % below exact LUT under these assumptions.
+
+\* Mitchell has only the default-activity `post_route/power.txt` report, rounded
+to 1 mW. Its refined power report is not committed, so its power saving against
+the activity-driven rows is left unreported. The DSP reference is above.
 
 **Refined run — `make power`** (script `synth/power.tcl`). It reopens each
 routed checkpoint and:
@@ -389,12 +416,14 @@ vectors; `power.tcl` is written so that swapping `set_switching_activity` for
 - **One placement per design.** Run-to-run variation is a few percent; the
   headline margins are larger than that, the `drum_opt4` vs `drum4_signed`
   difference is not.
-- **Power is preliminary** — see "Power" below.
+- **Power is estimated** — the refined reports have Medium confidence; Mitchell
+  still has only a default-activity estimate. See "Power" above.
 - **`dlzs_opt` vs the DRUM rows is not shell-matched** — DRUM needs two input
   negates, DLZS one. That difference is algorithmic and is stated as such;
   `dlzs_signed` vs `drum4_signed` is the matched-shell comparison.
-- **Not yet built:** `drum_opt5`, `drum_opt7`, the DSP-mapped exact reference
-  row, and Mitchell RTL.
+- **Now included:** `drum_opt5`, `drum_opt7`, the DSP-mapped exact reference
+  row and Mitchell RTL, with committed post-route reports. These reports do
+  not replace simulation pass logs or the remaining 8-bit characterization.
 
 ---
 
@@ -436,6 +465,7 @@ Things that are easy to get wrong and were got right:
       drum/                 vendored DRUM cores (upstream licence) + our signed shell
       drum_opt/             our FPGA-optimized DRUM(K)
       exact/                exact multiplier
+      mitchell/             Mitchell core + signed shell
     synth/
       synth_ooc.tcl         OOC LUT-only synthesis + place and route of every design
       power.tcl             activity-driven power from the routed checkpoints
@@ -443,7 +473,7 @@ Things that are easy to get wrong and were got right:
       wrappers/             identical register harnesses, one per design family
     tb/
       dirs.mk  common.mk    shared cocotb plumbing
-      lzc/ mult/ drum/ exact/ opt/ drum_opt/     one directory per bench
+      lzc/ mult/ mitchell/ drum/ exact/ opt/ drum_opt/     one directory per bench
     src/golden_model.py     bit-exact reference models, no float in any datapath
     src/metrics.py          MRED, NMED, max RED, signed bias, error rate
     src/sweep.py            8-bit exhaustive + 16-bit sampled sweeps
@@ -463,8 +493,8 @@ From the repo root:
 
     make test      # golden-model regression suite (19 tests)
     make sweep     # error sweeps -> results/
-    make sim       # all six cocotb benches
-    make lint      # Verilator lint on all six
+    make sim       # all seven cocotb benches
+    make lint      # Verilator lint on all seven
     make smoke     # fast test + sim, for the pre-commit loop
     make synth     # Vivado OOC synth + place and route -> synth_result/
     make designs   # list the buildable designs
@@ -475,6 +505,7 @@ From the repo root:
 |---|---|---|
 | `tb/lzc` | 3 | `LZC_N_RANDOM` |
 | `tb/mult` | 5 | `MULT_N_RANDOM` |
+| `tb/mitchell` | 5 | `MITCHELL_N_RANDOM` |
 | `tb/drum` | 7 | `DRUM_N_RANDOM` |
 | `tb/exact` | 8 | `EXACT_N_RANDOM` |
 | `tb/opt` | 8 | `OPT_N_RANDOM` |
@@ -518,7 +549,8 @@ vectors and the published error tables are the same set.
 2. **Mitchell worst-case note.** `golden_model.py` says the −11.1 % worst case
    is at mantissas near 0.44; it is at exactly 0.5.
 3. **Fmax of passing designs is understated** (§7) — tighter-period run pending.
-   **Power is preliminary** (1 mW resolution, default activity) — `make power`
+   **Power remains estimated** — refined reports are committed for DLZS, DRUM
+   and exact; Mitchell's activity-driven run and SAIF-based validation remain
    pending.
 4. **The RTL is fixed at 16 bits.** No 8-bit synthesis numbers and no
    exhaustive 8-bit model/RTL equivalence yet.
@@ -534,7 +566,7 @@ vectors and the published error tables are the same set.
 |------|-------|--------|
 | 1–2 | Literature lock + golden model | done |
 | 3–5 | DLZS RTL + verification | done |
-| 6–7 | Baselines, OOC LUT-only synthesis, comparison table | mostly done — optimized DLZS and DRUM built and routed; remaining: Mitchell RTL, DSP-mapped exact row, `drum_opt5/7`, tighter-period run |
+| 6–7 | Baselines, OOC LUT-only synthesis, comparison table | mostly done — DLZS, DRUM K=3..8, Mitchell and exact LUT/DSP reports included; remaining: 8-bit characterization, committed simulation evidence, Mitchell refined power, tighter-period run |
 | 8–9 | AXI-Lite wrapper, PYNQ-Z2 overlay, ≥10,000 vectors hardware-vs-sim | |
 | 10–11 | Attention Q/K from DistilBERT, top-k index overlap vs hardware cost | |
 | 12–13 | MBM-style error compensation, accuracy-vs-LUTs Pareto front | |
