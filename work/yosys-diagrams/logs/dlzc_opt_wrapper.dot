@@ -1,0 +1,28 @@
+digraph "dlzc_opt_wrapper" {
+label="dlzc_opt_wrapper";
+rankdir="LR";
+remincross=true;
+n1 [ shape=octagon, label="a", color="black", fontcolor="black" ];
+n2 [ shape=diamond, label="a_reg", color="black", fontcolor="black" ];
+n3 [ shape=octagon, label="b", color="black", fontcolor="black" ];
+n4 [ shape=diamond, label="b_reg", color="black", fontcolor="black" ];
+n5 [ shape=octagon, label="clk", color="black", fontcolor="black" ];
+n6 [ shape=octagon, label="p", color="black", fontcolor="black" ];
+n7 [ shape=diamond, label="p_comb", color="black", fontcolor="black" ];
+c11 [ shape=record, label="{{<p8> CLK|<p9> D}|$74\n$dff|{<p10> Q}}",  ];
+c12 [ shape=record, label="{{<p8> CLK|<p9> D}|$75\n$dff|{<p10> Q}}",  ];
+c13 [ shape=record, label="{{<p8> CLK|<p9> D}|$76\n$dff|{<p10> Q}}",  ];
+c17 [ shape=record, label="{{<p14> operand1|<p15> operand2}|u_dlzc_opt\ndlzc_opt_top|{<p16> output_mul}}",  ];
+n1:e -> c12:p9:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c12:p10:e -> n2:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n2:e -> c17:p14:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n3:e -> c13:p9:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c13:p10:e -> n4:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n4:e -> c17:p15:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n5:e -> c11:p8:w [color="black", fontcolor="black", label=""];
+n5:e -> c12:p8:w [color="black", fontcolor="black", label=""];
+n5:e -> c13:p8:w [color="black", fontcolor="black", label=""];
+c11:p10:e -> n6:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c17:p16:e -> n7:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n7:e -> c11:p9:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+}

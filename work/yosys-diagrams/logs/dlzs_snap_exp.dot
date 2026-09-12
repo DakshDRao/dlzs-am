@@ -1,0 +1,24 @@
+digraph "dlzs_snap_exp" {
+label="dlzs_snap_exp";
+rankdir="LR";
+remincross=true;
+n2 [ shape=octagon, label="e", color="black", fontcolor="black" ];
+n3 [ shape=octagon, label="m", color="black", fontcolor="black" ];
+n4 [ shape=diamond, label="unused", color="black", fontcolor="black" ];
+n5 [ shape=diamond, label="v", color="black", fontcolor="black" ];
+c9 [ shape=record, label="{{<p6> A|<p7> B}|$6\n$and|{<p8> Y}}",  ];
+x0 [ shape=record, style=rounded, label="0 -&gt; 15:15 |<s0> 15:1 - 14:0 ", color="black", fontcolor="black" ];
+x0:e -> c9:p7:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c10 [ shape=record, label="{{<p6> A|<p7> B}|$8\n$or|{<p8> Y}}",  ];
+x1 [ shape=record, style=rounded, label="<s1> 13:0 - 15:2 |0 -&gt; 1:0 ", color="black", fontcolor="black" ];
+x1:e -> c10:p7:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c14 [ shape=record, label="{{<p11> input_operand}|lead1\nlzc_16|{<p12> all_zero|<p13> output_power}}",  ];
+c9:p8:e -> x1:s1:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c14:p13:e -> n2:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n3:e -> c10:p6:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n3:e -> c9:p6:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n3:e -> x0:s0:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c14:p12:e -> n4:w [color="black", fontcolor="black", label=""];
+c10:p8:e -> n5:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n5:e -> c14:p11:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+}
