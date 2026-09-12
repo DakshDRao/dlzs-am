@@ -91,6 +91,15 @@ and the RTL matches it bit-for-bit.
 **Exact.** `$signed(a) * $signed(b)`, mapped to LUTs (`-max_dsp 0`). Vivado
 folds the sign into the partial products, so it pays no separate sign cost.
 
+<details>
+<summary>Exact multiplier — Yosys top schematic</summary>
+
+[![Exact signed multiplier — Yosys RTL schematic](docs/images/schematics/exact.svg)](docs/images/schematics/exact.svg)
+
+*Exact 16×16 signed multiplication. The same RTL serves the LUT-only and DSP-mapped implementations; this diagram shows arithmetic before technology mapping.*
+
+</details>
+
 **DRUM(k)** (Hashemi, Bahar, Reda, ICCAD 2015). Truncate both operands to their
 k most significant bits from the leading one, force the lowest kept bit to 1
 (unbiased rounding), multiply exactly in a k×k core, shift back up. Unbiased
@@ -105,6 +114,15 @@ by construction. Two versions are compared:
 underestimates; worst case −11.1 %, at mantissas of exactly 0.5 (e.g.
 192 × 192 at 8 bits). RTL, a signed wrapper, a cocotb bench and post-route
 reports are now included.
+
+<details>
+<summary>Mitchell multiplier — Yosys top schematic</summary>
+
+[![Mitchell signed top — Yosys schematic](docs/images/schematics/mitchell_mult_top.svg)](docs/images/schematics/mitchell_mult_top.svg)
+
+*Signed Mitchell top: input magnitudes, the unsigned logarithmic core, and output sign restoration.*
+
+</details>
 
 ---
 
@@ -168,6 +186,18 @@ was one long series chain:
 
 The 32-bit output negate alone is 8 CARRY4s at the end of the path.
 
+**Original signed DLZC — Yosys**
+
+[![Original signed DLZC — Yosys schematic](docs/images/schematics/dlzc_mult_top.svg)](docs/images/schematics/dlzc_mult_top.svg)
+
+*The original dlzc_mult_top sign-magnitude implementation: input magnitude conversion, the unsigned core, and output sign restoration.*
+
+**Original signed DLZC — Vivado**
+
+[![Original signed DLZC — Vivado elaborated schematic](docs/images/vivado/elaborated/dlzc_mult_top.png)](docs/images/vivado/elaborated/dlzc_mult_top.png)
+
+*Vivado elaboration of the same module, showing both input negation branches and the output negation branch.*
+
 ### The rule behind every change
 
 > The sign can be folded, for free, into any part of the datapath that is
@@ -205,6 +235,22 @@ The critical path is now:
     abs(A) → V logic merged into the LZC → two shifter levels
 
 Post-route this is **8 logic levels** against 15 for the original design.
+
+**Optimized signed DLZC — Yosys**
+
+[![Optimized signed DLZC — Yosys schematic](docs/images/schematics/dlzs_opt_core.svg)](docs/images/schematics/dlzs_opt_core.svg)
+
+*The optimized dlzc_opt_top datapath: A supplies the snapped exponent and the prepared signed B operand feeds the shifter, removing the 32-bit output negate.*
+
+**Optimized signed DLZC — Vivado**
+
+[![Optimized signed DLZC — Vivado elaborated schematic](docs/images/vivado/elaborated/dlzc_opt_top.png)](docs/images/vivado/elaborated/dlzc_opt_top.png)
+
+*Vivado elaboration shows the snap, B-preparation and shift blocks, with the A-magnitude logic and independent zero detection.*
+
+These are RTL schematics, not post-route physical views. Yosys and Vivado
+arrange the same design differently. Click an image to inspect it at full
+size; the measured logic-level counts come from the timing reports in §7.
 
 ### Output range
 
@@ -266,6 +312,59 @@ Verification: `tb/drum_opt` — all six K elaborated side by side; the operand
 block exhaustively over all 65,536 inputs for every K, the top over all
 65,536 A × 10 B for every K against the golden model **and**, for K = 4 and 6,
 against the published DRUM cores. All passing.
+
+<details>
+<summary>DRUM baselines — one Yosys top schematic per configuration</summary>
+
+**Published DRUM, K=4 — signed top**
+
+[![Published DRUM K=4 signed top — Yosys schematic](docs/images/schematics/drum_signed_k4.svg)](docs/images/schematics/drum_signed_k4.svg)
+
+*Signed wrapper around the vendored DRUM4 core.*
+
+**Published DRUM, K=6 — signed top**
+
+[![Published DRUM K=6 signed top — Yosys schematic](docs/images/schematics/drum_signed_k6.svg)](docs/images/schematics/drum_signed_k6.svg)
+
+*Signed wrapper around the vendored DRUM6 core.*
+
+**Optimized DRUM, K=3 — signed top**
+
+[![Optimized DRUM K=3 top — Yosys schematic](docs/images/schematics/drum_opt_k3.svg)](docs/images/schematics/drum_opt_k3.svg)
+
+*Optimized DRUM with K=3: two sign-carrying operand blocks, a signed 4×4 multiply, and the final shift.*
+
+**Optimized DRUM, K=4 — signed top**
+
+[![Optimized DRUM K=4 top — Yosys schematic](docs/images/schematics/drum_opt_k4.svg)](docs/images/schematics/drum_opt_k4.svg)
+
+*Optimized DRUM with K=4: two sign-carrying operand blocks, a signed 5×5 multiply, and the final shift.*
+
+**Optimized DRUM, K=5 — signed top**
+
+[![Optimized DRUM K=5 top — Yosys schematic](docs/images/schematics/drum_opt_k5.svg)](docs/images/schematics/drum_opt_k5.svg)
+
+*Optimized DRUM with K=5: two sign-carrying operand blocks, a signed 6×6 multiply, and the final shift.*
+
+**Optimized DRUM, K=6 — signed top**
+
+[![Optimized DRUM K=6 top — Yosys schematic](docs/images/schematics/drum_opt_k6.svg)](docs/images/schematics/drum_opt_k6.svg)
+
+*Optimized DRUM with K=6: two sign-carrying operand blocks, a signed 7×7 multiply, and the final shift.*
+
+**Optimized DRUM, K=7 — signed top**
+
+[![Optimized DRUM K=7 top — Yosys schematic](docs/images/schematics/drum_opt_k7.svg)](docs/images/schematics/drum_opt_k7.svg)
+
+*Optimized DRUM with K=7: two sign-carrying operand blocks, a signed 8×8 multiply, and the final shift.*
+
+**Optimized DRUM, K=8 — signed top**
+
+[![Optimized DRUM K=8 top — Yosys schematic](docs/images/schematics/drum_opt_k8.svg)](docs/images/schematics/drum_opt_k8.svg)
+
+*Optimized DRUM with K=8: two sign-carrying operand blocks, a signed 9×9 multiply, and the final shift.*
+
+</details>
 
 ---
 
@@ -480,6 +579,10 @@ Things that are easy to get wrong and were got right:
     tests/test_golden_model.py    19-test regression suite
     synth_result/<design>/  committed synthesis and post-route reports
     docs/progress.md
+    docs/images/schematics/           Yosys RTL schematics
+    docs/images/vivado/elaborated/    Vivado elaborated schematics
+    scripts/export_yosys.sh           regenerate the Yosys diagrams
+    scripts/export_vivado.tcl         export Vivado schematic PDFs
 
 The golden model is the **authority**. RTL is verified against the model, not
 against the exact product — an approximate multiplier that matched the exact
@@ -607,3 +710,4 @@ commit.
 
 Related work also includes power-of-two weight quantization, against which this
 scheme must be positioned rather than compared favourably by default.
+
