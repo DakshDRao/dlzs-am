@@ -1,0 +1,140 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
+| Date         : Fri Sep 11 15:13:38 2026
+| Host         : LAPTOP-OO671G6K running 64-bit major release  (build 9200)
+| Command      : report_timing -file synth_result/mitchell/timing.txt
+| Design       : mitchell_wrapper_test
+| Device       : 7z020-clg400
+| Speed File   : -1  PRODUCTION 1.12 2019-11-22
+| Design State : Synthesized
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (VIOLATED) :        -7.069ns  (required time - arrival time)
+  Source:                 b_reg_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            p_reg[28]/D
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
+  Data Path Delay:        17.062ns  (logic 7.900ns (46.302%)  route 9.162ns (53.698%))
+  Logic Levels:           30  (CARRY4=18 LUT1=1 LUT2=1 LUT4=1 LUT5=3 LUT6=6)
+  Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=63, unset)           0.973     0.973    clk
+                         FDRE                                         r  b_reg_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 f  b_reg_reg[0]/Q
+                         net (fo=4, unplaced)         0.335     1.826    u_mitchell/u_core/u_lzc_b/lzc_8_2/b_reg[0]
+                         LUT1 (Prop_lut1_I0_O)        0.295     2.121 r  u_mitchell/u_core/u_lzc_b/lzc_8_2/mb_carry_i_14/O
+                         net (fo=1, unplaced)         0.333     2.454    u_mitchell/u_core/u_lzc_b/lzc_8_2/p_0_in[0]
+                         CARRY4 (Prop_carry4_CYINIT_CO[3])
+                                                      0.595     3.049 r  u_mitchell/u_core/u_lzc_b/lzc_8_2/mb_carry_i_8/CO[3]
+                         net (fo=1, unplaced)         0.009     3.058    u_mitchell/u_core/u_lzc_b/lzc_8_2/mb_carry_i_8_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117     3.175 r  u_mitchell/u_core/u_lzc_b/lzc_8_2/mb_carry__0_i_9/CO[3]
+                         net (fo=1, unplaced)         0.000     3.175    u_mitchell/u_core/u_lzc_b_n_135
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117     3.292 r  u_mitchell/u_core/mb_carry__1_i_9/CO[3]
+                         net (fo=1, unplaced)         0.000     3.292    u_mitchell/u_core/mb_carry__1_i_9_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.256     3.548 f  u_mitchell/u_core/mb_carry__2_i_8/O[2]
+                         net (fo=2, unplaced)         0.463     4.011    u_mitchell/u_core/abs_value20[15]
+                         LUT2 (Prop_lut2_I1_O)        0.301     4.312 f  u_mitchell/u_core/mb_carry__1_i_15/O
+                         net (fo=3, unplaced)         0.920     5.232    u_mitchell/u_core/u_lzc_b/lzc_8_1/p[28]_i_8[7]
+                         LUT4 (Prop_lut4_I0_O)        0.124     5.356 f  u_mitchell/u_core/u_lzc_b/lzc_8_1/mb_carry__1_i_10/O
+                         net (fo=27, unplaced)        0.516     5.872    u_mitchell/u_core/u_lzc_b/lzc_8_1/b_reg_reg[15]
+                         LUT5 (Prop_lut5_I0_O)        0.124     5.996 r  u_mitchell/u_core/u_lzc_b/lzc_8_1/p[0]_i_5/O
+                         net (fo=73, unplaced)        0.541     6.537    u_mitchell/u_core/u_lzc_b/lzc_8_1/b_reg_reg[15]_0
+                         LUT5 (Prop_lut5_I3_O)        0.124     6.661 r  u_mitchell/u_core/u_lzc_b/lzc_8_1/mb_carry_i_12/O
+                         net (fo=6, unplaced)         0.481     7.142    u_mitchell/u_core/u_lzc_b/lzc_8_1/mb_carry_i_26_0
+                         LUT6 (Prop_lut6_I5_O)        0.124     7.266 r  u_mitchell/u_core/u_lzc_b/lzc_8_1/mb_carry_i_6/O
+                         net (fo=1, unplaced)         0.000     7.266    u_mitchell/u_core/u_lzc_b_n_51
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.533     7.799 r  u_mitchell/u_core/mb_carry/CO[3]
+                         net (fo=1, unplaced)         0.009     7.808    u_mitchell/u_core/mb_carry_n_0
+                         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.256     8.064 r  u_mitchell/u_core/mb_carry__0/O[2]
+                         net (fo=4, unplaced)         0.929     8.993    u_mitchell/u_core/u_lzc_a/lzc_8_1/mb0_out[6]
+                         LUT6 (Prop_lut6_I2_O)        0.301     9.294 r  u_mitchell/u_core/u_lzc_a/lzc_8_1/p[24]_i_23/O
+                         net (fo=4, unplaced)         0.473     9.767    u_mitchell/u_core/u_lzc_a/lzc_8_1/mb_carry__1_0
+                         LUT5 (Prop_lut5_I4_O)        0.124     9.891 r  u_mitchell/u_core/u_lzc_a/lzc_8_1/p[16]_i_22/O
+                         net (fo=1, unplaced)         0.902    10.793    u_mitchell/u_core/u_lzc_a_n_74
+                         LUT6 (Prop_lut6_I1_O)        0.124    10.917 r  u_mitchell/u_core/p[16]_i_10/O
+                         net (fo=1, unplaced)         0.000    10.917    u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[16]_0[1]
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.533    11.450 r  u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[16]_i_2/CO[3]
+                         net (fo=1, unplaced)         0.000    11.450    u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[16]_i_2_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    11.567 r  u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[20]_i_2/CO[3]
+                         net (fo=1, unplaced)         0.000    11.567    u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[20]_i_2_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    11.684 r  u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[24]_i_2/CO[3]
+                         net (fo=1, unplaced)         0.000    11.684    u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[24]_i_2_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.331    12.015 f  u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[28]_i_2/O[3]
+                         net (fo=5, unplaced)         0.646    12.661    u_mitchell/u_core/u_lzc_b/lzc_8_1/frac[27]
+                         LUT6 (Prop_lut6_I1_O)        0.307    12.968 r  u_mitchell/u_core/u_lzc_b/lzc_8_1/mul_out1_carry__2_i_3/O
+                         net (fo=1, unplaced)         0.639    13.607    u_mitchell/u_core/u_lzc_b_n_97
+                         CARRY4 (Prop_carry4_DI[1]_CO[3])
+                                                      0.520    14.127 f  u_mitchell/u_core/mul_out1_carry__2/CO[3]
+                         net (fo=64, unplaced)        1.006    15.133    u_mitchell/u_core/u_lzc_b/lzc_8_1/CO[0]
+                         LUT6 (Prop_lut6_I4_O)        0.124    15.257 r  u_mitchell/u_core/u_lzc_b/lzc_8_1/p[4]_i_12/O
+                         net (fo=1, unplaced)         0.333    15.590    u_mitchell/u_core/u_lzc_b/lzc_8_1/p[4]_i_12_n_0
+                         CARRY4 (Prop_carry4_CYINIT_CO[3])
+                                                      0.595    16.185 r  u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[4]_i_3/CO[3]
+                         net (fo=1, unplaced)         0.009    16.194    u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[4]_i_3_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    16.311 r  u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[8]_i_3/CO[3]
+                         net (fo=1, unplaced)         0.000    16.311    u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[8]_i_3_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    16.428 r  u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[12]_i_3/CO[3]
+                         net (fo=1, unplaced)         0.000    16.428    u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[12]_i_3_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    16.545 r  u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[16]_i_3/CO[3]
+                         net (fo=1, unplaced)         0.000    16.545    u_mitchell/u_core/u_lzc_a/lzc_8_2/p_reg[20][0]
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    16.662 r  u_mitchell/u_core/u_lzc_a/lzc_8_2/p_reg[20]_i_3/CO[3]
+                         net (fo=1, unplaced)         0.000    16.662    u_mitchell/u_core/u_lzc_a/lzc_8_2/p_reg[20]_i_3_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    16.779 r  u_mitchell/u_core/u_lzc_a/lzc_8_2/p_reg[24]_i_3/CO[3]
+                         net (fo=1, unplaced)         0.000    16.779    u_mitchell/u_core/u_lzc_a/lzc_8_2/p_reg[24]_i_3_n_0
+                         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.331    17.110 r  u_mitchell/u_core/u_lzc_a/lzc_8_2/p_reg[28]_i_3/O[3]
+                         net (fo=1, unplaced)         0.618    17.728    u_mitchell/u_core/u_lzc_b/lzc_8_1/p_reg[28][0]
+                         LUT6 (Prop_lut6_I5_O)        0.307    18.035 r  u_mitchell/u_core/u_lzc_b/lzc_8_1/p[28]_i_1/O
+                         net (fo=1, unplaced)         0.000    18.035    p_comb[28]
+                         FDRE                                         r  p_reg[28]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)       10.000    10.000 r  
+                                                      0.000    10.000 r  clk (IN)
+                         net (fo=63, unset)           0.924    10.924    clk
+                         FDRE                                         r  p_reg[28]/C
+                         clock pessimism              0.000    10.924    
+                         clock uncertainty           -0.035    10.889    
+                         FDRE (Setup_fdre_C_D)        0.077    10.966    p_reg[28]
+  -------------------------------------------------------------------
+                         required time                         10.966    
+                         arrival time                         -18.035    
+  -------------------------------------------------------------------
+                         slack                                 -7.069    
+
+
+
+
