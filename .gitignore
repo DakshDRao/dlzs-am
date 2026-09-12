@@ -15,7 +15,7 @@ results.xml
 obj_dir/
 *.log
 
-# Generated results — regenerate with `python3 src/sweep.py`
+# Generated results â€” regenerate with `python3 src/sweep.py`
 results/
 
 # Editor
@@ -64,3 +64,14 @@ xelab.pb
 # products, ~1 MB each, regenerated with -force -- not committed. (Placed after
 # the synth_result keep rules on purpose: last match wins.)
 *.dcp
+
+# Generated scratch files and Vivado clock-routing diagnostics
+/work/
+/clockInfo.txt
+
+# Intermediate schematic exports; retain final SVGs and PNGs
+/docs/images/vivado/elaborated/*.pdf
+
+# Curated simulation evidence may be committed despite the global *.log rule
+!/evidence/logs/
+!/evidence/logs/*.log

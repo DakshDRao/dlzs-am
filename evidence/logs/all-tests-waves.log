@@ -1,0 +1,495 @@
+=== tb/lzc ===
+make[1]: Entering directory '/mnt/c/projects/major_project/tb/lzc'
+rm -f results.xml
+/usr/bin/iverilog -o /mnt/c/projects/major_project/tb/lzc/sim_build/sim.vvp -s lzc_tb_top -g2012 -g2012 -f /mnt/c/projects/major_project/tb/lzc/sim_build/cmds.f -s cocotb_iverilog_dump  /mnt/c/projects/major_project/rtl/lzc_8.sv /mnt/c/projects/major_project/rtl/lzc_16.sv /mnt/c/projects/major_project/tb/lzc/lzc_tb_top.sv /mnt/c/projects/major_project/tb/lzc/sim_build/cocotb_iverilog_dump.v
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+rm -f results.xml
+COCOTB_TEST_MODULES=test_lzc COCOTB_TESTCASE=  COCOTB_TOPLEVEL=lzc_tb_top TOPLEVEL_LANG=verilog       \
+	 /usr/bin/vvp -m /home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb/libs/libcocotbvpi_icarus.so   /mnt/c/projects/major_project/tb/lzc/sim_build/sim.vvp -fst  
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:242  in gpi_load_users                  Loaded entry library: '/usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0'
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:233  in gpi_load_users                  Running entry func 'initialize' from loaded library '/home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb/simulator.cpython-312-x86_64-linux-gnu.so'
+     -.--ns INFO     pygpi                              ..ib/pygpi/embed.cpp:114  in initialize                      Using Python 3.12.12 interpreter at /home/daksh/projects/major_project/.venv/bin/python3
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:74   in gpi_print_registered_impl       GPI: VPI support registered
+     0.00ns INFO     cocotb.initialize                  Seeding Python random module with 1789196060
+     0.00ns INFO     cocotb.initialize                  Initialized cocotb v2.1.0 from /home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb
+     0.00ns INFO     cocotb.initialize                  Running on Icarus Verilog version 12.0 (stable)
+     0.00ns INFO     cocotb.regression                  Running tests
+     0.00ns INFO     cocotb.regression                  running test_lzc.test_lzc_8_exhaustive (1/3)
+                                                            All 256 operands. Nothing about an 8-bit block justifies sampling.
+     0.00ns INFO     cocotb.lzc_tb_top                  lzc_8: exhaustive sweep, 256 operands
+   256.00ns INFO     cocotb.lzc_tb_top                  lzc_8: 256 operands checked, all match the golden model
+   256.00ns INFO     cocotb.regression                  test_lzc.test_lzc_8_exhaustive passed
+   256.00ns INFO     cocotb.regression                  running test_lzc.test_lzc_16_sweep_operands (2/3)
+                                                            The 16-bit sweep's operand set, imported from sweep.py verbatim.
+   256.00ns INFO     cocotb.lzc_tb_top                  lzc_16: 65536 distinct operands from the sweep set (3600 corner pairs + 1000000 random pairs, seed per sweep.py) -- 100.00% of the 65536-value space
+   256.00ns INFO     cocotb.lzc_tb_top                  lzc_16: sweep set covers the full operand space; this run is exhaustive
+ 65792.00ns INFO     cocotb.lzc_tb_top                  lzc_16: 65536 operands checked, all match the golden model
+ 65792.00ns INFO     cocotb.regression                  test_lzc.test_lzc_16_sweep_operands passed
+ 65792.00ns INFO     cocotb.regression                  running test_lzc.test_lzc_16_binade_boundaries (3/3)
+                                                            Directed test on the 8/7 seam and every binade edge.
+ 65792.00ns INFO     cocotb.lzc_tb_top                  lzc_16: 45 directed binade-boundary operands
+ 65837.00ns INFO     cocotb.lzc_tb_top                  lzc_16: 45 operands checked, all match the golden model
+ 65837.00ns INFO     cocotb.regression                  test_lzc.test_lzc_16_binade_boundaries passed
+ 65837.00ns INFO     cocotb.regression                  ************************************************************************************************
+                                                        ** TEST                                    STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
+                                                        ************************************************************************************************
+                                                        ** test_lzc.test_lzc_8_exhaustive           PASS         256.00           0.01      19891.56  **
+                                                        ** test_lzc.test_lzc_16_sweep_operands      PASS       65536.00           1.71      38392.58  **
+                                                        ** test_lzc.test_lzc_16_binade_boundaries   PASS          45.00           0.00      58750.34  **
+                                                        ************************************************************************************************
+                                                        ** TESTS=3 PASS=3 FAIL=0 SKIP=0                        65837.00           1.72      38240.60  **
+                                                        ************************************************************************************************
+FST info: dumpfile /mnt/c/projects/major_project/tb/lzc/sim_build/lzc_tb_top.fst opened for output.
+make[1]: Leaving directory '/mnt/c/projects/major_project/tb/lzc'
+=== tb/mult ===
+make[1]: Entering directory '/mnt/c/projects/major_project/tb/mult'
+rm -f results.xml
+/usr/bin/iverilog -o /mnt/c/projects/major_project/tb/mult/sim_build/sim.vvp -s mult_tb_top -g2012 -g2012 -f /mnt/c/projects/major_project/tb/mult/sim_build/cmds.f -s cocotb_iverilog_dump  /mnt/c/projects/major_project/rtl/lzc_8.sv /mnt/c/projects/major_project/rtl/lzc_16.sv /mnt/c/projects/major_project/rtl/dlzc_mult.sv /mnt/c/projects/major_project/rtl/dlzc_mult_top.sv /mnt/c/projects/major_project/tb/mult/mult_tb_top.sv /mnt/c/projects/major_project/tb/mult/sim_build/cocotb_iverilog_dump.v
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+rm -f results.xml
+COCOTB_TEST_MODULES=test_mult COCOTB_TESTCASE=  COCOTB_TOPLEVEL=mult_tb_top TOPLEVEL_LANG=verilog       \
+	 /usr/bin/vvp -m /home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb/libs/libcocotbvpi_icarus.so   /mnt/c/projects/major_project/tb/mult/sim_build/sim.vvp -fst  
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:242  in gpi_load_users                  Loaded entry library: '/usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0'
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:233  in gpi_load_users                  Running entry func 'initialize' from loaded library '/home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb/simulator.cpython-312-x86_64-linux-gnu.so'
+     -.--ns INFO     pygpi                              ..ib/pygpi/embed.cpp:114  in initialize                      Using Python 3.12.12 interpreter at /home/daksh/projects/major_project/.venv/bin/python3
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:74   in gpi_print_registered_impl       GPI: VPI support registered
+     0.00ns INFO     cocotb.initialize                  Seeding Python random module with 1789196063
+     0.00ns INFO     cocotb.initialize                  Initialized cocotb v2.1.0 from /home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb
+     0.00ns INFO     cocotb.initialize                  Running on Icarus Verilog version 12.0 (stable)
+     0.00ns INFO     cocotb.regression                  Running tests
+     0.00ns INFO     cocotb.regression                  running test_mult.test_unsigned_corners (1/5)
+                                                            Directed cross product over binade edges and tie values.
+     0.00ns INFO     cocotb.mult_tb_top                 dlzc_mult: 7569 directed corner pairs (87 x 87 operands)
+  7569.00ns INFO     cocotb.mult_tb_top                 dlzc_mult corners: 7569 pairs checked, all match the golden model
+  7569.00ns INFO     cocotb.regression                  test_mult.test_unsigned_corners passed
+  7569.00ns INFO     cocotb.regression                  running test_mult.test_unsigned_sweep (2/5)
+                                                            The sweep set, imported from sweep.py verbatim.
+  7569.00ns INFO     cocotb.mult_tb_top                 dlzc_mult: 203600 pairs from the sweep set (3600 corner + 200000 random, seed per sweep.py) -- 0.004740% of the 4294967296-pair space
+211169.00ns INFO     cocotb.mult_tb_top                 dlzc_mult sweep: 203600 pairs checked, all match the golden model
+211169.00ns INFO     cocotb.regression                  test_mult.test_unsigned_sweep passed
+211169.00ns INFO     cocotb.regression                  running test_mult.test_signed_corners (3/5)
+                                                            Directed cross product including -32768 against everything.
+211169.00ns INFO     cocotb.mult_tb_top                 dlzc_mult_top: 25600 directed corner pairs (160 x 160 operands)
+236769.00ns INFO     cocotb.mult_tb_top                 dlzc_mult_top corners: 25600 pairs checked, all match the golden model
+236769.00ns INFO     cocotb.regression                  test_mult.test_signed_corners passed
+236769.00ns INFO     cocotb.regression                  running test_mult.test_signed_sweep (4/5)
+                                                            The sweep set reinterpreted as two's complement.
+236769.00ns INFO     cocotb.mult_tb_top                 dlzc_mult_top: 203600 pairs from the sweep set reinterpreted signed (3600 corner + 200000 random)
+440369.00ns INFO     cocotb.mult_tb_top                 dlzc_mult_top sweep: 203600 pairs checked, all match the golden model
+440369.00ns INFO     cocotb.regression                  test_mult.test_signed_sweep passed
+440369.00ns INFO     cocotb.regression                  running test_mult.test_signed_no_overflow (5/5)
+                                                            The product magnitude never reaches 2^31, so the signed output cannot
+440405.00ns INFO     cocotb.mult_tb_top                 dlzc_mult_top overflow: 36 pairs checked, all match the golden model
+440405.00ns INFO     cocotb.mult_tb_top                 dlzc_mult_top: worst |product| over extremes = 1073741824 (2^30)
+440405.00ns INFO     cocotb.regression                  test_mult.test_signed_no_overflow passed
+440405.00ns INFO     cocotb.regression                  *******************************************************************************************
+                                                        ** TEST                               STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
+                                                        *******************************************************************************************
+                                                        ** test_mult.test_unsigned_corners     PASS        7569.00           0.10      76909.83  **
+                                                        ** test_mult.test_unsigned_sweep       PASS      203600.00           3.54      57438.25  **
+                                                        ** test_mult.test_signed_corners       PASS       25600.00           0.32      79508.36  **
+                                                        ** test_mult.test_signed_sweep         PASS      203600.00           5.64      36074.67  **
+                                                        ** test_mult.test_signed_no_overflow   PASS          36.00           0.00      32847.04  **
+                                                        *******************************************************************************************
+                                                        ** TESTS=5 PASS=5 FAIL=0 SKIP=0                  440405.00           9.61      45820.25  **
+                                                        *******************************************************************************************
+FST info: dumpfile /mnt/c/projects/major_project/tb/mult/sim_build/mult_tb_top.fst opened for output.
+make[1]: Leaving directory '/mnt/c/projects/major_project/tb/mult'
+=== tb/mitchell ===
+make[1]: Entering directory '/mnt/c/projects/major_project/tb/mitchell'
+rm -f results.xml
+/usr/bin/iverilog -o /mnt/c/projects/major_project/tb/mitchell/sim_build/sim.vvp -s mitchell_tb_top -g2012 -g2012 -f /mnt/c/projects/major_project/tb/mitchell/sim_build/cmds.f -s cocotb_iverilog_dump  /mnt/c/projects/major_project/rtl/lzc_8.sv /mnt/c/projects/major_project/rtl/lzc_16.sv /mnt/c/projects/major_project/tb/mitchell/../../baselines/mitchell/mitchell_mult.sv /mnt/c/projects/major_project/tb/mitchell/../../baselines/mitchell/mitchell_mult_top.sv /mnt/c/projects/major_project/tb/mitchell/mitchell_tb_top.sv /mnt/c/projects/major_project/tb/mitchell/sim_build/cocotb_iverilog_dump.v
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+rm -f results.xml
+COCOTB_TEST_MODULES=test_mitchell COCOTB_TESTCASE=  COCOTB_TOPLEVEL=mitchell_tb_top TOPLEVEL_LANG=verilog       \
+	 /usr/bin/vvp -m /home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb/libs/libcocotbvpi_icarus.so   /mnt/c/projects/major_project/tb/mitchell/sim_build/sim.vvp -fst  
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:242  in gpi_load_users                  Loaded entry library: '/usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0'
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:233  in gpi_load_users                  Running entry func 'initialize' from loaded library '/home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb/simulator.cpython-312-x86_64-linux-gnu.so'
+     -.--ns INFO     pygpi                              ..ib/pygpi/embed.cpp:114  in initialize                      Using Python 3.12.12 interpreter at /home/daksh/projects/major_project/.venv/bin/python3
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:74   in gpi_print_registered_impl       GPI: VPI support registered
+     0.00ns INFO     cocotb.initialize                  Seeding Python random module with 1789196074
+     0.00ns INFO     cocotb.initialize                  Initialized cocotb v2.1.0 from /home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb
+     0.00ns INFO     cocotb.initialize                  Running on Icarus Verilog version 12.0 (stable)
+     0.00ns INFO     cocotb.regression                  Running tests
+     0.00ns INFO     cocotb.regression                  running test_mitchell.test_unsigned_corners (1/5)
+     0.00ns INFO     cocotb.mitchell_tb_top             Mitchell unsigned: 7056 directed pairs (84 x 84)
+  7056.00ns INFO     cocotb.mitchell_tb_top             Mitchell unsigned corners: 7056 pairs checked, all match the golden model
+  7056.00ns INFO     cocotb.regression                  test_mitchell.test_unsigned_corners passed
+  7056.00ns INFO     cocotb.regression                  running test_mitchell.test_unsigned_sweep (2/5)
+  7056.00ns INFO     cocotb.mitchell_tb_top             Mitchell unsigned: 203600 pairs (3600 corner + 200000 random)
+210656.00ns INFO     cocotb.mitchell_tb_top             Mitchell unsigned sweep: 203600 pairs checked, all match the golden model
+210656.00ns INFO     cocotb.regression                  test_mitchell.test_unsigned_sweep passed
+210656.00ns INFO     cocotb.regression                  running test_mitchell.test_signed_corners (3/5)
+210656.00ns INFO     cocotb.mitchell_tb_top             Mitchell signed: 25600 directed pairs (160 x 160)
+236256.00ns INFO     cocotb.mitchell_tb_top             Mitchell signed corners: 25600 pairs checked, all match the golden model
+236256.00ns INFO     cocotb.regression                  test_mitchell.test_signed_corners passed
+236256.00ns INFO     cocotb.regression                  running test_mitchell.test_signed_sweep (4/5)
+236256.00ns INFO     cocotb.mitchell_tb_top             Mitchell signed: 203600 pairs (3600 corner + 200000 random)
+439856.00ns INFO     cocotb.mitchell_tb_top             Mitchell signed sweep: 203600 pairs checked, all match the golden model
+439856.00ns INFO     cocotb.regression                  test_mitchell.test_signed_sweep passed
+439856.00ns INFO     cocotb.regression                  running test_mitchell.test_signed_min_negative (5/5)
+439876.00ns INFO     cocotb.mitchell_tb_top             Mitchell signed -32768 boundary: 20 pairs checked, all match the golden model
+439876.00ns INFO     cocotb.regression                  test_mitchell.test_signed_min_negative passed
+439876.00ns INFO     cocotb.regression                  ************************************************************************************************
+                                                        ** TEST                                    STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
+                                                        ************************************************************************************************
+                                                        ** test_mitchell.test_unsigned_corners      PASS        7056.00           0.18      38358.36  **
+                                                        ** test_mitchell.test_unsigned_sweep        PASS      203600.00           7.50      27162.18  **
+                                                        ** test_mitchell.test_signed_corners        PASS       25600.00           0.64      39915.50  **
+                                                        ** test_mitchell.test_signed_sweep          PASS      203600.00           9.41      21641.88  **
+                                                        ** test_mitchell.test_signed_min_negative   PASS          20.00           0.00      26678.33  **
+                                                        ************************************************************************************************
+                                                        ** TESTS=5 PASS=5 FAIL=0 SKIP=0                       439876.00          17.73      24807.84  **
+                                                        ************************************************************************************************
+FST info: dumpfile /mnt/c/projects/major_project/tb/mitchell/sim_build/mitchell_tb_top.fst opened for output.
+make[1]: Leaving directory '/mnt/c/projects/major_project/tb/mitchell'
+=== tb/drum ===
+make[1]: Entering directory '/mnt/c/projects/major_project/tb/drum'
+rm -f results.xml
+/usr/bin/iverilog -o /mnt/c/projects/major_project/tb/drum/sim_build/sim.vvp -s drum_tb_top -g2012 -g2012 -f /mnt/c/projects/major_project/tb/drum/sim_build/cmds.f -s cocotb_iverilog_dump  /mnt/c/projects/major_project/baselines/drum/DRUM6_16_u.v /mnt/c/projects/major_project/baselines/drum/DRUM4_16_u.v /mnt/c/projects/major_project/baselines/drum/drum_signed_top.sv /mnt/c/projects/major_project/tb/drum/drum_tb_top.sv /mnt/c/projects/major_project/tb/drum/sim_build/cocotb_iverilog_dump.v
+rm -f results.xml
+COCOTB_TEST_MODULES=test_drum COCOTB_TESTCASE=  COCOTB_TOPLEVEL=drum_tb_top TOPLEVEL_LANG=verilog       \
+	 /usr/bin/vvp -m /home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb/libs/libcocotbvpi_icarus.so   /mnt/c/projects/major_project/tb/drum/sim_build/sim.vvp -fst  
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:242  in gpi_load_users                  Loaded entry library: '/usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0'
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:233  in gpi_load_users                  Running entry func 'initialize' from loaded library '/home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb/simulator.cpython-312-x86_64-linux-gnu.so'
+     -.--ns INFO     pygpi                              ..ib/pygpi/embed.cpp:114  in initialize                      Using Python 3.12.12 interpreter at /home/daksh/projects/major_project/.venv/bin/python3
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:74   in gpi_print_registered_impl       GPI: VPI support registered
+     0.00ns INFO     cocotb.initialize                  Seeding Python random module with 1789196096
+     0.00ns INFO     cocotb.initialize                  Initialized cocotb v2.1.0 from /home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb
+     0.00ns INFO     cocotb.initialize                  Running on Icarus Verilog version 12.0 (stable)
+     0.00ns INFO     cocotb.regression                  Running tests
+     0.00ns INFO     cocotb.regression                  running test_drum.test_core_k6_sweep (1/7)
+                                                            DRUM6_16_u against drum(k=6). Core only, no sign logic in the path.
+     0.00ns INFO     cocotb.drum_tb_top                 DRUM6_16_u: 203600 pairs (3600 corner + 200000 random)
+203600.00ns INFO     cocotb.drum_tb_top                 DRUM6_16_u: 203600 pairs checked, all match the golden model
+203600.00ns INFO     cocotb.regression                  test_drum.test_core_k6_sweep passed
+203600.00ns INFO     cocotb.regression                  running test_drum.test_core_k4_sweep (2/7)
+                                                            DRUM4_16_u against drum(k=4). Note this file carries a one-line fix to
+203600.00ns INFO     cocotb.drum_tb_top                 DRUM4_16_u: 203600 pairs (3600 corner + 200000 random)
+407200.00ns INFO     cocotb.drum_tb_top                 DRUM4_16_u: 203600 pairs checked, all match the golden model
+407200.00ns INFO     cocotb.regression                  test_drum.test_core_k4_sweep passed
+407200.00ns INFO     cocotb.regression                  running test_drum.test_signed_k6_corners (3/7)
+                                                            Directed cross product over all four sign quadrants.
+407200.00ns INFO     cocotb.drum_tb_top                 drum_signed_top K=6: 7396 directed corner pairs (86 x 86)
+414596.00ns INFO     cocotb.drum_tb_top                 drum_signed_top K=6 corners: 7396 pairs checked, all match the golden model
+414596.00ns INFO     cocotb.regression                  test_drum.test_signed_k6_corners passed
+414596.00ns INFO     cocotb.regression                  running test_drum.test_signed_k6_sweep (4/7)
+                                                            The sweep set reinterpreted as two's complement -- the same stimulus
+414596.00ns INFO     cocotb.drum_tb_top                 drum_signed_top K=6: 203600 sweep pairs signed (3600 corner + 200000 random)
+618196.00ns INFO     cocotb.drum_tb_top                 drum_signed_top K=6 sweep: 203600 pairs checked, all match the golden model
+618196.00ns INFO     cocotb.regression                  test_drum.test_signed_k6_sweep passed
+618196.00ns INFO     cocotb.regression                  running test_drum.test_signed_k4_corners (5/7)
+618196.00ns INFO     cocotb.drum_tb_top                 drum_signed_top K=4: 7396 directed corner pairs
+625592.00ns INFO     cocotb.drum_tb_top                 drum_signed_top K=4 corners: 7396 pairs checked, all match the golden model
+625592.00ns INFO     cocotb.regression                  test_drum.test_signed_k4_corners passed
+625592.00ns INFO     cocotb.regression                  running test_drum.test_signed_k4_sweep (6/7)
+625592.01ns INFO     cocotb.drum_tb_top                 drum_signed_top K=4: 203600 sweep pairs signed
+829192.01ns INFO     cocotb.drum_tb_top                 drum_signed_top K=4 sweep: 203600 pairs checked, all match the golden model
+829192.01ns INFO     cocotb.regression                  test_drum.test_signed_k4_sweep passed
+829192.01ns INFO     cocotb.regression                  running test_drum.test_min_negative (7/7)
+                                                            -32768 against everything, both K.
+829212.01ns INFO     cocotb.drum_tb_top                 drum_signed_top K=6 min-negative: 20 pairs checked, all match the golden model
+829232.01ns INFO     cocotb.drum_tb_top                 drum_signed_top K=4 min-negative: 20 pairs checked, all match the golden model
+829232.01ns INFO     cocotb.regression                  test_drum.test_min_negative passed
+829232.01ns INFO     cocotb.regression                  ******************************************************************************************
+                                                        ** TEST                              STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
+                                                        ******************************************************************************************
+                                                        ** test_drum.test_core_k6_sweep       PASS      203600.00          19.41      10492.10  **
+                                                        ** test_drum.test_core_k4_sweep       PASS      203600.00          19.95      10205.56  **
+                                                        ** test_drum.test_signed_k6_corners   PASS        7396.00           0.36      20488.09  **
+                                                        ** test_drum.test_signed_k6_sweep     PASS      203600.00          23.63       8615.13  **
+                                                        ** test_drum.test_signed_k4_corners   PASS        7396.00           0.38      19626.96  **
+                                                        ** test_drum.test_signed_k4_sweep     PASS      203600.00          24.70       8242.73  **
+                                                        ** test_drum.test_min_negative        PASS          40.00           0.00      15383.83  **
+                                                        ******************************************************************************************
+                                                        ** TESTS=7 PASS=7 FAIL=0 SKIP=0                 829232.01          88.43       9377.12  **
+                                                        ******************************************************************************************
+FST info: dumpfile /mnt/c/projects/major_project/tb/drum/sim_build/drum_tb_top.fst opened for output.
+make[1]: Leaving directory '/mnt/c/projects/major_project/tb/drum'
+=== tb/exact ===
+make[1]: Entering directory '/mnt/c/projects/major_project/tb/exact'
+rm -f results.xml
+/usr/bin/iverilog -o /mnt/c/projects/major_project/tb/exact/sim_build/sim.vvp -s exact_tb_top -g2012 -g2012 -f /mnt/c/projects/major_project/tb/exact/sim_build/cmds.f -s cocotb_iverilog_dump  /mnt/c/projects/major_project/baselines/exact/exact.sv /mnt/c/projects/major_project/synth/wrappers/exact_wrapper.sv /mnt/c/projects/major_project/tb/exact/exact_tb_top.sv /mnt/c/projects/major_project/tb/exact/sim_build/cocotb_iverilog_dump.v
+rm -f results.xml
+COCOTB_TEST_MODULES=test_exact COCOTB_TESTCASE=  COCOTB_TOPLEVEL=exact_tb_top TOPLEVEL_LANG=verilog       \
+	 /usr/bin/vvp -m /home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb/libs/libcocotbvpi_icarus.so   /mnt/c/projects/major_project/tb/exact/sim_build/sim.vvp -fst  
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:242  in gpi_load_users                  Loaded entry library: '/usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0'
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:233  in gpi_load_users                  Running entry func 'initialize' from loaded library '/home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb/simulator.cpython-312-x86_64-linux-gnu.so'
+     -.--ns INFO     pygpi                              ..ib/pygpi/embed.cpp:114  in initialize                      Using Python 3.12.12 interpreter at /home/daksh/projects/major_project/.venv/bin/python3
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:74   in gpi_print_registered_impl       GPI: VPI support registered
+     0.00ns INFO     cocotb.initialize                  Seeding Python random module with 1789196191
+     0.00ns INFO     cocotb.initialize                  Initialized cocotb v2.1.0 from /home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb
+     0.00ns INFO     cocotb.initialize                  Running on Icarus Verilog version 12.0 (stable)
+     0.00ns INFO     cocotb.regression                  Running tests
+     0.00ns INFO     cocotb.regression                  running test_exact.test_core_corners (1/8)
+                                                            Directed cross product over all four sign quadrants.
+     0.00ns INFO     cocotb.exact_tb_top                exact core: 7744 directed corner pairs (88 x 88)
+  7744.00ns INFO     cocotb.exact_tb_top                exact core corners: 7744 pairs checked, all match the golden model
+  7744.00ns INFO     cocotb.regression                  test_exact.test_core_corners passed
+  7744.00ns INFO     cocotb.regression                  running test_exact.test_core_sweep (2/8)
+                                                            The same stimulus test_mult.py and test_drum.py drive, so the reference
+  7744.00ns INFO     cocotb.exact_tb_top                exact core: 203600 sweep pairs signed (3600 corner + 200000 random)
+211344.00ns INFO     cocotb.exact_tb_top                exact core sweep: 203600 pairs checked, all match the golden model
+211344.00ns INFO     cocotb.regression                  test_exact.test_core_sweep passed
+211344.00ns INFO     cocotb.regression                  running test_exact.test_core_min_negative (3/8)
+                                                            -32768 against everything.
+211364.00ns INFO     cocotb.exact_tb_top                exact core min-negative: 20 pairs checked, all match the golden model
+211364.00ns INFO     cocotb.regression                  test_exact.test_core_min_negative passed
+211364.00ns INFO     cocotb.regression                  running test_exact.test_core_no_overflow (4/8)
+                                                            The product never leaves the 32-bit signed range, so the reference needs
+211413.00ns INFO     cocotb.exact_tb_top                exact core overflow bound: 49 pairs checked, all match the golden model
+211413.00ns INFO     cocotb.exact_tb_top                exact core: |product| <= 2^30 on all extreme corners
+211413.00ns INFO     cocotb.regression                  test_exact.test_core_no_overflow passed
+211413.00ns INFO     cocotb.regression                  running test_exact.test_wrapper_latency (5/8)
+                                                            The registered product appears exactly LATENCY clocks after its
+211464.00ns INFO     cocotb.exact_tb_top                exact_wrapper: latency confirmed at exactly 2 clocks
+211464.00ns INFO     cocotb.regression                  test_exact.test_wrapper_latency passed
+211464.00ns INFO     cocotb.regression                  running test_exact.test_wrapper_corners (6/8)
+                                                            Directed quadrant cross product through the registered path.
+211464.01ns INFO     cocotb.exact_tb_top                exact_wrapper: 7744 directed corner pairs
+288945.01ns INFO     cocotb.exact_tb_top                exact_wrapper corners: 7744 pairs checked, all match the golden model
+288945.01ns INFO     cocotb.regression                  test_exact.test_wrapper_corners passed
+288945.01ns INFO     cocotb.regression                  running test_exact.test_wrapper_sweep (7/8)
+                                                            Back-to-back streaming of the published sweep set, one pair per clock.
+288945.01ns INFO     cocotb.exact_tb_top                exact_wrapper: 203600 sweep pairs signed (3600 corner + 200000 random)
+2324986.01ns INFO     cocotb.exact_tb_top                exact_wrapper sweep: 203600 pairs checked, all match the golden model
+2324986.01ns INFO     cocotb.regression                  test_exact.test_wrapper_sweep passed
+2324986.01ns INFO     cocotb.regression                  running test_exact.test_wrapper_matches_core (8/8)
+                                                            Wrapper and core, same vectors, compared to each other rather than to
+2334017.01ns INFO     cocotb.exact_tb_top                exact_wrapper agrees with exact core on 899 vectors
+2334017.01ns INFO     cocotb.regression                  test_exact.test_wrapper_matches_core passed
+2334017.01ns INFO     cocotb.regression                  **********************************************************************************************
+                                                        ** TEST                                  STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
+                                                        **********************************************************************************************
+                                                        ** test_exact.test_core_corners           PASS        7744.00           0.10      75514.80  **
+                                                        ** test_exact.test_core_sweep             PASS      203600.00           2.96      68712.10  **
+                                                        ** test_exact.test_core_min_negative      PASS          20.00           0.00      44286.59  **
+                                                        ** test_exact.test_core_no_overflow       PASS          49.00           0.00      68263.28  **
+                                                        ** test_exact.test_wrapper_latency        PASS          51.00           0.00     122270.20  **
+                                                        ** test_exact.test_wrapper_corners        PASS       77481.00           0.25     307399.52  **
+                                                        ** test_exact.test_wrapper_sweep          PASS     2036041.00           7.04     289376.20  **
+                                                        ** test_exact.test_wrapper_matches_core   PASS        9031.00           0.03     260300.13  **
+                                                        **********************************************************************************************
+                                                        ** TESTS=8 PASS=8 FAIL=0 SKIP=0                    2334017.01          10.39     224604.50  **
+                                                        **********************************************************************************************
+FST info: dumpfile /mnt/c/projects/major_project/tb/exact/sim_build/exact_tb_top.fst opened for output.
+make[1]: Leaving directory '/mnt/c/projects/major_project/tb/exact'
+=== tb/opt ===
+make[1]: Entering directory '/mnt/c/projects/major_project/tb/opt'
+rm -f results.xml
+/usr/bin/iverilog -o /mnt/c/projects/major_project/tb/opt/sim_build/sim.vvp -s opt_tb_top -g2012 -g2012 -f /mnt/c/projects/major_project/tb/opt/sim_build/cmds.f -s cocotb_iverilog_dump  /mnt/c/projects/major_project/rtl/lzc_8.sv /mnt/c/projects/major_project/rtl/lzc_16.sv /mnt/c/projects/major_project/rtl/dlzs_snap_exp.sv /mnt/c/projects/major_project/rtl/dlzs_b_prep.sv /mnt/c/projects/major_project/rtl/dlzc_shift.sv /mnt/c/projects/major_project/rtl/dlzc_opt_top.sv /mnt/c/projects/major_project/rtl/dlzc_mult.sv /mnt/c/projects/major_project/rtl/dlzc_mult_top.sv /mnt/c/projects/major_project/tb/opt/opt_tb_top.sv /mnt/c/projects/major_project/tb/opt/sim_build/cocotb_iverilog_dump.v
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/dlzc_shift.sv:10: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/dlzc_shift.sv:18: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/dlzc_shift.sv:10: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/dlzc_shift.sv:18: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+rm -f results.xml
+COCOTB_TEST_MODULES=test_opt COCOTB_TESTCASE=  COCOTB_TOPLEVEL=opt_tb_top TOPLEVEL_LANG=verilog       \
+	 /usr/bin/vvp -m /home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb/libs/libcocotbvpi_icarus.so   /mnt/c/projects/major_project/tb/opt/sim_build/sim.vvp -fst  
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:242  in gpi_load_users                  Loaded entry library: '/usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0'
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:233  in gpi_load_users                  Running entry func 'initialize' from loaded library '/home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb/simulator.cpython-312-x86_64-linux-gnu.so'
+     -.--ns INFO     pygpi                              ..ib/pygpi/embed.cpp:114  in initialize                      Using Python 3.12.12 interpreter at /home/daksh/projects/major_project/.venv/bin/python3
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:74   in gpi_print_registered_impl       GPI: VPI support registered
+     0.00ns INFO     cocotb.initialize                  Seeding Python random module with 1789196203
+     0.00ns INFO     cocotb.initialize                  Initialized cocotb v2.1.0 from /home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb
+     0.00ns INFO     cocotb.initialize                  Running on Icarus Verilog version 12.0 (stable)
+     0.00ns INFO     cocotb.regression                  Running tests
+     0.00ns INFO     cocotb.regression                  running test_opt.test_snap_exp_exhaustive (1/8)
+                                                            Every legal magnitude 1..32768 against the reference exponent.
+ 32768.00ns INFO     cocotb.opt_tb_top                  dlzs_snap_exp: 32768 vectors checked, all match
+ 32768.00ns INFO     cocotb.opt_tb_top                  dlzs_snap_exp: 30 powers-of-two / tie values covered
+ 32768.00ns INFO     cocotb.regression                  test_opt.test_snap_exp_exhaustive passed
+ 32768.00ns INFO     cocotb.regression                  running test_opt.test_b_prep_exhaustive (2/8)
+                                                            All 65,536 B in every (a_zero, a_neg) combination.
+294912.00ns INFO     cocotb.opt_tb_top                  dlzs_b_prep: 262144 vectors checked, all match
+294912.00ns INFO     cocotb.regression                  test_opt.test_b_prep_exhaustive passed
+294912.00ns INFO     cocotb.regression                  running test_opt.test_shift_extremes (3/8)
+                                                            Every e against the extremes of the legal bp range.
+295056.00ns INFO     cocotb.opt_tb_top                  dlzc_shift extremes: 144 vectors checked, all match
+295056.00ns INFO     cocotb.regression                  test_opt.test_shift_extremes passed
+295056.00ns INFO     cocotb.regression                  running test_opt.test_shift_random (4/8)
+                                                            Random bp over the legal range, every e.
+495056.00ns INFO     cocotb.opt_tb_top                  dlzc_shift random: 200000 vectors checked, all match
+495056.00ns INFO     cocotb.regression                  test_opt.test_shift_random passed
+495056.00ns INFO     cocotb.regression                  running test_opt.test_top_exhaustive_a (5/8)
+                                                            Every A (all 65,536) against a fixed set of B.
+495056.00ns INFO     cocotb.opt_tb_top                  dlzc_opt_top: 655360 pairs (all A x 10 B)
+1150416.00ns INFO     cocotb.opt_tb_top                  dlzc_opt_top exhaustive-A vs golden model: 655360 vectors checked, all match
+1150416.00ns INFO     cocotb.opt_tb_top                  dlzc_opt_top exhaustive-A vs dlzc_mult_top: 655360 vectors checked, all match
+1150416.00ns INFO     cocotb.regression                  test_opt.test_top_exhaustive_a passed
+1150416.00ns INFO     cocotb.regression                  running test_opt.test_top_corners (6/8)
+                                                            Directed cross product over binade edges, tie values and extremes.
+1150416.00ns INFO     cocotb.opt_tb_top                  dlzc_opt_top: 25600 directed corner pairs (160 x 160 operands)
+1176016.00ns INFO     cocotb.opt_tb_top                  dlzc_opt_top corners vs golden model: 25600 vectors checked, all match
+1176016.00ns INFO     cocotb.opt_tb_top                  dlzc_opt_top corners vs dlzc_mult_top: 25600 vectors checked, all match
+1176016.00ns INFO     cocotb.regression                  test_opt.test_top_corners passed
+1176016.00ns INFO     cocotb.regression                  running test_opt.test_top_sweep (7/8)
+                                                            The sweep set from src/sweep.py reinterpreted as two's complement, so
+1176016.01ns INFO     cocotb.opt_tb_top                  dlzc_opt_top: 203600 sweep pairs (3600 corner + 200000 random)
+1379616.01ns INFO     cocotb.opt_tb_top                  dlzc_opt_top sweep vs golden model: 203600 vectors checked, all match
+1379616.01ns INFO     cocotb.opt_tb_top                  dlzc_opt_top sweep vs dlzc_mult_top: 203600 vectors checked, all match
+1379616.01ns INFO     cocotb.regression                  test_opt.test_top_sweep passed
+1379616.01ns INFO     cocotb.regression                  running test_opt.test_top_output_range (8/8)
+                                                            The output stays inside the 32-bit signed port, with |p| <= 2^30.
+1379665.01ns INFO     cocotb.opt_tb_top                  dlzc_opt_top range vs golden model: 49 vectors checked, all match
+1379665.01ns INFO     cocotb.opt_tb_top                  dlzc_opt_top range vs dlzc_mult_top: 49 vectors checked, all match
+1379666.01ns INFO     cocotb.opt_tb_top                  dlzc_opt_top: worst |p| = 2^30, and -2^30 is produced at A=32767 B=-32768
+1379666.01ns INFO     cocotb.regression                  test_opt.test_top_output_range passed
+1379666.01ns INFO     cocotb.regression                  *******************************************************************************************
+                                                        ** TEST                               STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
+                                                        *******************************************************************************************
+                                                        ** test_opt.test_snap_exp_exhaustive   PASS       32768.00           0.40      81728.72  **
+                                                        ** test_opt.test_b_prep_exhaustive     PASS      262144.00           2.54     103351.87  **
+                                                        ** test_opt.test_shift_extremes        PASS         144.00           0.00      71850.77  **
+                                                        ** test_opt.test_shift_random          PASS      200000.00           2.10      95020.40  **
+                                                        ** test_opt.test_top_exhaustive_a      PASS      655360.00          15.38      42623.68  **
+                                                        ** test_opt.test_top_corners           PASS       25600.00           0.53      48546.99  **
+                                                        ** test_opt.test_top_sweep             PASS      203600.00           9.19      22156.45  **
+                                                        ** test_opt.test_top_output_range      PASS          50.00           0.00      30748.38  **
+                                                        *******************************************************************************************
+                                                        ** TESTS=8 PASS=8 FAIL=0 SKIP=0                 1379666.01          30.14      45775.33  **
+                                                        *******************************************************************************************
+FST info: dumpfile /mnt/c/projects/major_project/tb/opt/sim_build/opt_tb_top.fst opened for output.
+make[1]: Leaving directory '/mnt/c/projects/major_project/tb/opt'
+=== tb/drum_opt ===
+make[1]: Entering directory '/mnt/c/projects/major_project/tb/drum_opt'
+rm -f results.xml
+/usr/bin/iverilog -o /mnt/c/projects/major_project/tb/drum_opt/sim_build/sim.vvp -s drum_opt_tb_top -g2012 -g2012 -f /mnt/c/projects/major_project/tb/drum_opt/sim_build/cmds.f -s cocotb_iverilog_dump  /mnt/c/projects/major_project/rtl/lzc_8.sv /mnt/c/projects/major_project/rtl/lzc_16.sv /mnt/c/projects/major_project/baselines/drum_opt/drum_opt_operand.sv /mnt/c/projects/major_project/baselines/drum_opt/drum_opt_shift.sv /mnt/c/projects/major_project/baselines/drum_opt/drum_opt_top.sv /mnt/c/projects/major_project/baselines/drum/DRUM6_16_u.v /mnt/c/projects/major_project/baselines/drum/DRUM4_16_u.v /mnt/c/projects/major_project/baselines/drum/drum_signed_top.sv /mnt/c/projects/major_project/tb/drum_opt/drum_opt_tb_top.sv /mnt/c/projects/major_project/tb/drum_opt/sim_build/cocotb_iverilog_dump.v
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/mnt/c/projects/major_project/rtl/lzc_16.sv:22: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+rm -f results.xml
+COCOTB_TEST_MODULES=test_drum_opt COCOTB_TESTCASE=  COCOTB_TOPLEVEL=drum_opt_tb_top TOPLEVEL_LANG=verilog       \
+	 /usr/bin/vvp -m /home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb/libs/libcocotbvpi_icarus.so   /mnt/c/projects/major_project/tb/drum_opt/sim_build/sim.vvp -fst  
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:242  in gpi_load_users                  Loaded entry library: '/usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0'
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:233  in gpi_load_users                  Running entry func 'initialize' from loaded library '/home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb/simulator.cpython-312-x86_64-linux-gnu.so'
+     -.--ns INFO     pygpi                              ..ib/pygpi/embed.cpp:114  in initialize                      Using Python 3.12.12 interpreter at /home/daksh/projects/major_project/.venv/bin/python3
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:74   in gpi_print_registered_impl       GPI: VPI support registered
+     0.00ns INFO     cocotb.initialize                  Seeding Python random module with 1789196237
+     0.00ns INFO     cocotb.initialize                  Initialized cocotb v2.1.0 from /home/daksh/projects/major_project/.venv/lib/python3.12/site-packages/cocotb
+     0.00ns INFO     cocotb.initialize                  Running on Icarus Verilog version 12.0 (stable)
+     0.00ns INFO     cocotb.regression                  Running tests
+     0.00ns INFO     cocotb.regression                  running test_drum_opt.test_operand_exhaustive (1/5)
+                                                            Every 16-bit X, every K. The seam of interest is |X| = 2^K - 1 vs 2^K
+ 65536.00ns INFO     cocotb.drum_opt_tb_top             drum_opt_operand K=3: 65536 vectors checked, all match
+ 65536.00ns INFO     cocotb.drum_opt_tb_top             drum_opt_operand K=4: 65536 vectors checked, all match
+ 65536.00ns INFO     cocotb.drum_opt_tb_top             drum_opt_operand K=5: 65536 vectors checked, all match
+ 65536.00ns INFO     cocotb.drum_opt_tb_top             drum_opt_operand K=6: 65536 vectors checked, all match
+ 65536.00ns INFO     cocotb.drum_opt_tb_top             drum_opt_operand K=7: 65536 vectors checked, all match
+ 65536.00ns INFO     cocotb.drum_opt_tb_top             drum_opt_operand K=8: 65536 vectors checked, all match
+ 65536.00ns INFO     cocotb.regression                  test_drum_opt.test_operand_exhaustive passed
+ 65536.00ns INFO     cocotb.regression                  running test_drum_opt.test_top_exhaustive_a (2/5)
+                                                            Every A against a fixed set of B, all K. Since the operand blocks are
+ 65536.00ns INFO     cocotb.drum_opt_tb_top             drum_opt_top: 655360 pairs (all A x 10 B), K = 3..8
+720896.00ns INFO     cocotb.drum_opt_tb_top             exhaustive-A K=3 vs golden model: 655360 vectors checked, all match
+720896.00ns INFO     cocotb.drum_opt_tb_top             exhaustive-A K=4 vs golden model: 655360 vectors checked, all match
+720896.00ns INFO     cocotb.drum_opt_tb_top             exhaustive-A K=5 vs golden model: 655360 vectors checked, all match
+720896.00ns INFO     cocotb.drum_opt_tb_top             exhaustive-A K=6 vs golden model: 655360 vectors checked, all match
+720896.00ns INFO     cocotb.drum_opt_tb_top             exhaustive-A K=7 vs golden model: 655360 vectors checked, all match
+720896.00ns INFO     cocotb.drum_opt_tb_top             exhaustive-A K=8 vs golden model: 655360 vectors checked, all match
+720896.00ns INFO     cocotb.drum_opt_tb_top             exhaustive-A K=4 vs published DRUM4: 655360 vectors checked, all match
+720896.00ns INFO     cocotb.drum_opt_tb_top             exhaustive-A K=6 vs published DRUM6: 655360 vectors checked, all match
+720896.00ns INFO     cocotb.regression                  test_drum_opt.test_top_exhaustive_a passed
+720896.00ns INFO     cocotb.regression                  running test_drum_opt.test_top_corners (3/5)
+                                                            Directed cross product over binade edges, seams and extremes.
+720896.00ns INFO     cocotb.drum_opt_tb_top             drum_opt_top: 12544 directed corner pairs
+733440.00ns INFO     cocotb.drum_opt_tb_top             corners K=3 vs golden model: 12544 vectors checked, all match
+733440.00ns INFO     cocotb.drum_opt_tb_top             corners K=4 vs golden model: 12544 vectors checked, all match
+733440.00ns INFO     cocotb.drum_opt_tb_top             corners K=5 vs golden model: 12544 vectors checked, all match
+733440.00ns INFO     cocotb.drum_opt_tb_top             corners K=6 vs golden model: 12544 vectors checked, all match
+733440.00ns INFO     cocotb.drum_opt_tb_top             corners K=7 vs golden model: 12544 vectors checked, all match
+733440.00ns INFO     cocotb.drum_opt_tb_top             corners K=8 vs golden model: 12544 vectors checked, all match
+733440.00ns INFO     cocotb.drum_opt_tb_top             corners K=4 vs published DRUM4: 12544 vectors checked, all match
+733440.00ns INFO     cocotb.drum_opt_tb_top             corners K=6 vs published DRUM6: 12544 vectors checked, all match
+733440.00ns INFO     cocotb.regression                  test_drum_opt.test_top_corners passed
+733440.00ns INFO     cocotb.regression                  running test_drum_opt.test_top_sweep (4/5)
+                                                            The sweep set from src/sweep.py reinterpreted as two's complement.
+733440.00ns INFO     cocotb.drum_opt_tb_top             drum_opt_top: 203600 sweep pairs (3600 corner + 200000 random)
+937040.00ns INFO     cocotb.drum_opt_tb_top             sweep K=3 vs golden model: 203600 vectors checked, all match
+937040.00ns INFO     cocotb.drum_opt_tb_top             sweep K=4 vs golden model: 203600 vectors checked, all match
+937040.00ns INFO     cocotb.drum_opt_tb_top             sweep K=5 vs golden model: 203600 vectors checked, all match
+937040.00ns INFO     cocotb.drum_opt_tb_top             sweep K=6 vs golden model: 203600 vectors checked, all match
+937040.00ns INFO     cocotb.drum_opt_tb_top             sweep K=7 vs golden model: 203600 vectors checked, all match
+937040.00ns INFO     cocotb.drum_opt_tb_top             sweep K=8 vs golden model: 203600 vectors checked, all match
+937040.00ns INFO     cocotb.drum_opt_tb_top             sweep K=4 vs published DRUM4: 203600 vectors checked, all match
+937040.00ns INFO     cocotb.drum_opt_tb_top             sweep K=6 vs published DRUM6: 203600 vectors checked, all match
+937040.00ns INFO     cocotb.regression                  test_drum_opt.test_top_sweep passed
+937040.00ns INFO     cocotb.regression                  running test_drum_opt.test_top_output_range (5/5)
+                                                            DRUM can OVERestimate (the forced LSB), so its largest result exceeds
+937089.00ns INFO     cocotb.drum_opt_tb_top             range K=3 vs golden model: 49 vectors checked, all match
+937089.00ns INFO     cocotb.drum_opt_tb_top             range K=4 vs golden model: 49 vectors checked, all match
+937089.00ns INFO     cocotb.drum_opt_tb_top             range K=5 vs golden model: 49 vectors checked, all match
+937089.00ns INFO     cocotb.drum_opt_tb_top             range K=6 vs golden model: 49 vectors checked, all match
+937089.00ns INFO     cocotb.drum_opt_tb_top             range K=7 vs golden model: 49 vectors checked, all match
+937089.00ns INFO     cocotb.drum_opt_tb_top             range K=8 vs golden model: 49 vectors checked, all match
+937089.00ns INFO     cocotb.drum_opt_tb_top             range K=4 vs published DRUM4: 49 vectors checked, all match
+937089.00ns INFO     cocotb.drum_opt_tb_top             range K=6 vs published DRUM6: 49 vectors checked, all match
+937089.00ns INFO     cocotb.drum_opt_tb_top             K=3: worst |product| over extremes = 1677721600 (1.562 x 2^30)
+937089.00ns INFO     cocotb.drum_opt_tb_top             K=4: worst |product| over extremes = 1358954496 (1.266 x 2^30)
+937089.00ns INFO     cocotb.drum_opt_tb_top             K=5: worst |product| over extremes = 1212153856 (1.129 x 2^30)
+937089.00ns INFO     cocotb.drum_opt_tb_top             K=6: worst |product| over extremes = 1141899264 (1.063 x 2^30)
+937089.00ns INFO     cocotb.drum_opt_tb_top             K=7: worst |product| over extremes = 1107558400 (1.031 x 2^30)
+937089.00ns INFO     cocotb.drum_opt_tb_top             K=8: worst |product| over extremes = 1090584576 (1.016 x 2^30)
+937089.00ns INFO     cocotb.regression                  test_drum_opt.test_top_output_range passed
+937089.00ns INFO     cocotb.regression                  ***********************************************************************************************
+                                                        ** TEST                                   STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
+                                                        ***********************************************************************************************
+                                                        ** test_drum_opt.test_operand_exhaustive   PASS       65536.00           3.68      17784.91  **
+                                                        ** test_drum_opt.test_top_exhaustive_a     PASS      655360.00         116.37       5631.48  **
+                                                        ** test_drum_opt.test_top_corners          PASS       12544.00           1.46       8562.79  **
+                                                        ** test_drum_opt.test_top_sweep            PASS      203600.00          60.24       3379.90  **
+                                                        ** test_drum_opt.test_top_output_range     PASS          49.00           0.01       4793.60  **
+                                                        ***********************************************************************************************
+                                                        ** TESTS=5 PASS=5 FAIL=0 SKIP=0                      937089.00         181.78       5155.21  **
+                                                        ***********************************************************************************************
+FST info: dumpfile /mnt/c/projects/major_project/tb/drum_opt/sim_build/drum_opt_tb_top.fst opened for output.
+make[1]: Leaving directory '/mnt/c/projects/major_project/tb/drum_opt'
