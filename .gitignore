@@ -44,6 +44,27 @@ usage_statistics_webtalk.*
 *.ip_user_files/
 *.runs/
 *.sim/
+*.gen/
+
+# Vivado-generated project products inside the AXI/PYNQ integration project.
+# Keep the hand-authored IP package, .xpr, .bd, .xci, and imported RTL.
+axi_lite_wrapper/**/dlzs.gen/
+axi_lite_wrapper/**/dlzs.runs/
+axi_lite_wrapper/**/dlzs.cache/
+axi_lite_wrapper/**/dlzs.hw/
+axi_lite_wrapper/**/dlzs.sim/
+axi_lite_wrapper/**/dlzs.ip_user_files/
+axi_lite_wrapper/**/ipshared/
+axi_lite_wrapper/**/xsim.dir/
+axi_lite_wrapper/**/waveform/
+axi_lite_wrapper/**/ui/
+axi_lite_wrapper/ip_repo/edit_dlzs_axi_v1_0.srcs/
+axi_lite_wrapper/ip_repo/edit_dlzs_axi_v1_0.xpr
+axi_lite_wrapper/ip_repo/tb_axi_smoke_behav.wcfg
+axi_lite_wrapper/**/*.bda
+
+# Board definitions are local Vivado setup files, not project sources.
+/board_files/
 
 # XSim simulation files (if you use XSim instead of Icarus)
 xsim.dir/
