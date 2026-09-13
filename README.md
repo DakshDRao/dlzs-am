@@ -526,7 +526,47 @@ vectors; `power.tcl` is written so that swapping `set_switching_activity` for
 
 ---
 
-## 8. RTL
+## 8. PYNQ-Z2 integration checkpoint
+
+The Week 8–9 hardware integration is now built through Vivado 2025.2 for the
+PYNQ-Z2 (`xc7z020clg400-1`). The packaged `dlzs_axi` IP contains the optimized
+signed DLZS core behind an AXI4-Lite register interface. The wrapper accepts AXI
+write address and write data independently, honors byte strobes, holds write and
+read responses until the master accepts them, and snapshots operands before
+capturing the combinational multiplier result on the following clock.
+
+The software-visible register map is:
+
+| Offset | Access | Meaning |
+|---|---|---|
+| `0x00` | W | CONTROL bit 0 starts an operation |
+| `0x04` | R | STATUS bit 0 = busy, bit 1 = done |
+| `0x08` | RW | Signed operand A, low 16 bits |
+| `0x0C` | RW | Signed operand B, low 16 bits |
+| `0x10` | R | Signed 32-bit result |
+
+The block design uses the Zynq processing system, AXI SmartConnect, and a
+50 MHz `FCLK_CLK0`. Address Editor assigned `dlzs_axi_0` the base address
+`0x43C00000` with a 64 KiB range. Block-design validation completed
+successfully. Post-implementation timing also passed: WNS `+11.036 ns`, WHS
+`+0.088 ns`, and zero failing endpoints.
+
+![PYNQ-Z2 DLZS AXI block design](docs/images/vivado/image.png)
+
+*Vivado block design showing the Zynq processing system, AXI SmartConnect,
+the reset block, and the packaged `dlzs_axi_0` peripheral.*
+
+The wrapper passed a local Vivado XSim smoke test covering 100 signed operand
+pairs, split address/data arrivals, byte strobes, reset, ignored read-only and
+unaligned writes, and stalled read/write responses. The generated bitstream and
+hardware handoff are ready for the board run, but the required ≥10,000-vector
+PYNQ regression against `src/golden_model.py` remains open until the board is
+available. The bitstream and handoff files are generated artifacts and are not
+tracked in Git.
+
+---
+
+## 9. RTL
 
     rtl/lzc_8.sv            8-bit leading-one detector
     rtl/lzc_16.sv           16-bit, two cascaded lzc_8 blocks
@@ -557,7 +597,7 @@ Things that are easy to get wrong and were got right:
 
 ---
 
-## 9. Repository layout
+## 10. Repository layout
 
     rtl/                    DLZS design sources (original and optimized)
     baselines/
@@ -590,7 +630,7 @@ product would be a bug.
 
 ---
 
-## 10. Running it
+## 11. Running it
 
 From the repo root:
 
@@ -643,7 +683,7 @@ vectors and the published error tables are the same set.
 
 ---
 
-## 11. Known issues
+## 12. Known issues
 
 1. **`metrics.py` signed bias.** Dividing by `abs(p)` flips the sign on
    negative products, so signed `bias` averages to ≈ 0 regardless of the
@@ -657,20 +697,22 @@ vectors and the published error tables are the same set.
    pending.
 4. **The RTL is fixed at 16 bits.** No 8-bit synthesis numbers and no
    exhaustive 8-bit model/RTL equivalence yet.
-5. **No simulation log is committed.**
+5. **No ≥10,000-vector PYNQ hardware log is committed yet.** The AXI wrapper has
+   passed a local Vivado XSim smoke test; the real-board regression is pending
+   until the PYNQ-Z2 is available.
 6. **Vendored DRUM lint warnings are waived, not fixed** (`WIDTHEXPAND`,
    `UNUSEDSIGNAL`), scoped to the benches that compile upstream code.
 
 ---
 
-## 12. Roadmap
+## 13. Roadmap
 
 | Week | Scope | Status |
 |------|-------|--------|
 | 1–2 | Literature lock + golden model | done |
 | 3–5 | DLZS RTL + verification | done |
 | 6–7 | Baselines, OOC LUT-only synthesis, comparison table | mostly done — DLZS, DRUM K=3..8, Mitchell and exact LUT/DSP reports included; remaining: 8-bit characterization, committed simulation evidence, Mitchell refined power, tighter-period run |
-| 8–9 | AXI-Lite wrapper, PYNQ-Z2 overlay, ≥10,000 vectors hardware-vs-sim | |
+| 8–9 | AXI-Lite wrapper, PYNQ-Z2 overlay, ≥10,000 vectors hardware-vs-sim | in progress — wrapper, validated block design, timing, bitstream, and local smoke test complete; board regression pending |
 | 10–11 | Attention Q/K from DistilBERT, top-k index overlap vs hardware cost | |
 | 12–13 | MBM-style error compensation, accuracy-vs-LUTs Pareto front | |
 | 14 | Buffer, thesis writeup, defense dry-run | |
@@ -686,7 +728,7 @@ commit.
 
 ---
 
-## 13. Environment
+## 14. Environment
 
 - **Board:** PYNQ-Z2 (primary); Arty A7-100T (optional stretch)
 - **Tools:** Vivado, Icarus Verilog / Verilator, cocotb, Python 3, PyTorch
@@ -697,7 +739,7 @@ commit.
 
 ---
 
-## 14. References
+## 15. References
 
 1. J. N. Mitchell, "Computer Multiplication and Division Using Binary
    Logarithms," *IRE Transactions on Electronic Computers*, 1962.
