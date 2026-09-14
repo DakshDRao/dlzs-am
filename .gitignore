@@ -96,3 +96,9 @@ xelab.pb
 # Curated simulation evidence may be committed despite the global *.log rule
 !/evidence/logs/
 !/evidence/logs/*.log
+
+# Curated README evidence and figures are versioned documentation.
+!/docs/results/
+!/docs/results/**
+!/docs/images/results/
+!/docs/images/results/**

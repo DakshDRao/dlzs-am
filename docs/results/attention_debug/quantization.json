@@ -1,0 +1,104 @@
+{
+  "passed": true,
+  "source_directory": "/mnt/c/projects/major_project/src/results/attention_sanity/20260914T055041_172785Z",
+  "model_revision": "12040accade4e8a0f71eabdb258fecc2e7e948be",
+  "numpy_version": "2.5.3",
+  "layer_index": 0,
+  "shape": [
+    2,
+    12,
+    26,
+    64
+  ],
+  "quantization": {
+    "range": [
+      -32767,
+      32767
+    ],
+    "storage": "int16",
+    "rounding": "nearest, ties to even",
+    "zero_point": 0,
+    "scale": "dynamic per sample/head, separately Q and K, valid tokens only",
+    "zero_tensor_scale": 1.0,
+    "clipped_values": 0,
+    "accumulator": "int64",
+    "absolute_accumulator_bound": 68715282496
+  },
+  "score_mae": 3.798164483446334e-05,
+  "score_max_absolute_error": 0.000316170749208311,
+  "topk": [
+    {
+      "percent": 5,
+      "mean_overlap": 1.0,
+      "min_overlap": 1.0,
+      "rows": 384,
+      "boundary_tie_rows": 0
+    },
+    {
+      "percent": 10,
+      "mean_overlap": 1.0,
+      "min_overlap": 1.0,
+      "rows": 384,
+      "boundary_tie_rows": 0
+    },
+    {
+      "percent": 15,
+      "mean_overlap": 1.0,
+      "min_overlap": 1.0,
+      "rows": 384,
+      "boundary_tie_rows": 0
+    },
+    {
+      "percent": 20,
+      "mean_overlap": 1.0,
+      "min_overlap": 1.0,
+      "rows": 384,
+      "boundary_tie_rows": 0
+    },
+    {
+      "percent": 25,
+      "mean_overlap": 1.0,
+      "min_overlap": 1.0,
+      "rows": 384,
+      "boundary_tie_rows": 0
+    },
+    {
+      "percent": 30,
+      "mean_overlap": 1.0,
+      "min_overlap": 1.0,
+      "rows": 384,
+      "boundary_tie_rows": 0
+    },
+    {
+      "percent": 35,
+      "mean_overlap": 0.9997395833333332,
+      "min_overlap": 0.9,
+      "rows": 384,
+      "boundary_tie_rows": 0
+    },
+    {
+      "percent": 40,
+      "mean_overlap": 1.0,
+      "min_overlap": 1.0,
+      "rows": 384,
+      "boundary_tie_rows": 0
+    },
+    {
+      "percent": 45,
+      "mean_overlap": 1.0,
+      "min_overlap": 1.0,
+      "rows": 384,
+      "boundary_tie_rows": 0
+    },
+    {
+      "percent": 50,
+      "mean_overlap": 1.0,
+      "min_overlap": 1.0,
+      "rows": 384,
+      "boundary_tie_rows": 0
+    }
+  ],
+  "aggregation": "equal weight per valid query/head row",
+  "ranking": "descending signed score; ties use ascending key index; k=ceil(percent*valid_keys/100)",
+  "scope": "two-text debug quantization baseline, no approximate multiplication, no hardware results"
+}

@@ -1,0 +1,22 @@
+{
+  "source_run": "20260914T070644_541555Z",
+  "files_sha256": {
+    "manifest.json": "e0703069f46b3fcc382c30a3d8425d97ea6544f4cfa9e563a31b4eccfdc117c5",
+    "summary_corrected.csv": "2f0c8feb2c037a7d2b23d94ce378751329316dc207596779485da25d5912a03a",
+    "summary.csv": "0b8dcbd977b89aac45fce6f49f50a75134a6c8365468df43f8cd0526fdfe175e",
+    "design_summary.csv": "c894aa23fbb1f26acb78e219c9404e645b593aa373c416666b956dbafb3fe7aa",
+    "attention_cost_table.csv": "d4a216eb90c55982ade8d9a3c32438a075101fa4d876b85d5e87d26883b64f29",
+    "attention_cost_table.json": "9cac6f13a222ad31feebedbd5839f5f210f34d4779d1439fc67f9877b76f14c7",
+    "per_layer.csv": "7b1a4a3879ebde9f41446be092913357fb195f1bcfb89e981e49aab25341ebc5",
+    "per_text.csv": "680209722baee8d0240cbce6dad128afd5b2051a965cc42a9ee6c9dc00c548f1",
+    "score_errors.csv": "c33125a9e01c029799b1dbde8707ca660a07f2e7598a60df19f07c3044557c94",
+    "reconstruction_checks.csv": "2ab9c2dfddb270b8fff8faaaaf6c267f6dbe4a34ca737e679ca91e516e73ab6c",
+    "outliers_10pct.csv": "4c15a4728463780170194162cd851c6f2a3ba2df23d4afd85a0529793b84f85b",
+    "outlier_report.json": "95e70722720e044583d3a64870a331038760ad8f2f068e8084c3cbc3779928f9"
+  },
+  "copied_plot_sha256": {
+    "topk_overlap.png": "813c1aa9d4111b9e0aaa783d9c524172bf18ffaeb55d7c82ab71c23f01b28c06",
+    "topk_overlap.svg": "fbeb1cf773b3d52e56ceb4367440f630a16390a0ca9a9f9ee113ab6457489c05"
+  },
+  "validation": "summary_corrected means and passage ranges independently recomputed from per_text.csv"
+}

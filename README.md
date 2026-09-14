@@ -1,10 +1,18 @@
 # DLZS-AM
 
-**An FPGA-optimized differential log-domain approximate multiplier with error
-compensation — design, characterization, and application to attention-sparsity
-prediction.**
+**An FPGA-optimized differential log-domain approximate multiplier — design, characterization, AXI4-Lite integration,
+and attention top-k ranking study. Error compensation is planned.**
 
 B.Tech ECE major project, NIT Andhra Pradesh.
+
+**Updated: 14 September 2026.** Standalone RTL characterization, AXI simulation,
+PYNQ bitstream generation, and the fixed-corpus attention ranking study are
+complete. Physical-board regression and error compensation remain pending.
+
+Jump to [hardware results](#7-implementation-results),
+[PYNQ integration](#8-pynq-z2-integration-checkpoint),
+[attention results](#9-attention-top-k-study--completed-fixed-corpus-experiment),
+[run instructions](#12-running-it), or [roadmap](#14-roadmap).
 
 ---
 
@@ -46,15 +54,15 @@ multiply collapses into a leading-one detector and a shifter.
     A × B  ≈  2^round(log₂ A) × B  =  B << round(log₂ A)
 
 SOFA describes DLZS as a component inside a larger accelerator, and its notation
-is ambiguous about which way the snap rounds. Nobody has published a standalone
-characterization of the scheme. That gap is the project.
+is ambiguous about which way the snap rounds. This project studies its standalone FPGA cost and ranking error under a
+controlled comparison; it does not establish a literature-wide priority claim.
 
 ### What is and is not claimed
 
 Log-domain multiplication is **Mitchell (1962)** and is **not** claimed as novel.
 The claims are narrower:
 
-- the first standalone FPGA implementation and error characterization of the
+- a standalone FPGA implementation and error characterization of the
   asymmetric log scheme, against DRUM, Mitchell and an exact multiplier under
   identical LUT-only constraints;
 - an FPGA architecture for signed DLZS that removes the sign-handling cost
@@ -170,7 +178,7 @@ DLZS is not an accuracy play: DRUM6 is about 11× more accurate, and even DRUM3
 has a lower mean error (though a worse worst case). The case for DLZS is
 hardware cost, and whether its error is tolerable for top-k attention ranking
 — a consistent scaling bias does not change a ranking, the spread of the error
-does. That is the Week 10–11 study.
+does. The completed fixed-corpus study is reported in §9.
 
 ---
 
@@ -450,7 +458,8 @@ single-cycle):
    a contradiction of the DRUM paper, which evaluated an ASIC flow.
 2. **DLZS-opt is the only design that beats exact on both axes.** Its cost is
    accuracy: 16.8 % mean error against 12.1 % for the cheapest DRUM. Whether
-   that is acceptable is an application question, answered in Week 10–11.
+   that is acceptable is an application question. The ranking results in §9
+   quantify the trade; end-to-end task accuracy remains unmeasured.
 
 ### Power
 
@@ -461,8 +470,10 @@ power, and most fairly in **energy per multiplication**:
 
     E (pJ) = P_dynamic (mW) × clock period (ns)
 
-Energy per operation does not depend on the clock the estimate was made at, so
-it stays fair even though several designs miss the 10 ns target.
+This conversion assumes one multiplication per cycle and the stated switching
+activity. Designs that miss the 10 ns target cannot operate correctly at that
+clock; these figures are activity-based estimates, not demonstrated energy at
+a timing-closed operating frequency.
 
 **Activity-driven figures** — committed `power_summary.txt` reports, 50 % input
 toggle rate, 0.5 static probability, post-route, 10 ns clock:
@@ -561,12 +572,312 @@ pairs, split address/data arrivals, byte strobes, reset, ignored read-only and
 unaligned writes, and stalled read/write responses. The generated bitstream and
 hardware handoff are ready for the board run, but the required ≥10,000-vector
 PYNQ regression against `src/golden_model.py` remains open until the board is
-available. The bitstream and handoff files are generated artifacts and are not
-tracked in Git.
+available. The completed deployment pair is now preserved at:
+
+- [pynq_overlay/dlzs_system_wrapper.bit](pynq_overlay/dlzs_system_wrapper.bit)
+- [pynq_overlay/dlzs_system_wrapper.hwh](pynq_overlay/dlzs_system_wrapper.hwh)
+
+Both files use the same basename for PYNQ. They were preserved during cleanup;
+board execution, measured power, and the hardware regression are still pending.
+The FPGA overlay performs a scalar multiply through AXI4-Lite; it does not
+implement the DistilBERT attention evaluation or a complete top-k accelerator.
+
+| Integration check | Recorded result |
+|---|---|
+| AXI address window | `0x43C00000`–`0x43C0FFFF` (64 KiB) |
+| Peripheral register decode | 32 bytes; offsets above use the low 5 address bits |
+| Fabric clock | 50 MHz, shared AXI clock/reset domain |
+| Block-design validation | Passed |
+| Setup / hold / pulse-width slack | +11.036 / +0.088 / +9.020 ns |
+| Failing timing endpoints | 0 in each category |
+| XSim smoke test | User-recorded PASS: 100 signed pairs, split writes, strobes, reset, RO/unaligned writes, response stalls |
+| Bitstream generation | Completed |
+| Physical-board execution | Pending board access |
+
+Timing and XSim completion above are recorded from the Vivado screenshots and
+console output; the cleanup removed the generated run logs. These integration
+slacks are separate from the standalone 100 MHz OOC results in §7.
+
+CONTROL reads zero. START with byte strobe 0 set snapshots the two operands;
+the following clock captures the product. DONE stays set until reset or the
+next accepted start. Starts while busy are ignored. Read-only writes return
+OKAY without changing storage; unaligned accesses return SLVERR. Software
+should use the documented register offsets within the assigned address window.
 
 ---
 
-## 9. RTL
+## 9. Attention top-k study — completed fixed-corpus experiment
+
+The completed run is **`20260914T070644_541555Z`**, recorded on 14 September
+2026. At 10% key selection, snapping Q retains **91.90%** of the exact-int16
+top-k indices; snapping K retains **89.41%**. DRUM3 retains **92.71%**, DRUM4
+**96.09%**, DRUM6 **98.94%**, and Mitchell **98.25%**.
+
+These are local ranking-preservation results on a fixed template corpus.
+They are not model task accuracy, attention-output error, FPGA throughput,
+or measured energy savings for an attention accelerator.
+
+### Method and scope
+
+| Setting | Recorded configuration |
+|---|---|
+| Model | `distilbert/distilbert-base-uncased` |
+| Checkpoint revision | `12040accade4e8a0f71eabdb258fecc2e7e948be` |
+| Corpus | 100 deterministic passages: 20 topics × 5 conditions |
+| Corpus source | [attention_corpus_100.json](src/attention_corpus_100.json), reproducible with [make_attention_corpus.py](src/make_attention_corpus.py) |
+| Layers / heads / head dimension | 6 / 12 / 64 (projection width 768) |
+| Valid lengths / tokenizer limit | 81–105 tokens / 128; no passage truncated |
+| Padding and special tokens | Padded keys and queries excluded; CLS and SEP retained |
+| Q/K origin | Unmodified float32 model, eager attention; independent replacement at each layer |
+| Quantizer | Symmetric signed int16, −32767…32767, zero point 0, nearest ties-to-even |
+| Scales | Separate Q and K scales per passage/head, shared across valid tokens/features |
+| Accumulation | int64 sum of 64 scalar products; reference score reconstruction uses float64 |
+| Fractions | 5%, 10%, …, 50% of valid keys |
+| Selected count | `max(1, ceil(fraction × valid_key_count))` |
+| Ranking ties | Stable descending sort, preserving ascending valid-key index |
+| Mean aggregation | Average query rows within each passage/layer/head, then equal weight per passage/layer/head |
+| Evaluated groups / query rows | 7,200 passage/layer/head groups; 667,440 valid query rows per design/baseline/fraction |
+| GPU | NVIDIA GeForce RTX 4070 Laptop GPU |
+| Model batch / scoring tile | 8 passages / 16 queries × 16 keys |
+| Recorded scoring-loop time | 512.65 seconds; excludes initial model load and Q/K capture |
+| Peak Torch-allocated CUDA memory | 1.414 GiB; not total device usage |
+
+For each query row, overlap is `|approx_topk ∩ reference_topk| / k`.
+`quantized_exact` isolates multiplier error; `float` includes quantization
+error as well. `dlzs_snap_q` sends Q to the snapped operand of DLZS;
+`dlzs_snap_k` sends K there. The same RTL core implements both assignments.
+
+Multiplying a row by a common positive scale, including `1/sqrt(64)`, preserves
+its ordering. The per-passage/head Q/K scales satisfy this condition. Errors
+in individual products can change the ordering after accumulation.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| Float attention reconstructed from captured Q/K | Passed across all 6 layers and 13 model batches per layer |
+| Maximum reconstructed probability difference | 0 in the saved checks |
+| Maximum valid-row probability-sum error | 3.5762787e−7 (threshold 1e−5) |
+| Maximum padded-key probability | 0 (threshold 1e−7) |
+| Vectorized multiplier kernels vs scalar golden model | Reported PASS on 4,096 signed pairs for each of 6 approximate designs |
+| Exact int64 score matrices vs integer matrix multiplication | Checked for equality in each layer |
+| Clipped Q/K values | 0 in every layer |
+| Exact-int16 top-k vs itself | 1.0 for every evaluated row |
+| Exact-int16 mean overlap vs float, across 5–50% | 0.99996316–0.99998149 |
+
+Sources: [reconstruction checks](docs/results/attention_corpus_20260914/reconstruction_checks.csv),
+[score errors](docs/results/attention_corpus_20260914/score_errors.csv), [run manifest](docs/results/attention_corpus_20260914/manifest.json).
+The kernel self-check and exact-score equality checks are implemented in
+[attention_corpus_eval.py](src/attention_corpus_eval.py); its successful run
+was reported in the console. No new model evaluation was run to write this README.
+
+### Full selection curve
+
+Mean overlap versus **quantized exact** (fractions, not percentages):
+
+| Design | 5% | 10% | 15% | 20% | 25% | 30% | 35% | 40% | 45% | 50% |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `exact_int16` | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| `dlzs_snap_q` | 0.9086 | 0.9190 | 0.9232 | 0.9273 | 0.9318 | 0.9368 | 0.9420 | 0.9469 | 0.9517 | 0.9559 |
+| `dlzs_snap_k` | 0.8719 | 0.8941 | 0.9009 | 0.9070 | 0.9135 | 0.9202 | 0.9268 | 0.9329 | 0.9389 | 0.9440 |
+| `drum3` | 0.9125 | 0.9271 | 0.9314 | 0.9356 | 0.9401 | 0.9448 | 0.9495 | 0.9539 | 0.9580 | 0.9617 |
+| `drum4` | 0.9536 | 0.9609 | 0.9630 | 0.9652 | 0.9676 | 0.9703 | 0.9728 | 0.9752 | 0.9775 | 0.9794 |
+| `drum6` | 0.9877 | 0.9894 | 0.9897 | 0.9903 | 0.9909 | 0.9916 | 0.9923 | 0.9929 | 0.9936 | 0.9942 |
+| `mitchell` | 0.9795 | 0.9825 | 0.9833 | 0.9842 | 0.9853 | 0.9864 | 0.9876 | 0.9887 | 0.9897 | 0.9906 |
+
+[![Top-k overlap against exact-int16 and floating-point scores](docs/images/results/topk_overlap.png)](docs/images/results/topk_overlap.svg)
+
+The existing plot is reproduced unchanged from this corpus run. Both panels
+show means; the later passage-range correction does not change those curves.
+The ordinate is truncated to 0.8–1.0. [Download all corrected values](docs/results/attention_corpus_20260914/summary_corrected.csv).
+
+<details>
+<summary>Full mean-overlap table versus the original floating-point scores</summary>
+
+| Design | 5% | 10% | 15% | 20% | 25% | 30% | 35% | 40% | 45% | 50% |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `exact_int16` | 0.999963 | 0.999972 | 0.999968 | 0.999968 | 0.999970 | 0.999975 | 0.999975 | 0.999976 | 0.999978 | 0.999981 |
+| `dlzs_snap_q` | 0.908631 | 0.919030 | 0.923208 | 0.927301 | 0.931808 | 0.936814 | 0.942030 | 0.946885 | 0.951700 | 0.955937 |
+| `dlzs_snap_k` | 0.871937 | 0.894105 | 0.900890 | 0.906985 | 0.913525 | 0.920206 | 0.926791 | 0.932886 | 0.938856 | 0.944034 |
+| `drum3` | 0.912500 | 0.927050 | 0.931436 | 0.935608 | 0.940110 | 0.944818 | 0.949493 | 0.953853 | 0.957988 | 0.961654 |
+| `drum4` | 0.953612 | 0.960864 | 0.962960 | 0.965214 | 0.967645 | 0.970286 | 0.972837 | 0.975212 | 0.977490 | 0.979406 |
+| `drum6` | 0.987661 | 0.989359 | 0.989748 | 0.990289 | 0.990857 | 0.991609 | 0.992279 | 0.992945 | 0.993596 | 0.994156 |
+| `mitchell` | 0.979486 | 0.982496 | 0.983273 | 0.984246 | 0.985281 | 0.986413 | 0.987604 | 0.988694 | 0.989721 | 0.990596 |
+
+</details>
+
+### Passage variation and score error at 10% selection
+
+| Design | Mean overlap | Passage min | Passage max | Passage SD | Mean layer score MAE |
+| --- | --- | --- | --- | --- | --- |
+| `exact_int16` | 1.000000 | 1.000000 | 1.000000 | 0.000000 | 0.000000 |
+| `dlzs_snap_q` | 0.919028 | 0.914382 | 0.921729 | 0.001403 | 0.286569 |
+| `dlzs_snap_k` | 0.894105 | 0.889184 | 0.899758 | 0.001954 | 0.281458 |
+| `drum3` | 0.927053 | 0.924436 | 0.930004 | 0.001372 | 0.231260 |
+| `drum4` | 0.960865 | 0.958623 | 0.962888 | 0.000892 | 0.106879 |
+| `drum6` | 0.989360 | 0.988400 | 0.990446 | 0.000456 | 0.026031 |
+| `mitchell` | 0.982496 | 0.980961 | 0.983866 | 0.000550 | 0.096117 |
+
+Passage statistics come from means over each passage's six layers and twelve
+heads. SD is the population standard deviation across these 100 passages,
+not a confidence interval. Score MAE is the equal-layer mean of absolute,
+dequantized score error against exact-int16 scores; it uses valid query/key pairs.
+
+**Correction to the earlier console summary:** the reported minima of 0.3000
+for DLZS were worst individual query-row overlaps, mislabeled as passage
+minima. The corrected minima are **0.914382 for snapping Q** and **0.889184
+for snapping K**. Means are unchanged. Use `summary_corrected.csv` or the
+audit's `design_summary.csv` for passage ranges. The retained evaluator still
+writes the old minimum field; this is a known reporting issue, not an arithmetic
+change. The original `summary.csv` is included for provenance.
+
+<details>
+<summary>Five hardest passages for each design at 10% selection</summary>
+
+| Design | Rank | Sample (zero-based) | Overlap | Valid tokens | Truncated |
+| --- | --- | --- | --- | --- | --- |
+| dlzs_snap_k | 1 | 90 | 0.889184 | 89 | False |
+| dlzs_snap_k | 2 | 79 | 0.889247 | 97 | False |
+| dlzs_snap_k | 3 | 94 | 0.890389 | 100 | False |
+| dlzs_snap_k | 4 | 93 | 0.890416 | 105 | False |
+| dlzs_snap_k | 5 | 52 | 0.890711 | 93 | False |
+| dlzs_snap_q | 1 | 93 | 0.914382 | 105 | False |
+| dlzs_snap_q | 2 | 94 | 0.915569 | 100 | False |
+| dlzs_snap_q | 3 | 78 | 0.916605 | 102 | False |
+| dlzs_snap_q | 4 | 29 | 0.916652 | 96 | False |
+| dlzs_snap_q | 5 | 64 | 0.916768 | 96 | False |
+| drum3 | 1 | 29 | 0.924436 | 96 | False |
+| drum3 | 2 | 90 | 0.924452 | 89 | False |
+| drum3 | 3 | 94 | 0.924639 | 100 | False |
+| drum3 | 4 | 93 | 0.924747 | 105 | False |
+| drum3 | 5 | 2 | 0.924926 | 88 | False |
+| drum4 | 1 | 29 | 0.958623 | 96 | False |
+| drum4 | 2 | 93 | 0.958802 | 105 | False |
+| drum4 | 3 | 90 | 0.958992 | 89 | False |
+| drum4 | 4 | 94 | 0.959014 | 100 | False |
+| drum4 | 5 | 2 | 0.959017 | 88 | False |
+| drum6 | 1 | 90 | 0.988400 | 89 | False |
+| drum6 | 2 | 42 | 0.988527 | 96 | False |
+| drum6 | 3 | 75 | 0.988534 | 86 | False |
+| drum6 | 4 | 70 | 0.988547 | 83 | False |
+| drum6 | 5 | 92 | 0.988571 | 96 | False |
+| exact_int16 | 1 | 0 | 1.000000 | 81 | False |
+| exact_int16 | 2 | 1 | 1.000000 | 85 | False |
+| exact_int16 | 3 | 2 | 1.000000 | 88 | False |
+| exact_int16 | 4 | 3 | 1.000000 | 97 | False |
+| exact_int16 | 5 | 4 | 1.000000 | 92 | False |
+| mitchell | 1 | 29 | 0.980961 | 96 | False |
+| mitchell | 2 | 79 | 0.981286 | 97 | False |
+| mitchell | 3 | 94 | 0.981306 | 100 | False |
+| mitchell | 4 | 90 | 0.981308 | 89 | False |
+| mitchell | 5 | 98 | 0.981314 | 97 | False |
+
+The exact baseline is 1.0 everywhere, so its first five entries are ties.
+Full texts are in [outlier_report.json](docs/results/attention_corpus_20260914/outlier_report.json).
+
+</details>
+
+### Layer-by-layer results at 10% selection
+
+| Design | Layer 1 | Layer 2 | Layer 3 | Layer 4 | Layer 5 | Layer 6 |
+| --- | --- | --- | --- | --- | --- | --- |
+| exact_int16 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| dlzs_snap_q | 0.8979 | 0.9141 | 0.9186 | 0.9269 | 0.9116 | 0.9451 |
+| dlzs_snap_k | 0.8787 | 0.8928 | 0.8875 | 0.8998 | 0.8765 | 0.9295 |
+| drum3 | 0.9138 | 0.9251 | 0.9239 | 0.9328 | 0.9165 | 0.9503 |
+| drum4 | 0.9536 | 0.9598 | 0.9597 | 0.9639 | 0.9546 | 0.9736 |
+| drum6 | 0.9871 | 0.9890 | 0.9891 | 0.9902 | 0.9876 | 0.9931 |
+| mitchell | 0.9792 | 0.9823 | 0.9817 | 0.9836 | 0.9794 | 0.9888 |
+
+[![Layer-wise top-k overlap](docs/images/results/attention_layers.png)](docs/images/results/attention_layers.svg)
+
+[All layer/fraction/baseline values](docs/results/attention_corpus_20260914/per_layer.csv).
+
+### Ranking preservation versus FPGA cost
+
+| Attention design | Hardware | Overlap @10% | Slice LUTs | LUT cells | FFs | DSPs | Fmax (MHz) | WNS (ns) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `exact_int16` | `exact_lut` | 100.00% | 265 | 357 | 64 | 0 | 104.29 | 0.411 |
+| `dlzs_snap_q` | `dlzs_opt` | 91.90% | 145 | 169 | 64 | 0 | 121.51 | 1.77 |
+| `dlzs_snap_k` | `dlzs_opt` | 89.41% | 145 | 169 | 64 | 0 | 121.51 | 1.77 |
+| `drum3` | `drum_opt3` | 92.71% | 233 | 236 | 64 | 0 | 86.94 | -1.502 |
+| `drum4` | `drum_opt4` | 96.09% | 273 | 278 | 64 | 0 | 76.62 | -3.051 |
+| `drum6` | `drum_opt6` | 98.94% | 318 | 327 | 64 | 0 | 72.13 | -3.864 |
+| `mitchell` | `mitchell` | 98.25% | 464 | 496 | 66 | 0 | 63.71 | -5.696 |
+
+**Slice LUTs are physical utilization; LUT cells are the pre-packing count
+reported by `summary.txt`.** The saved `attention_cost_table.csv` uses LUT
+cells in its `impl_luts` column. Physical counts above come from each design's
+`post_route/utilization.txt` and match §7; they must not be interchanged.
+
+[![Attention ranking versus physical area and timing](docs/images/results/attention_hardware_cost.png)](docs/images/results/attention_hardware_cost.svg)
+
+This joins GPU ranking results with **standalone multiplier** OOC costs.
+It excludes the AXI wrapper, score accumulators, memories, selectors, and
+software overhead. It is not an area or speed estimate for a complete attention
+accelerator. [Saved cost join](docs/results/attention_corpus_20260914/attention_cost_table.csv).
+
+On this corpus, snapping Q preserves about **2.49 percentage points** more
+top-k indices than snapping K at the same multiplier cost. DLZS-opt reduces
+physical LUTs by **45.3%** and has **16.5%** higher reported OOC Fmax than exact
+LUT, at the cost of about **8.10%** missing top-k indices at 10% selection.
+DRUM3 improves overlap by about **0.80 percentage points** over snapping Q,
+but uses 233 rather than 145 Slice LUTs and has lower reported Fmax.
+DRUM6 and Mitchell preserve more rankings but cost more physical LUTs and
+miss the 100 MHz OOC constraint. A satisfactory overlap threshold has not yet
+been established with a downstream task.
+
+### Earlier diagnostic stages
+
+| Stage | Result | Scope |
+|---|---|---|
+| Model/projection inspection | Q, K, V and output projections: 768 → 768 | Setup check |
+| First-layer reconstruction | All checks passed, 12 heads | 2 debugging passages |
+| Exact quantization baseline | Score MAE 3.79816448e−5; max error 3.16170749e−4; 0 clipped | Same 2 passages |
+| Baseline top-k versus float | Mean 1.0 at every tested fraction except 35%: 0.999740 | Debugging only |
+| Scalar multiplier comparison | All seven designs evaluated | Same 2 passages |
+| Multilayer diagnostic | Six layers compared | 4 debugging passages |
+| Corpus evaluation | Complete with audit and cost join | 100 template passages |
+
+At **10% selection**, mean overlap versus quantized exact evolved as follows:
+
+| Design | 2 passages, layer 1 | 4 passages, all layers | 100 passages, all layers |
+| --- | --- | --- | --- |
+| exact_int16 | 1.0000 | 1.0000 | 1.0000 |
+| dlzs_snap_q | 0.9201 | 0.9190 | 0.9190 |
+| dlzs_snap_k | 0.9123 | 0.8939 | 0.8941 |
+| drum3 | 0.9427 | 0.9272 | 0.9271 |
+| drum4 | 0.9653 | 0.9614 | 0.9609 |
+| drum6 | 0.9887 | 0.9892 | 0.9894 |
+| mitchell | 0.9826 | 0.9826 | 0.9825 |
+
+These are different text sets, so the columns are checks of the workflow,
+not evidence of a statistical convergence trend. Compact early-stage reports
+are preserved under [docs/results/attention_debug](docs/results/attention_debug).
+The superseded diagnostic runners and CUDA setup check were removed during
+cleanup; the final corpus evaluator includes reconstruction and kernel checks.
+
+### Limits and evidence provenance
+
+The 100 texts share 20 topic templates and five condition templates. Their
+narrow passage range does not demonstrate robustness on independent natural
+language, longer sequences, other checkpoints, or other models. No approximate
+errors propagate between layers, and V, softmax outputs, downstream model
+predictions, and classification accuracy are not evaluated under replacement.
+The GPU study uses dynamic scales and int64 sums; these are not yet implemented
+as a hardware dot-product pipeline.
+
+Curated CSV/JSON evidence is copied into [docs/results/attention_corpus_20260914](docs/results/attention_corpus_20260914) so GitHub links do
+not depend on ignored `results/` directories. Raw tensor archives remain local.
+[snapshot.json](docs/results/attention_corpus_20260914/snapshot.json) records SHA-256 hashes of the copied
+files. Original manifests retain the paths and source hashes from execution;
+cleanup and line-ending normalization can change today's source hashes.
+The range repair and newer key tiling are disclosed rather than presented as
+a byte-identical rerun of all earlier scripts.
+
+---
+
+## 10. RTL
 
     rtl/lzc_8.sv            8-bit leading-one detector
     rtl/lzc_16.sv           16-bit, two cascaded lzc_8 blocks
@@ -597,7 +908,7 @@ Things that are easy to get wrong and were got right:
 
 ---
 
-## 10. Repository layout
+## 11. Repository layout
 
     rtl/                    DLZS design sources (original and optimized)
     baselines/
@@ -616,6 +927,19 @@ Things that are easy to get wrong and were got right:
     src/golden_model.py     bit-exact reference models, no float in any datapath
     src/metrics.py          MRED, NMED, max RED, signed bias, error rate
     src/sweep.py            8-bit exhaustive + 16-bit sampled sweeps
+    src/attention_quantize.py     shared symmetric int16 quantizer
+    src/attention_corpus_eval.py  final all-layer fixed-corpus evaluator
+    src/attention_corpus_100.json fixed 100-passage corpus
+    src/make_attention_corpus.py  deterministic corpus generator
+    src/audit_attention_run.py    passage ranges, outliers and error summaries
+    src/combine_attention_costs.py join overlap with OOC multiplier reports
+    axi_lite_wrapper/dlzs/         Vivado project, block design and wrapper
+    axi_lite_wrapper/ip_repo/dlzs_axi_1_0/  packaged IP and its RTL
+    pynq_overlay/                 paired final .bit and .hwh files
+    board_files/                  local PYNQ-Z2 board definitions (ignored)
+    docs/results/                 curated, versionable experiment tables
+    docs/images/results/          overlap, layer and hardware-cost figures
+    results/                      local run directories and tensor archives (ignored)
     tests/test_golden_model.py    19-test regression suite
     synth_result/<design>/  committed synthesis and post-route reports
     docs/progress.md
@@ -630,7 +954,7 @@ product would be a bug.
 
 ---
 
-## 11. Running it
+## 12. Running it
 
 From the repo root:
 
@@ -672,6 +996,55 @@ The `Route 35-198` warning about `HD.PARTPIN_LOCS` is expected in OOC runs and
 does not affect any reported number: every port lands on a harness register,
 and port paths are unconstrained.
 
+### Final attention workflow (WSL, activated Python environment)
+
+Run from the repository root. The saved corpus is the default study input;
+regenerate it only when needed with `python src/make_attention_corpus.py`.
+
+```bash
+python src/attention_corpus_eval.py \
+  --texts src/attention_corpus_100.json \
+  --revision 12040accade4e8a0f71eabdb258fecc2e7e948be \
+  --device cuda --max-length 128 --batch-size 8 \
+  --query-block 16 --key-block 16
+```
+
+The 16×16 query/key tiles are the successful settings for the 8 GiB RTX 4070
+Laptop GPU. The earlier broad product allocation exhausted memory. Use
+`--device cpu` when CUDA is unavailable; the arithmetic reference is unchanged.
+`--no-save-tensors` reduces output storage if raw Q/K archives are unnecessary.
+
+To audit the retained completed run and regenerate its hardware join:
+
+```bash
+run=results/attention_corpus_eval/20260914T070644_541555Z
+python src/audit_attention_run.py --input "$run" --percent 10
+python src/combine_attention_costs.py --attention-run "$run" --synth-root synth_result
+```
+
+For a new run, set `run` to its printed output directory. The audit recomputes
+correct passage ranges directly from `per_text.csv`. The cost join prefers
+`summary_corrected.csv` when available; without it, the current evaluator's
+minimum-field bug also affects the joined minimum column. Use audit output
+for passage minima until that reporting bug is fixed.
+
+Curated documentation snapshots are for reading the results; the audit expects
+the original full run directory, including its per-head rows. The plot scripts
+used during exploration were pruned; final PNG/SVG figures are retained here.
+
+### Reopening the hardware project after cleanup
+
+Open `axi_lite_wrapper/dlzs/dlzs.xpr` in Vivado 2025.2. Keep the local PYNQ-Z2
+board definitions and the packaged IP repository available. The tracked HDL
+wrapper under `dlzs.gen` is retained; other generated products may need to be
+regenerated from the block design before a new build. The preserved overlay
+pair is independent of those temporary directories. Reopening/rebuilding after
+cleanup has not yet been recorded as a validation result.
+
+Cleanup also removed routed `.dcp` files used by `make power`; regenerate the
+needed checkpoints with `make synth` (or a targeted `make synth-one`) before
+rerunning that command. Preserve existing reports before a new synthesis run.
+
 ### Reproducibility
 
 The 8-bit sweep is exhaustive. The 16-bit sweep combines a fixed-seed uniform
@@ -683,7 +1056,7 @@ vectors and the published error tables are the same set.
 
 ---
 
-## 12. Known issues
+## 13. Known issues
 
 1. **`metrics.py` signed bias.** Dividing by `abs(p)` flips the sign on
    negative products, so signed `bias` averages to ≈ 0 regardless of the
@@ -700,12 +1073,19 @@ vectors and the published error tables are the same set.
 5. **No ≥10,000-vector PYNQ hardware log is committed yet.** The AXI wrapper has
    passed a local Vivado XSim smoke test; the real-board regression is pending
    until the PYNQ-Z2 is available.
-6. **Vendored DRUM lint warnings are waived, not fixed** (`WIDTHEXPAND`,
+6. **Attention summary minima:** the current evaluator labels query-row minima
+   as passage minima. Saved corrected tables and the audit fix the interpretation;
+   the producer still needs correction before a fresh publication run.
+7. **Attention scope:** 100 correlated template passages and one checkpoint;
+   no downstream task evaluation or propagated approximation. Compensation is pending.
+8. **Post-cleanup reproduction:** routed checkpoints and diagnostic runners
+   were removed; hardware products must be regenerated for new timing/power runs.
+9. **Vendored DRUM lint warnings are waived, not fixed** (`WIDTHEXPAND`,
    `UNUSEDSIGNAL`), scoped to the benches that compile upstream code.
 
 ---
 
-## 13. Roadmap
+## 14. Roadmap
 
 | Week | Scope | Status |
 |------|-------|--------|
@@ -713,9 +1093,9 @@ vectors and the published error tables are the same set.
 | 3–5 | DLZS RTL + verification | done |
 | 6–7 | Baselines, OOC LUT-only synthesis, comparison table | mostly done — DLZS, DRUM K=3..8, Mitchell and exact LUT/DSP reports included; remaining: 8-bit characterization, committed simulation evidence, Mitchell refined power, tighter-period run |
 | 8–9 | AXI-Lite wrapper, PYNQ-Z2 overlay, ≥10,000 vectors hardware-vs-sim | in progress — wrapper, validated block design, timing, bitstream, and local smoke test complete; board regression pending |
-| 10–11 | Attention Q/K from DistilBERT, top-k index overlap vs hardware cost | |
-| 12–13 | MBM-style error compensation, accuracy-vs-LUTs Pareto front | |
-| 14 | Buffer, thesis writeup, defense dry-run | |
+| 10–11 | Attention Q/K from DistilBERT, top-k index overlap vs hardware cost | fixed-corpus study complete: 100 passages, 6 layers, both snap directions, audited tables, plots and OOC cost join; generalization/task validation remains open |
+| 12–13 | MBM-style error compensation, accuracy-vs-LUTs Pareto front | planned; no compensation results yet |
+| 14 | Buffer, thesis writeup, defense dry-run | README and evidence updated; thesis and defense preparation pending |
 
 Scope is cut from the **top tier down** if the schedule slips — compensation
 first, then the application study — never the baseline characterization.
@@ -728,10 +1108,14 @@ commit.
 
 ---
 
-## 14. Environment
+## 15. Environment
 
 - **Board:** PYNQ-Z2 (primary); Arty A7-100T (optional stretch)
-- **Tools:** Vivado, Icarus Verilog / Verilator, cocotb, Python 3, PyTorch
+- **Tools:** Vivado 2025.2, Icarus Verilog / Verilator, cocotb, Python 3, PyTorch
+- **Recorded GPU run:** PyTorch `2.11.0+cu128`, CUDA runtime `12.8`,
+  Transformers `5.17.0`, NumPy `2.5.3`, RTX 4070 Laptop GPU (8 GiB).
+  These are the completed run's manifest values; earlier CPU setup checks used
+  a different Torch build. They describe the experiment, not a dependency lockfile.
 - **Synthesis constraints:** out-of-context, `USE_DSP="no"`,
   matched bit-widths, identical input distributions across all designs. The
   exact multiplier is reported twice — LUT-only, and DSP-mapped as a separate
@@ -739,7 +1123,7 @@ commit.
 
 ---
 
-## 15. References
+## 16. References
 
 1. J. N. Mitchell, "Computer Multiplication and Division Using Binary
    Logarithms," *IRE Transactions on Electronic Computers*, 1962.

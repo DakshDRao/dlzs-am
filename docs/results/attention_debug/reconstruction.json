@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "checks": {
+    "finite_q_k_scores_and_probabilities": true,
+    "max_probability_difference_below_1e-5": true,
+    "valid_query_row_sum_error_below_1e-5": true,
+    "padded_key_probability_below_1e-7": true
+  },
+  "model_id": "distilbert/distilbert-base-uncased",
+  "model_revision": "12040accade4e8a0f71eabdb258fecc2e7e948be",
+  "versions": {
+    "torch": "2.14.0+cpu",
+    "transformers": "5.17.0",
+    "numpy": "2.5.3"
+  },
+  "layer_index": 0,
+  "device": "cpu",
+  "dtype": "float32",
+  "attention_backend": "eager",
+  "texts": [
+    "The cat slept.",
+    "An approximate multiplier trades numerical accuracy for lower hardware cost, but its effect on attention rankings must be measured carefully."
+  ],
+  "q_shape": [
+    2,
+    12,
+    26,
+    64
+  ],
+  "k_shape": [
+    2,
+    12,
+    26,
+    64
+  ],
+  "attention_shape": [
+    2,
+    12,
+    26,
+    26
+  ],
+  "valid_token_counts": [
+    6,
+    26
+  ],
+  "max_abs_difference": 0.0,
+  "max_row_sum_error": 2.384185791015625e-07,
+  "max_padded_key_probability": 0.0,
+  "max_abs_difference_per_head": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "conventions": {
+    "q_k": "raw projection outputs, split into heads, BEFORE 1/sqrt(head_dim) scaling",
+    "scores": "unmasked QK^T/sqrt(head_dim)",
+    "mask": "1 means real token; exclude padded queries and keys in later ranking analysis",
+    "special_tokens": "CLS and SEP retained",
+    "scope": "first-layer reconstruction on debugging text, not top-k evaluation"
+  }
+}
