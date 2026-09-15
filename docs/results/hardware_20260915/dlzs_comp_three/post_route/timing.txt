@@ -1,0 +1,98 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
+| Date         : Tue Sep 15 13:10:11 2026
+| Host         : LAPTOP-OO671G6K running 64-bit major release  (build 9200)
+| Command      : report_timing -file synth_result/dlzs_comp_three/post_route/timing.txt
+| Design       : dlzc_comp_wrapper
+| Device       : 7z020-clg400
+| Speed File   : -1  PRODUCTION 1.12 2019-11-22
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (MET) :             0.114ns  (required time - arrival time)
+  Source:                 a_reg_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            p_reg[24]/D
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
+  Data Path Delay:        9.833ns  (logic 3.797ns (38.616%)  route 6.036ns (61.384%))
+  Logic Levels:           15  (CARRY4=6 LUT1=1 LUT2=1 LUT5=3 LUT6=4)
+  Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=63, unset)           0.973     0.973    clk
+    SLICE_X29Y60         FDRE                                         r  a_reg_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X29Y60         FDRE (Prop_fdre_C_Q)         0.456     1.429 f  a_reg_reg[1]/Q
+                         net (fo=3, routed)           0.647     2.076    core/compensated.multiples/a_reg[1]
+    SLICE_X29Y60         LUT1 (Prop_lut1_I0_O)        0.124     2.200 r  core/compensated.multiples/p[31]_i_66/O
+                         net (fo=1, routed)           0.000     2.200    core/compensated.multiples/p[31]_i_66_n_0
+    SLICE_X29Y60         CARRY4 (Prop_carry4_S[0]_CO[3])
+                                                      0.532     2.732 r  core/compensated.multiples/p_reg[31]_i_43/CO[3]
+                         net (fo=1, routed)           0.000     2.732    core/compensated.multiples/p_reg[31]_i_43_n_0
+    SLICE_X29Y61         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.114     2.846 r  core/compensated.multiples/p_reg[31]_i_23/CO[3]
+                         net (fo=1, routed)           0.000     2.846    core/compensated.multiples/p_reg[31]_i_23_n_0
+    SLICE_X29Y62         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.334     3.180 f  core/compensated.multiples/p_reg[31]_i_56/O[1]
+                         net (fo=5, routed)           0.715     3.894    core/compensated.multiples/compensated.magnitude0[10]
+    SLICE_X27Y61         LUT5 (Prop_lut5_I1_O)        0.303     4.197 f  core/compensated.multiples/p[31]_i_26/O
+                         net (fo=3, routed)           0.850     5.048    core/compensated.multiples/p[31]_i_26_n_0
+    SLICE_X27Y60         LUT6 (Prop_lut6_I0_O)        0.124     5.172 r  core/compensated.multiples/p[31]_i_38/O
+                         net (fo=2, routed)           0.583     5.755    core/compensated.multiples/p[31]_i_38_n_0
+    SLICE_X31Y60         LUT6 (Prop_lut6_I4_O)        0.124     5.879 f  core/compensated.multiples/p[31]_i_20/O
+                         net (fo=1, routed)           0.640     6.519    core/compensated.multiples/p[31]_i_20_n_0
+    SLICE_X31Y60         LUT5 (Prop_lut5_I4_O)        0.124     6.643 r  core/compensated.multiples/p[31]_i_6/O
+                         net (fo=5, routed)           0.373     7.016    core/compensated.multiples/p[31]_i_6_n_0
+    SLICE_X30Y60         LUT2 (Prop_lut2_I1_O)        0.124     7.140 r  core/compensated.multiples/_carry_i_9/O
+                         net (fo=17, routed)          0.514     7.654    core/compensated.prepare/_carry__3_1
+    SLICE_X30Y62         LUT6 (Prop_lut6_I0_O)        0.124     7.778 r  core/compensated.prepare/_carry__0_i_7/O
+                         net (fo=1, routed)           0.000     7.778    core/compensated.multiples/p[5]_i_2_0[1]
+    SLICE_X30Y62         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.533     8.311 r  core/compensated.multiples/_carry__0/CO[3]
+                         net (fo=1, routed)           0.000     8.311    core/compensated.multiples/_carry__0_n_0
+    SLICE_X30Y63         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117     8.428 r  core/compensated.multiples/_carry__1/CO[3]
+                         net (fo=1, routed)           0.000     8.428    core/compensated.multiples/_carry__1_n_0
+    SLICE_X30Y64         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.239     8.667 r  core/compensated.multiples/_carry__2/O[2]
+                         net (fo=5, routed)           1.041     9.708    core/compensated.multiples/O[1]
+    SLICE_X31Y66         LUT5 (Prop_lut5_I0_O)        0.301    10.009 r  core/compensated.multiples/p[25]_i_2/O
+                         net (fo=4, routed)           0.673    10.682    core/compensated.multiples/p[25]_i_2_n_0
+    SLICE_X31Y66         LUT6 (Prop_lut6_I0_O)        0.124    10.806 r  core/compensated.multiples/p[24]_i_1/O
+                         net (fo=1, routed)           0.000    10.806    result[24]
+    SLICE_X31Y66         FDRE                                         r  p_reg[24]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)       10.000    10.000 r  
+                                                      0.000    10.000 r  clk (IN)
+                         net (fo=63, unset)           0.924    10.924    clk
+    SLICE_X31Y66         FDRE                                         r  p_reg[24]/C
+                         clock pessimism              0.000    10.924    
+                         clock uncertainty           -0.035    10.889    
+    SLICE_X31Y66         FDRE (Setup_fdre_C_D)        0.031    10.920    p_reg[24]
+  -------------------------------------------------------------------
+                         required time                         10.920    
+                         arrival time                         -10.806    
+  -------------------------------------------------------------------
+                         slack                                  0.114    
+
+
+
+

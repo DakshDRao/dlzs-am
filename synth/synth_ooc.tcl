@@ -156,6 +156,9 @@ dict set DESIGNS dlzs_opt {
     }
 }
 
+# Three-level error-compensated DLZS. This is kept in the shared design
+# dictionary so `make synth`, `make designs`, and `synth-one` all use the same
+# LUT-only OOC flow and report directory as the original models.
 dict set DESIGNS dlzs_comp_three {
     top     dlzc_comp_wrapper
     generic {}
@@ -214,6 +217,16 @@ dict set DESIGNS mitchell {
         ./baselines/mitchell/mitchell_mult.sv
         ./baselines/mitchell/mitchell_mult_top.sv
         ./synth/wrappers/mitchell_wrapper_test.sv
+    }
+}
+dict set DESIGNS mitchell_opt {
+    top     mitchell_opt_wrapper_test
+    generic {}
+    sources {
+        ./baselines/mitchell_opt/mitchell_lzc_meta.sv
+        ./baselines/mitchell_opt/mitchell_mult_opt.sv
+        ./baselines/mitchell_opt/mitchell_mult_opt_top.sv
+        ./synth/wrappers/mitchell_opt_wrapper_test.sv
     }
 }
 

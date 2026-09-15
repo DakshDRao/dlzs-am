@@ -1,0 +1,15 @@
+design            dlzs_comp_three
+activity_toggle   50.0
+activity_sp       0.5
+period_ns         10.000
+unit              mW
+total             106.574
+dynamic           3.954
+static            102.620
+clocks            0.921
+slice_logic       1.462
+signals           1.571
+dsps              n/a
+dynamic_mw        3.954
+energy_pj_per_op  39.540
+confidence        Medium

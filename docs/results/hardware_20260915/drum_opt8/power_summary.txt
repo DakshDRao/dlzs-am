@@ -1,0 +1,15 @@
+design            drum_opt8
+activity_toggle   50.0
+activity_sp       0.5
+period_ns         10.000
+unit              mW
+total             112.532
+dynamic           9.826
+static            102.705
+clocks            0.942
+slice_logic       4.103
+signals           4.782
+dsps              n/a
+dynamic_mw        9.826
+energy_pj_per_op  98.260
+confidence        Medium

@@ -1,13 +1,15 @@
 # DLZS-AM
 
 **An FPGA-optimized differential log-domain approximate multiplier — design, characterization, AXI4-Lite integration,
-and attention top-k ranking study. Error compensation is planned.**
+error compensation, and attention top-k ranking study.**
 
 B.Tech ECE major project, NIT Andhra Pradesh.
 
-**Updated: 14 September 2026.** Standalone RTL characterization, AXI simulation,
+**Updated: 15 September 2026.** Standalone RTL characterization, AXI simulation,
 PYNQ bitstream generation, and the fixed-corpus attention ranking study are
-complete. Physical-board regression and error compensation remain pending.
+complete. Three-level compensated DLZS and optimized Mitchell now have post-route
+results. Compensation has been evaluated on the full attention corpus. Physical-board
+regression remains pending; the current PYNQ overlay still uses uncompensated `dlzs_opt`.
 
 Jump to [hardware results](#7-implementation-results),
 [PYNQ integration](#8-pynq-z2-integration-checkpoint),
@@ -24,9 +26,11 @@ On a LUT-only Zynq-7020 (xc7z020clg400-1), post-route, 16×16 → 32 signed:
 |---|---|---|---|---|
 | Exact multiplier (LUT-only) | 0 | 265 | 104.3 | 49.55 pJ |
 | **DLZS, optimized (`dlzs_opt`)** | 16.8 % | **145** (−45 %) | **121.5** (+16.5 %) | **21.20 pJ** |
+| **DLZS, compensated (`dlzs_comp_three`)** | **8.50 %** | **177** (−33.2 %) | **101.15** (−3.0 %) | **39.54 pJ** |
 
 \* Vivado activity-driven estimate, 50 % input toggle rate, Medium confidence;
-see §7. These are estimates, not board measurements.
+see §7. These are estimates, not board measurements. Headline MRED comes from
+the unsigned model sweep in §4; hardware costs are for signed 16-bit units.
 
 `dlzs_opt` is the only approximate design in the comparison that beats the
 exact multiplier on **both** area and speed, and it also has the lowest
@@ -67,11 +71,12 @@ The claims are narrower:
   identical LUT-only constraints;
 - an FPGA architecture for signed DLZS that removes the sign-handling cost
   (§5), and an equally optimized DRUM so the comparison is effort-matched (§6);
-- an MBM-style error compensation, evaluated on an accuracy-vs-LUTs Pareto
-  front (planned, Week 12–13).
+- three-level compensation built on `dlzs_opt`, evaluated for arithmetic error,
+  FPGA area/timing/power, and attention ranking;
+- an arithmetic-equivalent optimized Mitchell baseline for a fairer FPGA comparison.
 
-A negative result on the compensation tier is acceptable provided it is
-characterized honestly.
+The measured tradeoff is reported in §7 and §9; no literature-wide priority
+claim is established by these experiments.
 
 ---
 
@@ -136,49 +141,51 @@ reports are now included.
 
 ## 4. Accuracy
 
-Golden model, 16-bit **unsigned** operands, the sweep set from `src/sweep.py`:
-200,000 uniform random pairs (seed 20260828) plus 3,600 corner pairs. Signed
-operands give the same figures to within 0.03 %. Metrics are defined in
-`src/metrics.py`.
+Golden-model results regenerated on 15 September 2026. The 16-bit **unsigned**
+sweep uses 200,000 random pairs (seed 20260828) plus 3,600 corner pairs.
+Bias below is unsigned-product bias; it should not be read as signed attention-score bias.
+RED metrics exclude zero products; NMED and error rate include them.
 
-| Design | MRED | Bias | Max RED |
-|---|---|---|---|
-| exact | 0 | 0 | 0 |
-| DRUM k=8 | 0.37 % | +0.02 % | 1.57 % |
-| DRUM k=7 | 0.74 % | +0.03 % | 3.15 % |
-| DRUM k=6 | 1.49 % | +0.08 % | 6.35 % |
-| DRUM k=5 | 2.99 % | +0.21 % | 12.89 % |
-| Mitchell | 3.81 % | −3.81 % | 11.11 % |
-| DRUM k=4 | 6.00 % | +0.71 % | 26.56 % |
-| DRUM k=3 | 12.14 % | +2.43 % | 56.25 % |
-| **DLZS nearest-linear** | **16.84 %** | **−1.89 %** | **33.33 %** |
-
-The Mitchell row was regenerated from the committed golden model using the
-same 200,000 random pairs and 3,600 corners (seed 20260828).
-
-Cross-check: the DRUM paper reports 1.47 % mean relative error for DRUM6; the
-golden model gives 1.468 % on a pure random sample (the 1.49 % above includes
-the corner set, which skews toward boundary cases).
+| Design | MRED | Bias | Max RED | NMED | Error rate |
+| --- | --- | --- | --- | --- | --- |
+| dlzs_three_level | 8.50% | -0.46% | 20.00% | 0.020369 | 99.00% |
+| dlzs_floor | 30.47% | -30.47% | 50.00% | 0.081170 | 99.45% |
+| dlzs_ceil | 38.57% | +38.57% | 99.99% | 0.081718 | 99.45% |
+| dlzs_nearest_linear | 16.84% | -1.89% | 33.33% | 0.040596 | 99.45% |
+| dlzs_nearest_log | 17.35% | +3.93% | 41.42% | 0.041795 | 99.45% |
+| mitchell | 3.81% | -3.81% | 11.11% | 0.009063 | 99.09% |
+| drum4 | 6.00% | +0.71% | 26.56% | 0.013798 | 99.88% |
+| drum6 | 1.49% | +0.08% | 6.35% | 0.003453 | 99.76% |
+| exact | 0.00% | +0.00% | 0.00% | 0.000000 | 0.00% |
+| drum3 | 12.14% | +2.43% | 56.25% | 0.027439 | 99.92% |
+| drum5 | 2.99% | +0.21% | 12.89% | 0.006924 | 99.83% |
+| drum7 | 0.74% | +0.03% | 3.15% | 0.001720 | 99.67% |
+| drum8 | 0.37% | +0.02% | 1.57% | 0.000860 | 99.56% |
 
 ### 8-bit exhaustive — all 65,536 ordered pairs
 
-```
-design                   MRED   maxRED      bias      NMED      maxAED err_rate
--------------------------------------------------------------------------------
-dlzs_floor            0.29855  0.49804  -0.29855  0.082682       32385  0.96107
-dlzs_ceil             0.37153  0.98450  +0.37153  0.082682       32385  0.96107
-dlzs_nearest_linear   0.16918  0.33333  -0.00964  0.041828       16320  0.96107
-dlzs_nearest_log      0.17364  0.40659  +0.03890  0.042961       18870  0.96107
-mitchell              0.03788  0.11111  -0.03788  0.009326        4096  0.93092
-drum4                 0.05887  0.26562  +0.01596  0.014238        7425  0.97717
-drum6                 0.01301  0.06348  +0.00571  0.003581        2000  0.85431
-```
+| Design | MRED | Max RED | Bias | NMED | Max AED | Error rate |
+| --- | --- | --- | --- | --- | --- | --- |
+| dlzs_three_level | 0.08515 | 0.20000 | +0.00320 | 0.020910 | 8160 | 0.93384 |
+| dlzs_floor | 0.29855 | 0.49804 | -0.29855 | 0.082682 | 32385 | 0.96107 |
+| dlzs_ceil | 0.37153 | 0.98450 | +0.37153 | 0.082682 | 32385 | 0.96107 |
+| dlzs_nearest_linear | 0.16918 | 0.33333 | -0.00964 | 0.041828 | 16320 | 0.96107 |
+| dlzs_nearest_log | 0.17364 | 0.40659 | +0.03890 | 0.042961 | 18870 | 0.96107 |
+| mitchell | 0.03788 | 0.11111 | -0.03788 | 0.009326 | 4096 | 0.93092 |
+| drum4 | 0.05887 | 0.26562 | +0.01596 | 0.014238 | 7425 | 0.97717 |
+| drum6 | 0.01301 | 0.06348 | +0.00571 | 0.003581 | 2000 | 0.85431 |
+| exact | 0.00000 | 0.00000 | +0.00000 | 0.000000 | 0 | 0.00000 |
+| drum3 | 0.12095 | 0.56250 | +0.03433 | 0.028405 | 14849 | 0.98779 |
+| drum5 | 0.02839 | 0.12891 | +0.00937 | 0.007154 | 3904 | 0.94577 |
+| drum7 | 0.00483 | 0.03149 | +0.00277 | 0.001615 | 1012 | 0.60645 |
+| drum8 | 0.00000 | 0.00000 | +0.00000 | 0.000000 | 0 | 0.00000 |
 
-DLZS is not an accuracy play: DRUM6 is about 11× more accurate, and even DRUM3
-has a lower mean error (though a worse worst case). The case for DLZS is
-hardware cost, and whether its error is tolerable for top-k attention ranking
-— a consistent scaling bias does not change a ranking, the spread of the error
-does. The completed fixed-corpus study is reported in §9.
+These are model sweeps, not exhaustive 16-bit RTL proofs. `dlzs_opt` preserves
+`dlzs_nearest_linear` arithmetic; `mitchell_opt` preserves Mitchell arithmetic.
+Compensation reduces the worst-case relative error from 33.33% to 20%, but
+arithmetic error alone does not determine attention ranking. Full metric records:
+[8-bit](docs/results/hardware_20260915/accuracy_w8.json),
+[16-bit](docs/results/hardware_20260915/accuracy_w16.json).
 
 ---
 
@@ -275,6 +282,47 @@ extremes, and the assembled design over all 65,536 A × 10 B against **both**
 the golden model and the original verified `dlzc_mult_top`. Re-injecting the
 two bugs found during development (raw A into the snap, a missing +1 in the
 negate) fails 5 of the 8 tests.
+
+---
+
+### Three-level compensation (`dlzs_comp_three`)
+
+The compensated core builds on `dlzs_opt`. With `k = floor(log2(|A|))`, it
+rounds the magnitude to the nearest of `{1, 1.5, 2} × 2^k`; ties round up.
+The decision boundaries are `1.25 × 2^k` and `1.75 × 2^k`. This is a change
+to the arithmetic, unlike the bit-equivalent baseline optimization.
+
+The leading-one detector also emits the two following magnitude bits. A small
+decoder selects signed `B` or `3B` and a shift; the middle level uses
+`3B × 2^(k−1)`. Small magnitudes and zero are handled explicitly. Preparing
+these multiples alongside the A path avoids a runtime mantissa-extraction shift.
+The shared shifter accepts an 18-bit prepared operand for compensation.
+
+| Name | Role |
+|---|---|
+| `dlzs_three_level` | Python golden model |
+| `dlzs_comp_three` | OOC synthesis design |
+| `dlzs_comp_q` / `dlzs_comp_k` | Attention experiment, Q or K operand rounded |
+| `COMPENSATE=0` | Baseline arithmetic fallback |
+
+Saved verification records show seven compensation cocotb tests passing with
+`COMP_N_RANDOM=1000`, exhaustive metadata checks over magnitudes 0–32768,
+boundary/sign checks, two golden-model tests, and lint. The baseline fallback
+is tested. See [validation record](docs/results/hardware_20260915/comp_validation.md).
+The validation record predates the full attention run; its pending attention
+status is superseded by §9. This core has OOC implementation results; it has
+not replaced the deployed PYNQ overlay.
+
+### Optimized Mitchell baseline (`mitchell_opt`)
+
+The optimized version extracts mantissa bits directly from leading-one metadata
+and replaces an addition with OR where the fields cannot overlap. It retains
+the two operand alignment paths and signed shell. Its arithmetic is unchanged.
+Saved XSim validation covered 165,536 pairs in signed/unsigned checks: an
+exhaustive 8-bit subspace plus 100,000 full-width random pairs. This is not a
+formal exhaustive 16-bit proof. A five-test cocotb bench is supplied; its run
+is not claimed here. The post-route result is **406 physical LUTs / 406 LUT
+cells**, down from 464 / 496. **388 is the synthesis LUT count**, not post-route.
 
 ---
 
@@ -399,6 +447,8 @@ register. Fmax = 1000 / (10 − WNS).
 | `drum_opt7` | 346 | 366 | −4.030 | 71.28 | 19 | 64 % |
 | `drum_opt8` | 403 | 408 | −4.424 | 69.33 | 21 | 63 % |
 | `mitchell` | 464 | 496 | −5.696 | 63.71 | 26 | 56 % |
+| `mitchell_opt` | 406 | 406 | −4.077 | 71.04 | 26 | 58 % |
+| **`dlzs_comp_three`** | **177** | **187** | **+0.114** | **101.15** | **15** | **62 %** |
 
 `exact_lut` is the exact multiplier built **without DSP blocks**:
 `$signed(a) * $signed(b)` under `-max_dsp 0`, with the DSP count parsed from
@@ -433,6 +483,9 @@ report 64.
 | `drum_opt6` vs `drum6_signed` | −12.6 % | +16.0 % | what the published DRUM6 RTL left on the table |
 | `drum_opt4` vs `drum4_signed` | +5.4 % | +0.0 % | no gain at K=4 — the published design was already near its limit |
 | `drum_opt3` vs `exact_lut` | −12.1 % | −16.6 % | the cheapest DRUM: smaller than exact, but slower |
+| `dlzs_comp_three` vs `dlzs_opt` | +22.1 % | −16.8 % | improved ranking at additional area and delay |
+| `dlzs_comp_three` vs `exact_lut` | −33.2 % | −3.0 % | smaller, meets the 100 MHz constraint |
+| `mitchell_opt` vs `mitchell` | −12.5 % | +11.5 % | same arithmetic with cheaper implementation |
 
 ### Accuracy against cost
 
@@ -444,6 +497,8 @@ report 64.
 | DRUM-opt k=6 | 1.49 % | 318 | 72.1 | nothing |
 | DRUM-opt k=5 | 2.99 % | 308 | 77.7 | nothing |
 | Mitchell | 3.81 % | 464 | 63.7 | nothing |
+| Mitchell-opt | 3.81 % | 406 | 71.0 | nothing |
+| DLZS compensated | 8.50 % | 177 | 101.2 | area only |
 | DRUM-opt k=4 | 6.00 % | 273 | 76.6 | nothing |
 | DRUM-opt k=3 | 12.14 % | 233 | 86.9 | area only |
 | **DLZS-opt** | **16.84 %** | **145** | **121.5** | **area and speed** |
@@ -492,6 +547,8 @@ toggle rate, 0.5 static probability, post-route, 10 ns clock:
 | `drum_opt7` | 7.813 mW | 78.13 pJ | +57.7 % |
 | `drum_opt8` | 9.826 mW | 98.26 pJ | +98.3 % |
 | `mitchell` | ≈ 8 mW* | ≈ 80 pJ* | not comparable* |
+| `mitchell_opt` | pending | pending | unavailable |
+| **`dlzs_comp_three`** | **3.954 mW** | **39.54 pJ** | **−20.2 %** |
 
 Read these as **estimates, not measurements**. The refined reports use mW to
 three decimals and report Medium confidence. DLZS-opt's estimated energy is
@@ -517,15 +574,17 @@ Vivado typically rates activity propagated this way as "Medium" confidence.
 vectors; `power.tcl` is written so that swapping `set_switching_activity` for
 `read_saif` is the only change.
 
+Compensation increases estimated dynamic energy by 86.5% relative to `dlzs_opt`,
+while remaining 20.2% below exact LUT. Its +0.114 ns slack leaves little margin
+at the 10 ns constraint. [Saved hardware reports](docs/results/hardware_20260915/)
+include the compensation activity-driven power report.
+
 ### Caveats on these numbers
 
-- **The two passing designs' Fmax is understated.** `exact_lut` and `dlzs_opt`
-  meet the 10 ns target, and the router stops improving a path once it passes.
-  A tighter-period run is needed for their true maximum; the three-way
-  ordering is unlikely to change, but the margin may.
-- **One placement per design.** Run-to-run variation is a few percent; the
-  headline margins are larger than that, the `drum_opt4` vs `drum4_signed`
-  difference is not.
+- **Fmax is a derived estimate for this implementation:** `1000 / (10 − WNS)`.
+  It is not an independently searched maximum clock. A constraint sweep could
+  change placement and timing.
+- **One placement per design.** Seed/placement variability has not been measured.
 - **Power is estimated** — the refined reports have Medium confidence; Mitchell
   still has only a default-activity estimate. See "Power" above.
 - **`dlzs_opt` vs the DRUM rows is not shell-matched** — DRUM needs two input
@@ -608,272 +667,138 @@ should use the documented register offsets within the assigned address window.
 
 ## 9. Attention top-k study — completed fixed-corpus experiment
 
-The completed run is **`20260914T070644_541555Z`**, recorded on 14 September
-2026. At 10% key selection, snapping Q retains **91.90%** of the exact-int16
-top-k indices; snapping K retains **89.41%**. DRUM3 retains **92.71%**, DRUM4
-**96.09%**, DRUM6 **98.94%**, and Mitchell **98.25%**.
-
-These are local ranking-preservation results on a fixed template corpus.
-They are not model task accuracy, attention-output error, FPGA throughput,
-or measured energy savings for an attention accelerator.
+The latest complete run is `20260915T081426_479296Z`. It includes both
+uncompensated and compensated DLZS operand orientations alongside DRUM,
+Mitchell and exact int16. All tables and the plots below use the corrected
+summary from this run, with equal weight per passage/layer/head.
 
 ### Method and scope
 
-| Setting | Recorded configuration |
-|---|---|
+Q/K tensors come from the unmodified floating-point DistilBERT model. Each
+layer is evaluated independently with locally replaced score multiplication.
+`*_q` rounds Q; `*_k` rounds K. Top-k index overlap is the fraction of selected
+indices shared with the reference. This measures ranking preservation, not
+end-to-end model accuracy or propagated approximation.
+
+| Setting | Value |
+| --- | --- |
 | Model | `distilbert/distilbert-base-uncased` |
-| Checkpoint revision | `12040accade4e8a0f71eabdb258fecc2e7e948be` |
-| Corpus | 100 deterministic passages: 20 topics × 5 conditions |
-| Corpus source | [attention_corpus_100.json](src/attention_corpus_100.json), reproducible with [make_attention_corpus.py](src/make_attention_corpus.py) |
-| Layers / heads / head dimension | 6 / 12 / 64 (projection width 768) |
-| Valid lengths / tokenizer limit | 81–105 tokens / 128; no passage truncated |
-| Padding and special tokens | Padded keys and queries excluded; CLS and SEP retained |
-| Q/K origin | Unmodified float32 model, eager attention; independent replacement at each layer |
-| Quantizer | Symmetric signed int16, −32767…32767, zero point 0, nearest ties-to-even |
-| Scales | Separate Q and K scales per passage/head, shared across valid tokens/features |
-| Accumulation | int64 sum of 64 scalar products; reference score reconstruction uses float64 |
-| Fractions | 5%, 10%, …, 50% of valid keys |
-| Selected count | `max(1, ceil(fraction × valid_key_count))` |
-| Ranking ties | Stable descending sort, preserving ascending valid-key index |
-| Mean aggregation | Average query rows within each passage/layer/head, then equal weight per passage/layer/head |
-| Evaluated groups / query rows | 7,200 passage/layer/head groups; 667,440 valid query rows per design/baseline/fraction |
-| GPU | NVIDIA GeForce RTX 4070 Laptop GPU |
-| Model batch / scoring tile | 8 passages / 16 queries × 16 keys |
-| Recorded scoring-loop time | 512.65 seconds; excludes initial model load and Q/K capture |
-| Peak Torch-allocated CUDA memory | 1.414 GiB; not total device usage |
-
-For each query row, overlap is `|approx_topk ∩ reference_topk| / k`.
-`quantized_exact` isolates multiplier error; `float` includes quantization
-error as well. `dlzs_snap_q` sends Q to the snapped operand of DLZS;
-`dlzs_snap_k` sends K there. The same RTL core implements both assignments.
-
-Multiplying a row by a common positive scale, including `1/sqrt(64)`, preserves
-its ordering. The per-passage/head Q/K scales satisfy this condition. Errors
-in individual products can change the ordering after accumulation.
+| Revision | `12040accade4e8a0f71eabdb258fecc2e7e948be` |
+| Corpus | 100 fixed, correlated template passages |
+| Layers / heads | 6 / 12 |
+| Token lengths | 81–105; max length 128; no truncation |
+| Batch / query block / key block | 8 / 32 / 16 |
+| Selection fractions | 5% to 50%, step 5% |
+| Scoring-loop time | 639.49 seconds |
+| Peak Torch-allocated CUDA memory | 2.384 GiB |
+| Device | NVIDIA GeForce RTX 4070 Laptop GPU |
 
 ### Validation evidence
 
-| Check | Result |
-|---|---|
-| Float attention reconstructed from captured Q/K | Passed across all 6 layers and 13 model batches per layer |
-| Maximum reconstructed probability difference | 0 in the saved checks |
-| Maximum valid-row probability-sum error | 3.5762787e−7 (threshold 1e−5) |
-| Maximum padded-key probability | 0 (threshold 1e−7) |
-| Vectorized multiplier kernels vs scalar golden model | Reported PASS on 4,096 signed pairs for each of 6 approximate designs |
-| Exact int64 score matrices vs integer matrix multiplication | Checked for equality in each layer |
-| Clipped Q/K values | 0 in every layer |
-| Exact-int16 top-k vs itself | 1.0 for every evaluated row |
-| Exact-int16 mean overlap vs float, across 5–50% | 0.99996316–0.99998149 |
-
-Sources: [reconstruction checks](docs/results/attention_corpus_20260914/reconstruction_checks.csv),
-[score errors](docs/results/attention_corpus_20260914/score_errors.csv), [run manifest](docs/results/attention_corpus_20260914/manifest.json).
-The kernel self-check and exact-score equality checks are implemented in
-[attention_corpus_eval.py](src/attention_corpus_eval.py); its successful run
-was reported in the console. No new model evaluation was run to write this README.
+Reconstructed attention probabilities match the saved model reference: maximum
+absolute difference 0.0, maximum row-sum error 3.58e-07.
+All 180 summary rows were independently checked against 100 passage means each,
+including corrected passage minima/maxima. Query-row minima are not passage minima.
 
 ### Full selection curve
 
-Mean overlap versus **quantized exact** (fractions, not percentages):
+![Attention ranking preservation](docs/images/results/topk_overlap.png)
+
+The single panel compares against **quantized exact int16**, isolating multiplier
+error. The float-reference data remain in the saved CSV; visual similarity alone
+does not establish zero quantization error. Exact-int16 versus float overlap across
+selection fractions ranges from 0.99996316 to 0.99998149.
 
 | Design | 5% | 10% | 15% | 20% | 25% | 30% | 35% | 40% | 45% | 50% |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `exact_int16` | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
-| `dlzs_snap_q` | 0.9086 | 0.9190 | 0.9232 | 0.9273 | 0.9318 | 0.9368 | 0.9420 | 0.9469 | 0.9517 | 0.9559 |
-| `dlzs_snap_k` | 0.8719 | 0.8941 | 0.9009 | 0.9070 | 0.9135 | 0.9202 | 0.9268 | 0.9329 | 0.9389 | 0.9440 |
-| `drum3` | 0.9125 | 0.9271 | 0.9314 | 0.9356 | 0.9401 | 0.9448 | 0.9495 | 0.9539 | 0.9580 | 0.9617 |
-| `drum4` | 0.9536 | 0.9609 | 0.9630 | 0.9652 | 0.9676 | 0.9703 | 0.9728 | 0.9752 | 0.9775 | 0.9794 |
-| `drum6` | 0.9877 | 0.9894 | 0.9897 | 0.9903 | 0.9909 | 0.9916 | 0.9923 | 0.9929 | 0.9936 | 0.9942 |
-| `mitchell` | 0.9795 | 0.9825 | 0.9833 | 0.9842 | 0.9853 | 0.9864 | 0.9876 | 0.9887 | 0.9897 | 0.9906 |
-
-[![Top-k overlap against exact-int16 and floating-point scores](docs/images/results/topk_overlap.png)](docs/images/results/topk_overlap.svg)
-
-The existing plot is reproduced unchanged from this corpus run. Both panels
-show means; the later passage-range correction does not change those curves.
-The ordinate is truncated to 0.8–1.0. [Download all corrected values](docs/results/attention_corpus_20260914/summary_corrected.csv).
-
-<details>
-<summary>Full mean-overlap table versus the original floating-point scores</summary>
-
-| Design | 5% | 10% | 15% | 20% | 25% | 30% | 35% | 40% | 45% | 50% |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `exact_int16` | 0.999963 | 0.999972 | 0.999968 | 0.999968 | 0.999970 | 0.999975 | 0.999975 | 0.999976 | 0.999978 | 0.999981 |
-| `dlzs_snap_q` | 0.908631 | 0.919030 | 0.923208 | 0.927301 | 0.931808 | 0.936814 | 0.942030 | 0.946885 | 0.951700 | 0.955937 |
-| `dlzs_snap_k` | 0.871937 | 0.894105 | 0.900890 | 0.906985 | 0.913525 | 0.920206 | 0.926791 | 0.932886 | 0.938856 | 0.944034 |
-| `drum3` | 0.912500 | 0.927050 | 0.931436 | 0.935608 | 0.940110 | 0.944818 | 0.949493 | 0.953853 | 0.957988 | 0.961654 |
-| `drum4` | 0.953612 | 0.960864 | 0.962960 | 0.965214 | 0.967645 | 0.970286 | 0.972837 | 0.975212 | 0.977490 | 0.979406 |
-| `drum6` | 0.987661 | 0.989359 | 0.989748 | 0.990289 | 0.990857 | 0.991609 | 0.992279 | 0.992945 | 0.993596 | 0.994156 |
-| `mitchell` | 0.979486 | 0.982496 | 0.983273 | 0.984246 | 0.985281 | 0.986413 | 0.987604 | 0.988694 | 0.989721 | 0.990596 |
-
-</details>
+| exact_int16 | 1.000000 | 1.000000 | 1.000000 | 1.000000 | 1.000000 | 1.000000 | 1.000000 | 1.000000 | 1.000000 | 1.000000 |
+| dlzs_snap_q | 0.908630 | 0.919028 | 0.923208 | 0.927302 | 0.931807 | 0.936813 | 0.942029 | 0.946885 | 0.951700 | 0.955938 |
+| dlzs_snap_k | 0.871937 | 0.894105 | 0.900892 | 0.906983 | 0.913525 | 0.920206 | 0.926792 | 0.932886 | 0.938856 | 0.944034 |
+| dlzs_comp_q | 0.950262 | 0.955631 | 0.957686 | 0.959951 | 0.962519 | 0.965373 | 0.968269 | 0.971013 | 0.973623 | 0.975965 |
+| dlzs_comp_k | 0.928114 | 0.940864 | 0.944478 | 0.948026 | 0.951702 | 0.955614 | 0.959448 | 0.962997 | 0.966299 | 0.969162 |
+| mitchell | 0.979483 | 0.982496 | 0.983273 | 0.984246 | 0.985280 | 0.986412 | 0.987604 | 0.988695 | 0.989721 | 0.990595 |
+| drum3 | 0.912503 | 0.927053 | 0.931435 | 0.935610 | 0.940110 | 0.944817 | 0.949493 | 0.953852 | 0.957988 | 0.961654 |
+| drum4 | 0.953613 | 0.960865 | 0.962961 | 0.965214 | 0.967644 | 0.970286 | 0.972838 | 0.975212 | 0.977490 | 0.979406 |
+| drum6 | 0.987662 | 0.989360 | 0.989748 | 0.990290 | 0.990858 | 0.991609 | 0.992279 | 0.992945 | 0.993597 | 0.994156 |
 
 ### Passage variation and score error at 10% selection
 
-| Design | Mean overlap | Passage min | Passage max | Passage SD | Mean layer score MAE |
+| Design | Mean overlap | Passage min | Passage max | Passage std | Mean layer score MAE |
 | --- | --- | --- | --- | --- | --- |
-| `exact_int16` | 1.000000 | 1.000000 | 1.000000 | 0.000000 | 0.000000 |
-| `dlzs_snap_q` | 0.919028 | 0.914382 | 0.921729 | 0.001403 | 0.286569 |
-| `dlzs_snap_k` | 0.894105 | 0.889184 | 0.899758 | 0.001954 | 0.281458 |
-| `drum3` | 0.927053 | 0.924436 | 0.930004 | 0.001372 | 0.231260 |
-| `drum4` | 0.960865 | 0.958623 | 0.962888 | 0.000892 | 0.106879 |
-| `drum6` | 0.989360 | 0.988400 | 0.990446 | 0.000456 | 0.026031 |
-| `mitchell` | 0.982496 | 0.980961 | 0.983866 | 0.000550 | 0.096117 |
+| exact_int16 | 1.000000 | 1.000000 | 1.000000 | 0.000000 | 0.000000 |
+| dlzs_snap_q | 0.919028 | 0.914382 | 0.921729 | 0.001403 | 0.286569 |
+| dlzs_snap_k | 0.894105 | 0.889184 | 0.899758 | 0.001954 | 0.281458 |
+| dlzs_comp_q | 0.955631 | 0.953549 | 0.957631 | 0.000828 | 0.145709 |
+| dlzs_comp_k | 0.940864 | 0.937052 | 0.944564 | 0.001329 | 0.145342 |
+| mitchell | 0.982496 | 0.980961 | 0.983866 | 0.000550 | 0.096117 |
+| drum3 | 0.927053 | 0.924436 | 0.930004 | 0.001372 | 0.231260 |
+| drum4 | 0.960865 | 0.958623 | 0.962888 | 0.000892 | 0.106879 |
+| drum6 | 0.989360 | 0.988400 | 0.990446 | 0.000456 | 0.026031 |
 
-Passage statistics come from means over each passage's six layers and twelve
-heads. SD is the population standard deviation across these 100 passages,
-not a confidence interval. Score MAE is the equal-layer mean of absolute,
-dequantized score error against exact-int16 scores; it uses valid query/key pairs.
+The ranges describe complete passage means, not the worst individual query.
+[Worst passages](docs/results/attention_corpus_20260915/outliers_10pct.csv) and
+[the full audit](docs/results/attention_corpus_20260915/outlier_report.json) are preserved.
 
-**Correction to the earlier console summary:** the reported minima of 0.3000
-for DLZS were worst individual query-row overlaps, mislabeled as passage
-minima. The corrected minima are **0.914382 for snapping Q** and **0.889184
-for snapping K**. Means are unchanged. Use `summary_corrected.csv` or the
-audit's `design_summary.csv` for passage ranges. The retained evaluator still
-writes the old minimum field; this is a known reporting issue, not an arithmetic
-change. The original `summary.csv` is included for provenance.
+### Compensation improvement
 
-<details>
-<summary>Five hardest passages for each design at 10% selection</summary>
+| Orientation | Baseline overlap | Compensated overlap | Gain | Reduction in missed top-k indices |
+| --- | --- | --- | --- | --- |
+| Q | 91.90% | 95.56% | 3.66 percentage points | 45.2% |
+| K | 89.41% | 94.09% | 4.68 percentage points | 44.2% |
 
-| Design | Rank | Sample (zero-based) | Overlap | Valid tokens | Truncated |
-| --- | --- | --- | --- | --- | --- |
-| dlzs_snap_k | 1 | 90 | 0.889184 | 89 | False |
-| dlzs_snap_k | 2 | 79 | 0.889247 | 97 | False |
-| dlzs_snap_k | 3 | 94 | 0.890389 | 100 | False |
-| dlzs_snap_k | 4 | 93 | 0.890416 | 105 | False |
-| dlzs_snap_k | 5 | 52 | 0.890711 | 93 | False |
-| dlzs_snap_q | 1 | 93 | 0.914382 | 105 | False |
-| dlzs_snap_q | 2 | 94 | 0.915569 | 100 | False |
-| dlzs_snap_q | 3 | 78 | 0.916605 | 102 | False |
-| dlzs_snap_q | 4 | 29 | 0.916652 | 96 | False |
-| dlzs_snap_q | 5 | 64 | 0.916768 | 96 | False |
-| drum3 | 1 | 29 | 0.924436 | 96 | False |
-| drum3 | 2 | 90 | 0.924452 | 89 | False |
-| drum3 | 3 | 94 | 0.924639 | 100 | False |
-| drum3 | 4 | 93 | 0.924747 | 105 | False |
-| drum3 | 5 | 2 | 0.924926 | 88 | False |
-| drum4 | 1 | 29 | 0.958623 | 96 | False |
-| drum4 | 2 | 93 | 0.958802 | 105 | False |
-| drum4 | 3 | 90 | 0.958992 | 89 | False |
-| drum4 | 4 | 94 | 0.959014 | 100 | False |
-| drum4 | 5 | 2 | 0.959017 | 88 | False |
-| drum6 | 1 | 90 | 0.988400 | 89 | False |
-| drum6 | 2 | 42 | 0.988527 | 96 | False |
-| drum6 | 3 | 75 | 0.988534 | 86 | False |
-| drum6 | 4 | 70 | 0.988547 | 83 | False |
-| drum6 | 5 | 92 | 0.988571 | 96 | False |
-| exact_int16 | 1 | 0 | 1.000000 | 81 | False |
-| exact_int16 | 2 | 1 | 1.000000 | 85 | False |
-| exact_int16 | 3 | 2 | 1.000000 | 88 | False |
-| exact_int16 | 4 | 3 | 1.000000 | 97 | False |
-| exact_int16 | 5 | 4 | 1.000000 | 92 | False |
-| mitchell | 1 | 29 | 0.980961 | 96 | False |
-| mitchell | 2 | 79 | 0.981286 | 97 | False |
-| mitchell | 3 | 94 | 0.981306 | 100 | False |
-| mitchell | 4 | 90 | 0.981308 | 89 | False |
-| mitchell | 5 | 98 | 0.981314 | 97 | False |
-
-The exact baseline is 1.0 everywhere, so its first five entries are ties.
-Full texts are in [outlier_report.json](docs/results/attention_corpus_20260914/outlier_report.json).
-
-</details>
+Both orientations use the same 177-LUT core. Compensated Q reaches 95.56%
+overlap, below DRUM4 and Mitchell but at lower standalone area and higher Fmax.
+Compensation costs 32 LUTs and reduces Fmax from 121.51 to 101.15 MHz.
 
 ### Layer-by-layer results at 10% selection
 
+![Overlap by layer](docs/images/results/attention_layers.png)
+
 | Design | Layer 1 | Layer 2 | Layer 3 | Layer 4 | Layer 5 | Layer 6 |
 | --- | --- | --- | --- | --- | --- | --- |
-| exact_int16 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
-| dlzs_snap_q | 0.8979 | 0.9141 | 0.9186 | 0.9269 | 0.9116 | 0.9451 |
-| dlzs_snap_k | 0.8787 | 0.8928 | 0.8875 | 0.8998 | 0.8765 | 0.9295 |
-| drum3 | 0.9138 | 0.9251 | 0.9239 | 0.9328 | 0.9165 | 0.9503 |
-| drum4 | 0.9536 | 0.9598 | 0.9597 | 0.9639 | 0.9546 | 0.9736 |
-| drum6 | 0.9871 | 0.9890 | 0.9891 | 0.9902 | 0.9876 | 0.9931 |
-| mitchell | 0.9792 | 0.9823 | 0.9817 | 0.9836 | 0.9794 | 0.9888 |
-
-[![Layer-wise top-k overlap](docs/images/results/attention_layers.png)](docs/images/results/attention_layers.svg)
-
-[All layer/fraction/baseline values](docs/results/attention_corpus_20260914/per_layer.csv).
+| exact_int16 | 100.00% | 100.00% | 100.00% | 100.00% | 100.00% | 100.00% |
+| dlzs_snap_q | 89.79% | 91.41% | 91.86% | 92.69% | 91.16% | 94.51% |
+| dlzs_snap_k | 87.87% | 89.28% | 88.75% | 89.98% | 87.65% | 92.95% |
+| dlzs_comp_q | 94.36% | 95.30% | 95.53% | 96.02% | 95.15% | 97.03% |
+| dlzs_comp_k | 93.23% | 94.05% | 93.83% | 94.40% | 92.98% | 96.04% |
+| mitchell | 97.92% | 98.23% | 98.17% | 98.36% | 97.94% | 98.88% |
+| drum3 | 91.38% | 92.51% | 92.39% | 93.28% | 91.65% | 95.03% |
+| drum4 | 95.36% | 95.98% | 95.97% | 96.39% | 95.46% | 97.36% |
+| drum6 | 98.71% | 98.90% | 98.91% | 99.02% | 98.76% | 99.31% |
 
 ### Ranking preservation versus FPGA cost
 
-| Attention design | Hardware | Overlap @10% | Slice LUTs | LUT cells | FFs | DSPs | Fmax (MHz) | WNS (ns) |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `exact_int16` | `exact_lut` | 100.00% | 265 | 357 | 64 | 0 | 104.29 | 0.411 |
-| `dlzs_snap_q` | `dlzs_opt` | 91.90% | 145 | 169 | 64 | 0 | 121.51 | 1.77 |
-| `dlzs_snap_k` | `dlzs_opt` | 89.41% | 145 | 169 | 64 | 0 | 121.51 | 1.77 |
-| `drum3` | `drum_opt3` | 92.71% | 233 | 236 | 64 | 0 | 86.94 | -1.502 |
-| `drum4` | `drum_opt4` | 96.09% | 273 | 278 | 64 | 0 | 76.62 | -3.051 |
-| `drum6` | `drum_opt6` | 98.94% | 318 | 327 | 64 | 0 | 72.13 | -3.864 |
-| `mitchell` | `mitchell` | 98.25% | 464 | 496 | 66 | 0 | 63.71 | -5.696 |
+![Ranking versus area](docs/images/results/attention_hardware_cost.png)
 
-**Slice LUTs are physical utilization; LUT cells are the pre-packing count
-reported by `summary.txt`.** The saved `attention_cost_table.csv` uses LUT
-cells in its `impl_luts` column. Physical counts above come from each design's
-`post_route/utilization.txt` and match §7; they must not be interchanged.
+| Attention model | Hardware | 10% overlap | Slice LUTs | LUT cells | FFs | Fmax (MHz) | WNS (ns) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| exact_int16 | exact_lut | 100.00% | 265 | 357 | 64 | 104.29 | 0.411 |
+| dlzs_snap_q | dlzs_opt | 91.90% | 145 | 169 | 64 | 121.51 | 1.770 |
+| dlzs_snap_k | dlzs_opt | 89.41% | 145 | 169 | 64 | 121.51 | 1.770 |
+| dlzs_comp_q | dlzs_comp_three | 95.56% | 177 | 187 | 64 | 101.15 | 0.114 |
+| dlzs_comp_k | dlzs_comp_three | 94.09% | 177 | 187 | 64 | 101.15 | 0.114 |
+| mitchell | mitchell_opt | 98.25% | 406 | 406 | 64 | 71.04 | -4.077 |
+| drum3 | drum_opt3 | 92.71% | 233 | 236 | 64 | 86.94 | -1.502 |
+| drum4 | drum_opt4 | 96.09% | 273 | 278 | 64 | 76.62 | -3.051 |
+| drum6 | drum_opt6 | 98.94% | 318 | 327 | 64 | 72.13 | -3.864 |
 
-[![Attention ranking versus physical area and timing](docs/images/results/attention_hardware_cost.png)](docs/images/results/attention_hardware_cost.svg)
-
-This joins GPU ranking results with **standalone multiplier** OOC costs.
-It excludes the AXI wrapper, score accumulators, memories, selectors, and
-software overhead. It is not an area or speed estimate for a complete attention
-accelerator. [Saved cost join](docs/results/attention_corpus_20260914/attention_cost_table.csv).
-
-On this corpus, snapping Q preserves about **2.49 percentage points** more
-top-k indices than snapping K at the same multiplier cost. DLZS-opt reduces
-physical LUTs by **45.3%** and has **16.5%** higher reported OOC Fmax than exact
-LUT, at the cost of about **8.10%** missing top-k indices at 10% selection.
-DRUM3 improves overlap by about **0.80 percentage points** over snapping Q,
-but uses 233 rather than 145 Slice LUTs and has lower reported Fmax.
-DRUM6 and Mitchell preserve more rankings but cost more physical LUTs and
-miss the 100 MHz OOC constraint. A satisfactory overlap threshold has not yet
-been established with a downstream task.
-
-### Earlier diagnostic stages
-
-| Stage | Result | Scope |
-|---|---|---|
-| Model/projection inspection | Q, K, V and output projections: 768 → 768 | Setup check |
-| First-layer reconstruction | All checks passed, 12 heads | 2 debugging passages |
-| Exact quantization baseline | Score MAE 3.79816448e−5; max error 3.16170749e−4; 0 clipped | Same 2 passages |
-| Baseline top-k versus float | Mean 1.0 at every tested fraction except 35%: 0.999740 | Debugging only |
-| Scalar multiplier comparison | All seven designs evaluated | Same 2 passages |
-| Multilayer diagnostic | Six layers compared | 4 debugging passages |
-| Corpus evaluation | Complete with audit and cost join | 100 template passages |
-
-At **10% selection**, mean overlap versus quantized exact evolved as follows:
-
-| Design | 2 passages, layer 1 | 4 passages, all layers | 100 passages, all layers |
-| --- | --- | --- | --- |
-| exact_int16 | 1.0000 | 1.0000 | 1.0000 |
-| dlzs_snap_q | 0.9201 | 0.9190 | 0.9190 |
-| dlzs_snap_k | 0.9123 | 0.8939 | 0.8941 |
-| drum3 | 0.9427 | 0.9272 | 0.9271 |
-| drum4 | 0.9653 | 0.9614 | 0.9609 |
-| drum6 | 0.9887 | 0.9892 | 0.9894 |
-| mitchell | 0.9826 | 0.9826 | 0.9825 |
-
-These are different text sets, so the columns are checks of the workflow,
-not evidence of a statistical convergence trend. Compact early-stage reports
-are preserved under [docs/results/attention_debug](docs/results/attention_debug).
-The superseded diagnostic runners and CUDA setup check were removed during
-cleanup; the final corpus evaluator includes reconstruction and kernel checks.
+Mitchell ranking comes from the same golden arithmetic; `mitchell_opt` is the
+arithmetic-equivalent hardware implementation, not a separate attention run.
+All rows use zero DSPs. These are **standalone multiplier** costs, not the LUT
+cost or speedup of a complete attention engine.
 
 ### Limits and evidence provenance
 
-The 100 texts share 20 topic templates and five condition templates. Their
-narrow passage range does not demonstrate robustness on independent natural
-language, longer sequences, other checkpoints, or other models. No approximate
-errors propagate between layers, and V, softmax outputs, downstream model
-predictions, and classification accuracy are not evaluated under replacement.
-The GPU study uses dynamic scales and int64 sums; these are not yet implemented
-as a hardware dot-product pipeline.
+The fixed corpus is correlated and covers one checkpoint. No downstream task
+accuracy, propagated approximate layers, accelerator throughput, or board power
+is claimed. The current result supports an arithmetic-unit and ranking-preservation
+study; broader model-level claims would need broader evaluation.
 
-Curated CSV/JSON evidence is copied into [docs/results/attention_corpus_20260914](docs/results/attention_corpus_20260914) so GitHub links do
-not depend on ignored `results/` directories. Raw tensor archives remain local.
-[snapshot.json](docs/results/attention_corpus_20260914/snapshot.json) records SHA-256 hashes of the copied
-files. Original manifests retain the paths and source hashes from execution;
-cleanup and line-ending normalization can change today's source hashes.
-The range repair and newer key tiling are disclosed rather than presented as
-a byte-identical rerun of all earlier scripts.
+[Manifest](docs/results/attention_corpus_20260915/manifest.json),
+[corrected summary](docs/results/attention_corpus_20260915/summary_corrected.csv),
+[per-passage means](docs/results/attention_corpus_20260915/per_text.csv), and
+[snapshot hashes](docs/results/attention_corpus_20260915/snapshot.json) preserve
+the input evidence. Plots are also supplied as SVG and PDF for the paper.
 
 ---
 
@@ -887,6 +812,11 @@ a byte-identical rerun of all earlier scripts.
     rtl/dlzs_b_prep.sv      B branch: sign-extend, conditional negate, zero guard
     rtl/dlzc_shift.sv       two-level barrel shifter, e[3:2] then e[1:0]
     rtl/dlzc_opt_top.sv     optimized signed DLZS top
+    rtl/lzc_8_meta.sv       leading-one metadata for compensation
+    rtl/lzc_16_meta.sv      16-bit metadata detector
+    rtl/dlzs_comp_decode.sv three-level rounding decoder
+    rtl/dlzs_b_multiple.sv  signed B / 3B preparation
+    rtl/dlzc_comp_top.sv    compensated signed DLZS top
 
     baselines/drum_opt/drum_opt_operand.sv   |X| -> sign-carrying operand + shift
     baselines/drum_opt/drum_opt_shift.sv     final shift
@@ -923,7 +853,7 @@ Things that are easy to get wrong and were got right:
       wrappers/             identical register harnesses, one per design family
     tb/
       dirs.mk  common.mk    shared cocotb plumbing
-      lzc/ mult/ mitchell/ drum/ exact/ opt/ drum_opt/     one directory per bench
+      lzc/ mult/ mitchell/ mitchell_opt/ drum/ exact/ opt/ drum_opt/ comp/     one directory per bench
     src/golden_model.py     bit-exact reference models, no float in any datapath
     src/metrics.py          MRED, NMED, max RED, signed bias, error rate
     src/sweep.py            8-bit exhaustive + 16-bit sampled sweeps
@@ -940,7 +870,7 @@ Things that are easy to get wrong and were got right:
     docs/results/                 curated, versionable experiment tables
     docs/images/results/          overlap, layer and hardware-cost figures
     results/                      local run directories and tensor archives (ignored)
-    tests/test_golden_model.py    19-test regression suite
+    tests/test_golden_model.py    golden-model regression suite
     synth_result/<design>/  committed synthesis and post-route reports
     docs/progress.md
     docs/images/schematics/           Yosys RTL schematics
@@ -958,10 +888,10 @@ product would be a bug.
 
 From the repo root:
 
-    make test      # golden-model regression suite (19 tests)
+    make test      # golden-model regression suite
     make sweep     # error sweeps -> results/
-    make sim       # all seven cocotb benches
-    make lint      # Verilator lint on all seven
+    make sim       # all nine cocotb benches
+    make lint      # Verilator lint on all nine
     make smoke     # fast test + sim, for the pre-commit loop
     make synth     # Vivado OOC synth + place and route -> synth_result/
     make designs   # list the buildable designs
@@ -977,6 +907,17 @@ From the repo root:
 | `tb/exact` | 8 | `EXACT_N_RANDOM` |
 | `tb/opt` | 8 | `OPT_N_RANDOM` |
 | `tb/drum_opt` | 5 | `DRUM_OPT_N_RANDOM` |
+| `tb/comp` | 7 | `COMP_N_RANDOM` |
+| `tb/mitchell_opt` | 5 | `MITCHELL_OPT_N_RANDOM` |
+
+Bench counts describe the supplied tests, not a claim that every bench was rerun today.
+
+```bash
+make -C tb/comp COMP_N_RANDOM=1000
+make -C tb/mitchell_opt MITCHELL_OPT_N_RANDOM=1000
+make synth-one DESIGN=dlzs_comp_three
+make synth-one DESIGN=mitchell_opt
+```
 
 Synthesis options go after `-tclargs`:
 
@@ -1006,10 +947,10 @@ python src/attention_corpus_eval.py \
   --texts src/attention_corpus_100.json \
   --revision 12040accade4e8a0f71eabdb258fecc2e7e948be \
   --device cuda --max-length 128 --batch-size 8 \
-  --query-block 16 --key-block 16
+  --query-block 32 --key-block 16
 ```
 
-The 16×16 query/key tiles are the successful settings for the 8 GiB RTX 4070
+The 32×16 query/key tiles are the recorded settings for the 8 GiB RTX 4070
 Laptop GPU. The earlier broad product allocation exhausted memory. Use
 `--device cpu` when CUDA is unavailable; the arithmetic reference is unchanged.
 `--no-save-tensors` reduces output storage if raw Q/K archives are unnecessary.
@@ -1017,7 +958,8 @@ Laptop GPU. The earlier broad product allocation exhausted memory. Use
 To audit the retained completed run and regenerate its hardware join:
 
 ```bash
-run=results/attention_corpus_eval/20260914T070644_541555Z
+run=results/attention_corpus_eval/20260915T081426_479296Z
+python src/repair_attention_summary.py --input "$run"
 python src/audit_attention_run.py --input "$run" --percent 10
 python src/combine_attention_costs.py --attention-run "$run" --synth-root synth_result
 ```
@@ -1029,8 +971,9 @@ minimum-field bug also affects the joined minimum column. Use audit output
 for passage minima until that reporting bug is fixed.
 
 Curated documentation snapshots are for reading the results; the audit expects
-the original full run directory, including its per-head rows. The plot scripts
-used during exploration were pruned; final PNG/SVG figures are retained here.
+the original full run directory, including its per-head rows. The README includes regenerated PNG/SVG/PDF figures from the corrected summary.
+When regenerating overlap plots, select `baseline=quantized_exact` for the single
+panel and give every design an explicit color and marker.
 
 ### Reopening the hardware project after cleanup
 
@@ -1064,7 +1007,7 @@ vectors and the published error tables are the same set.
    or divide by `p` for a magnitude-consistent sign.
 2. **Mitchell worst-case note.** `golden_model.py` says the −11.1 % worst case
    is at mantissas near 0.44; it is at exactly 0.5.
-3. **Fmax of passing designs is understated** (§7) — tighter-period run pending.
+3. **Fmax depends on the chosen constraint and placement** (§7); a constraint sweep is pending.
    **Power remains estimated** — refined reports are committed for DLZS, DRUM
    and exact; Mitchell's activity-driven run and SAIF-based validation remain
    pending.
@@ -1077,7 +1020,7 @@ vectors and the published error tables are the same set.
    as passage minima. Saved corrected tables and the audit fix the interpretation;
    the producer still needs correction before a fresh publication run.
 7. **Attention scope:** 100 correlated template passages and one checkpoint;
-   no downstream task evaluation or propagated approximation. Compensation is pending.
+   no downstream task evaluation or propagated approximation. Compensation is now included.
 8. **Post-cleanup reproduction:** routed checkpoints and diagnostic runners
    were removed; hardware products must be regenerated for new timing/power runs.
 9. **Vendored DRUM lint warnings are waived, not fixed** (`WIDTHEXPAND`,
@@ -1094,17 +1037,12 @@ vectors and the published error tables are the same set.
 | 6–7 | Baselines, OOC LUT-only synthesis, comparison table | mostly done — DLZS, DRUM K=3..8, Mitchell and exact LUT/DSP reports included; remaining: 8-bit characterization, committed simulation evidence, Mitchell refined power, tighter-period run |
 | 8–9 | AXI-Lite wrapper, PYNQ-Z2 overlay, ≥10,000 vectors hardware-vs-sim | in progress — wrapper, validated block design, timing, bitstream, and local smoke test complete; board regression pending |
 | 10–11 | Attention Q/K from DistilBERT, top-k index overlap vs hardware cost | fixed-corpus study complete: 100 passages, 6 layers, both snap directions, audited tables, plots and OOC cost join; generalization/task validation remains open |
-| 12–13 | MBM-style error compensation, accuracy-vs-LUTs Pareto front | planned; no compensation results yet |
+| 12–13 | Three-level compensation, accuracy-vs-LUTs comparison | complete for model, RTL validation, OOC implementation, estimated power and fixed-corpus ranking; board deployment pending |
 | 14 | Buffer, thesis writeup, defense dry-run | README and evidence updated; thesis and defense preparation pending |
 
-Scope is cut from the **top tier down** if the schedule slips — compensation
-first, then the application study — never the baseline characterization.
-
-**Designed-in test hook for Week 12.** The compensation LUT must reduce to
-uncompensated DLZS when it is all zeros. That degenerate-parameter test is the
-same shape as `test_drum_degenerates_to_exact_at_k_equals_w`, the strongest
-test in the suite, and it should exist from the compensation module's first
-commit.
+**Compensation fallback:** `COMPENSATE=0` reproduces baseline DLZS and is
+covered by the compensation tests. Further compensation levels and broader
+attention datasets are follow-up experiments.
 
 ---
 
@@ -1131,8 +1069,9 @@ commit.
    Multiplier for Approximate Applications," *ICCAD*, 2015.
 3. Wang et al., "SOFA: A Compute-Memory Optimized Sparsity Accelerator via
    Cross-Stage Coordinated Tiling," *MICRO*, 2024. — origin of the DLZS scheme.
-4. MBM (Mitchell-based multiplier with error compensation) — the model for the
-   Week 12–13 compensation tier.
+The implemented three-level rounding scheme is described in §5. A verified
+related-work comparison is still needed before claiming priority for its
+compensation method; “MBM” alone is not a complete bibliographic reference.
 
 Related work also includes power-of-two weight quantization, against which this
 scheme must be positioned rather than compared favourably by default.

@@ -1,0 +1,509 @@
+{
+  "format": "dlzs_attention_run_audit_v1",
+  "source_run": "/mnt/c/projects/major_project/results/attention_corpus_eval/20260915T081426_479296Z",
+  "source_corpus_sha256": "9d6fffbf114bf3e093448e944c88ab0ba63fbc1d430b2b0d1a464dd7fa6194e1",
+  "device": "cuda",
+  "device_name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+  "text_count": 100,
+  "percent": 10,
+  "hardest_passages": [
+    {
+      "design": "dlzs_comp_k",
+      "rank": 1,
+      "sample": 92,
+      "mean_overlap": 0.9370515046296298,
+      "valid_tokens": 96,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule after two days of heavy rain. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, nearby activity produced a second change in the measurements. the investigators added a control location before interpreting the trend. the result was reported only when the control supported the same direction."
+    },
+    {
+      "design": "dlzs_comp_k",
+      "rank": 2,
+      "sample": 90,
+      "mean_overlap": 0.9374393119711463,
+      "valid_tokens": 89,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule before sunrise. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, a short power interruption changed the first readings. the team repeated the affected measurements after the instruments restarted. the final decision used both the original and repeated observations."
+    },
+    {
+      "design": "dlzs_comp_k",
+      "rank": 3,
+      "sample": 93,
+      "mean_overlap": 0.9379749879749871,
+      "valid_tokens": 105,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule on a clear weekend morning. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, one sensor or record contained an unusual outlier. the team checked the raw value and calibration history instead of deleting it. the outlier remained visible in the appendix and was excluded only from the mean."
+    },
+    {
+      "design": "dlzs_comp_k",
+      "rank": 4,
+      "sample": 78,
+      "mean_overlap": 0.9381313131313124,
+      "valid_tokens": 102,
+      "truncated": false,
+      "text": "A public health group reviewed responses from households invited to a local wellness survey on a clear weekend morning. The review focused on survey responses: response rate, age band, and collection method. They compared online and paper forms and documented every change to the questionnaire. In that period, one sensor or record contained an unusual outlier. the team checked the raw value and calibration history instead of deleting it. the outlier remained visible in the appendix and was excluded only from the mean."
+    },
+    {
+      "design": "dlzs_comp_k",
+      "rank": 5,
+      "sample": 77,
+      "mean_overlap": 0.9385304659498213,
+      "valid_tokens": 93,
+      "truncated": false,
+      "text": "A public health group reviewed responses from households invited to a local wellness survey after two days of heavy rain. The review focused on survey responses: response rate, age band, and collection method. They compared online and paper forms and documented every change to the questionnaire. In that period, nearby activity produced a second change in the measurements. the investigators added a control location before interpreting the trend. the result was reported only when the control supported the same direction."
+    },
+    {
+      "design": "dlzs_comp_q",
+      "rank": 1,
+      "sample": 83,
+      "mean_overlap": 0.9535493827160499,
+      "valid_tokens": 99,
+      "truncated": false,
+      "text": "A community orchestra evaluated a rehearsal plan for a concert with several new sections on a clear weekend morning. The review focused on rehearsal passages: tempo, missed entries, and section balance. They compared conductor notes with recordings and marked passages needing another rehearsal. In that period, one sensor or record contained an unusual outlier. the team checked the raw value and calibration history instead of deleting it. the outlier remained visible in the appendix and was excluded only from the mean."
+    },
+    {
+      "design": "dlzs_comp_q",
+      "rank": 2,
+      "sample": 93,
+      "mean_overlap": 0.9540163540163533,
+      "valid_tokens": 105,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule on a clear weekend morning. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, one sensor or record contained an unusual outlier. the team checked the raw value and calibration history instead of deleting it. the outlier remained visible in the appendix and was excluded only from the mean."
+    },
+    {
+      "design": "dlzs_comp_q",
+      "rank": 3,
+      "sample": 92,
+      "mean_overlap": 0.954195601851852,
+      "valid_tokens": 96,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule after two days of heavy rain. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, nearby activity produced a second change in the measurements. the investigators added a control location before interpreting the trend. the result was reported only when the control supported the same direction."
+    },
+    {
+      "design": "dlzs_comp_q",
+      "rank": 4,
+      "sample": 77,
+      "mean_overlap": 0.9543160095579452,
+      "valid_tokens": 93,
+      "truncated": false,
+      "text": "A public health group reviewed responses from households invited to a local wellness survey after two days of heavy rain. The review focused on survey responses: response rate, age band, and collection method. They compared online and paper forms and documented every change to the questionnaire. In that period, nearby activity produced a second change in the measurements. the investigators added a control location before interpreting the trend. the result was reported only when the control supported the same direction."
+    },
+    {
+      "design": "dlzs_comp_q",
+      "rank": 5,
+      "sample": 91,
+      "mean_overlap": 0.9543458781362008,
+      "valid_tokens": 93,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule during a busy afternoon. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, several observations arrived later than expected. the analysts kept the timestamps and compared late and early records separately. the report treated timing as a possible source of variation."
+    },
+    {
+      "design": "dlzs_snap_k",
+      "rank": 1,
+      "sample": 90,
+      "mean_overlap": 0.8891836593147446,
+      "valid_tokens": 89,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule before sunrise. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, a short power interruption changed the first readings. the team repeated the affected measurements after the instruments restarted. the final decision used both the original and repeated observations."
+    },
+    {
+      "design": "dlzs_snap_k",
+      "rank": 2,
+      "sample": 79,
+      "mean_overlap": 0.8892468499427264,
+      "valid_tokens": 97,
+      "truncated": false,
+      "text": "A public health group reviewed responses from households invited to a local wellness survey near the end of a month-long trial. The review focused on survey responses: response rate, age band, and collection method. They compared online and paper forms and documented every change to the questionnaire. In that period, the system became more variable as demand increased. the engineers grouped the results by load and tested the busiest interval again. the recommendation included a limit for the high-demand case."
+    },
+    {
+      "design": "dlzs_snap_k",
+      "rank": 3,
+      "sample": 94,
+      "mean_overlap": 0.8903888888888891,
+      "valid_tokens": 100,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule near the end of a month-long trial. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, the system became more variable as demand increased. the engineers grouped the results by load and tested the busiest interval again. the recommendation included a limit for the high-demand case."
+    },
+    {
+      "design": "dlzs_snap_k",
+      "rank": 4,
+      "sample": 93,
+      "mean_overlap": 0.8904160654160646,
+      "valid_tokens": 105,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule on a clear weekend morning. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, one sensor or record contained an unusual outlier. the team checked the raw value and calibration history instead of deleting it. the outlier remained visible in the appendix and was excluded only from the mean."
+    },
+    {
+      "design": "dlzs_snap_k",
+      "rank": 5,
+      "sample": 52,
+      "mean_overlap": 0.890710872162485,
+      "valid_tokens": 93,
+      "truncated": false,
+      "text": "A secondary school team studied attendance across classes using a new morning check-in process after two days of heavy rain. The review focused on attendance records: arrival time, absence reason, and class size. They compared the electronic register with teacher notes and the transport timetable. In that period, nearby activity produced a second change in the measurements. the investigators added a control location before interpreting the trend. the result was reported only when the control supported the same direction."
+    },
+    {
+      "design": "dlzs_snap_q",
+      "rank": 1,
+      "sample": 93,
+      "mean_overlap": 0.9143819143819134,
+      "valid_tokens": 105,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule on a clear weekend morning. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, one sensor or record contained an unusual outlier. the team checked the raw value and calibration history instead of deleting it. the outlier remained visible in the appendix and was excluded only from the mean."
+    },
+    {
+      "design": "dlzs_snap_q",
+      "rank": 2,
+      "sample": 94,
+      "mean_overlap": 0.9155694444444448,
+      "valid_tokens": 100,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule near the end of a month-long trial. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, the system became more variable as demand increased. the engineers grouped the results by load and tested the busiest interval again. the recommendation included a limit for the high-demand case."
+    },
+    {
+      "design": "dlzs_snap_q",
+      "rank": 3,
+      "sample": 78,
+      "mean_overlap": 0.9166047732224195,
+      "valid_tokens": 102,
+      "truncated": false,
+      "text": "A public health group reviewed responses from households invited to a local wellness survey on a clear weekend morning. The review focused on survey responses: response rate, age band, and collection method. They compared online and paper forms and documented every change to the questionnaire. In that period, one sensor or record contained an unusual outlier. the team checked the raw value and calibration history instead of deleting it. the outlier remained visible in the appendix and was excluded only from the mean."
+    },
+    {
+      "design": "dlzs_snap_q",
+      "rank": 4,
+      "sample": 29,
+      "mean_overlap": 0.9166521990740742,
+      "valid_tokens": 96,
+      "truncated": false,
+      "text": "A software team reviewed a staged deployment of a service used by several internal groups near the end of a month-long trial. The review focused on service requests: latency, error rate, and release stage. They compared application logs with the deployment timeline and rollback notes. In that period, the system became more variable as demand increased. the engineers grouped the results by load and tested the busiest interval again. the recommendation included a limit for the high-demand case."
+    },
+    {
+      "design": "dlzs_snap_q",
+      "rank": 5,
+      "sample": 64,
+      "mean_overlap": 0.916767939814815,
+      "valid_tokens": 96,
+      "truncated": false,
+      "text": "An energy cooperative reviewed output from rooftop solar arrays installed on several buildings near the end of a month-long trial. The review focused on power intervals: generated energy, cloud cover, and inverter temperature. They compared meter readings with the weather station and marked maintenance periods. In that period, the system became more variable as demand increased. the engineers grouped the results by load and tested the busiest interval again. the recommendation included a limit for the high-demand case."
+    },
+    {
+      "design": "drum3",
+      "rank": 1,
+      "sample": 29,
+      "mean_overlap": 0.9244357638888892,
+      "valid_tokens": 96,
+      "truncated": false,
+      "text": "A software team reviewed a staged deployment of a service used by several internal groups near the end of a month-long trial. The review focused on service requests: latency, error rate, and release stage. They compared application logs with the deployment timeline and rollback notes. In that period, the system became more variable as demand increased. the engineers grouped the results by load and tested the busiest interval again. the recommendation included a limit for the high-demand case."
+    },
+    {
+      "design": "drum3",
+      "rank": 2,
+      "sample": 90,
+      "mean_overlap": 0.9244520737966424,
+      "valid_tokens": 89,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule before sunrise. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, a short power interruption changed the first readings. the team repeated the affected measurements after the instruments restarted. the final decision used both the original and repeated observations."
+    },
+    {
+      "design": "drum3",
+      "rank": 3,
+      "sample": 94,
+      "mean_overlap": 0.924638888888889,
+      "valid_tokens": 100,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule near the end of a month-long trial. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, the system became more variable as demand increased. the engineers grouped the results by load and tested the busiest interval again. the recommendation included a limit for the high-demand case."
+    },
+    {
+      "design": "drum3",
+      "rank": 4,
+      "sample": 93,
+      "mean_overlap": 0.9247474747474738,
+      "valid_tokens": 105,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule on a clear weekend morning. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, one sensor or record contained an unusual outlier. the team checked the raw value and calibration history instead of deleting it. the outlier remained visible in the appendix and was excluded only from the mean."
+    },
+    {
+      "design": "drum3",
+      "rank": 5,
+      "sample": 2,
+      "mean_overlap": 0.924926346801346,
+      "valid_tokens": 88,
+      "truncated": false,
+      "text": "At a regional railway station, dispatchers reviewed the departure board and platform queue after two days of heavy rain. The review focused on train movements: departure times and passenger counts. They compared the records with the timetable and marked every platform change. In that period, nearby activity produced a second change in the measurements. the investigators added a control location before interpreting the trend. the result was reported only when the control supported the same direction."
+    },
+    {
+      "design": "drum4",
+      "rank": 1,
+      "sample": 29,
+      "mean_overlap": 0.9586226851851853,
+      "valid_tokens": 96,
+      "truncated": false,
+      "text": "A software team reviewed a staged deployment of a service used by several internal groups near the end of a month-long trial. The review focused on service requests: latency, error rate, and release stage. They compared application logs with the deployment timeline and rollback notes. In that period, the system became more variable as demand increased. the engineers grouped the results by load and tested the busiest interval again. the recommendation included a limit for the high-demand case."
+    },
+    {
+      "design": "drum4",
+      "rank": 2,
+      "sample": 93,
+      "mean_overlap": 0.958802308802308,
+      "valid_tokens": 105,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule on a clear weekend morning. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, one sensor or record contained an unusual outlier. the team checked the raw value and calibration history instead of deleting it. the outlier remained visible in the appendix and was excluded only from the mean."
+    },
+    {
+      "design": "drum4",
+      "rank": 3,
+      "sample": 90,
+      "mean_overlap": 0.9589922319323063,
+      "valid_tokens": 89,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule before sunrise. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, a short power interruption changed the first readings. the team repeated the affected measurements after the instruments restarted. the final decision used both the original and repeated observations."
+    },
+    {
+      "design": "drum4",
+      "rank": 4,
+      "sample": 94,
+      "mean_overlap": 0.9590138888888892,
+      "valid_tokens": 100,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule near the end of a month-long trial. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, the system became more variable as demand increased. the engineers grouped the results by load and tested the busiest interval again. the recommendation included a limit for the high-demand case."
+    },
+    {
+      "design": "drum4",
+      "rank": 5,
+      "sample": 2,
+      "mean_overlap": 0.9590172558922553,
+      "valid_tokens": 88,
+      "truncated": false,
+      "text": "At a regional railway station, dispatchers reviewed the departure board and platform queue after two days of heavy rain. The review focused on train movements: departure times and passenger counts. They compared the records with the timetable and marked every platform change. In that period, nearby activity produced a second change in the measurements. the investigators added a control location before interpreting the trend. the result was reported only when the control supported the same direction."
+    },
+    {
+      "design": "drum6",
+      "rank": 1,
+      "sample": 90,
+      "mean_overlap": 0.9883999167707032,
+      "valid_tokens": 89,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule before sunrise. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, a short power interruption changed the first readings. the team repeated the affected measurements after the instruments restarted. the final decision used both the original and repeated observations."
+    },
+    {
+      "design": "drum6",
+      "rank": 2,
+      "sample": 42,
+      "mean_overlap": 0.9885271990740743,
+      "valid_tokens": 96,
+      "truncated": false,
+      "text": "At a municipal water plant, operators checked the stages used to treat incoming river water after two days of heavy rain. The review focused on treatment batches: turbidity, chemical dose, and settling time. They compared laboratory samples with process logs and reviewed the valve settings. In that period, nearby activity produced a second change in the measurements. the investigators added a control location before interpreting the trend. the result was reported only when the control supported the same direction."
+    },
+    {
+      "design": "drum6",
+      "rank": 3,
+      "sample": 75,
+      "mean_overlap": 0.9885335917312658,
+      "valid_tokens": 86,
+      "truncated": false,
+      "text": "A public health group reviewed responses from households invited to a local wellness survey before sunrise. The review focused on survey responses: response rate, age band, and collection method. They compared online and paper forms and documented every change to the questionnaire. In that period, a short power interruption changed the first readings. the team repeated the affected measurements after the instruments restarted. the final decision used both the original and repeated observations."
+    },
+    {
+      "design": "drum6",
+      "rank": 4,
+      "sample": 70,
+      "mean_overlap": 0.9885467797114382,
+      "valid_tokens": 83,
+      "truncated": false,
+      "text": "At an archaeology site, researchers catalogued finds from adjacent layers of a test trench before sunrise. The review focused on recorded artefacts: depth, material, and grid position. They compared field sketches with the database and retained uncertain classifications. In that period, a short power interruption changed the first readings. the team repeated the affected measurements after the instruments restarted. the final decision used both the original and repeated observations."
+    },
+    {
+      "design": "drum6",
+      "rank": 5,
+      "sample": 92,
+      "mean_overlap": 0.988570601851852,
+      "valid_tokens": 96,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule after two days of heavy rain. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, nearby activity produced a second change in the measurements. the investigators added a control location before interpreting the trend. the result was reported only when the control supported the same direction."
+    },
+    {
+      "design": "exact_int16",
+      "rank": 1,
+      "sample": 0,
+      "mean_overlap": 1.0,
+      "valid_tokens": 81,
+      "truncated": false,
+      "text": "At a regional railway station, dispatchers reviewed the departure board and platform queue before sunrise. The review focused on train movements: departure times and passenger counts. They compared the records with the timetable and marked every platform change. In that period, a short power interruption changed the first readings. the team repeated the affected measurements after the instruments restarted. the final decision used both the original and repeated observations."
+    },
+    {
+      "design": "exact_int16",
+      "rank": 2,
+      "sample": 1,
+      "mean_overlap": 1.0,
+      "valid_tokens": 85,
+      "truncated": false,
+      "text": "At a regional railway station, dispatchers reviewed the departure board and platform queue during a busy afternoon. The review focused on train movements: departure times and passenger counts. They compared the records with the timetable and marked every platform change. In that period, several observations arrived later than expected. the analysts kept the timestamps and compared late and early records separately. the report treated timing as a possible source of variation."
+    },
+    {
+      "design": "exact_int16",
+      "rank": 3,
+      "sample": 2,
+      "mean_overlap": 1.0,
+      "valid_tokens": 88,
+      "truncated": false,
+      "text": "At a regional railway station, dispatchers reviewed the departure board and platform queue after two days of heavy rain. The review focused on train movements: departure times and passenger counts. They compared the records with the timetable and marked every platform change. In that period, nearby activity produced a second change in the measurements. the investigators added a control location before interpreting the trend. the result was reported only when the control supported the same direction."
+    },
+    {
+      "design": "exact_int16",
+      "rank": 4,
+      "sample": 3,
+      "mean_overlap": 1.0,
+      "valid_tokens": 97,
+      "truncated": false,
+      "text": "At a regional railway station, dispatchers reviewed the departure board and platform queue on a clear weekend morning. The review focused on train movements: departure times and passenger counts. They compared the records with the timetable and marked every platform change. In that period, one sensor or record contained an unusual outlier. the team checked the raw value and calibration history instead of deleting it. the outlier remained visible in the appendix and was excluded only from the mean."
+    },
+    {
+      "design": "exact_int16",
+      "rank": 5,
+      "sample": 4,
+      "mean_overlap": 1.0,
+      "valid_tokens": 92,
+      "truncated": false,
+      "text": "At a regional railway station, dispatchers reviewed the departure board and platform queue near the end of a month-long trial. The review focused on train movements: departure times and passenger counts. They compared the records with the timetable and marked every platform change. In that period, the system became more variable as demand increased. the engineers grouped the results by load and tested the busiest interval again. the recommendation included a limit for the high-demand case."
+    },
+    {
+      "design": "mitchell",
+      "rank": 1,
+      "sample": 29,
+      "mean_overlap": 0.9809606481481483,
+      "valid_tokens": 96,
+      "truncated": false,
+      "text": "A software team reviewed a staged deployment of a service used by several internal groups near the end of a month-long trial. The review focused on service requests: latency, error rate, and release stage. They compared application logs with the deployment timeline and rollback notes. In that period, the system became more variable as demand increased. the engineers grouped the results by load and tested the busiest interval again. the recommendation included a limit for the high-demand case."
+    },
+    {
+      "design": "mitchell",
+      "rank": 2,
+      "sample": 79,
+      "mean_overlap": 0.9812857961053838,
+      "valid_tokens": 97,
+      "truncated": false,
+      "text": "A public health group reviewed responses from households invited to a local wellness survey near the end of a month-long trial. The review focused on survey responses: response rate, age band, and collection method. They compared online and paper forms and documented every change to the questionnaire. In that period, the system became more variable as demand increased. the engineers grouped the results by load and tested the busiest interval again. the recommendation included a limit for the high-demand case."
+    },
+    {
+      "design": "mitchell",
+      "rank": 3,
+      "sample": 94,
+      "mean_overlap": 0.9813055555555557,
+      "valid_tokens": 100,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule near the end of a month-long trial. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, the system became more variable as demand increased. the engineers grouped the results by load and tested the busiest interval again. the recommendation included a limit for the high-demand case."
+    },
+    {
+      "design": "mitchell",
+      "rank": 4,
+      "sample": 90,
+      "mean_overlap": 0.9813080871133302,
+      "valid_tokens": 89,
+      "truncated": false,
+      "text": "A security team reviewed alerts from a business network after deploying a new detection rule before sunrise. The review focused on security events: alert type, response time, and source segment. They compared alerts with authenticated activity and preserved the original event order. In that period, a short power interruption changed the first readings. the team repeated the affected measurements after the instruments restarted. the final decision used both the original and repeated observations."
+    },
+    {
+      "design": "mitchell",
+      "rank": 5,
+      "sample": 98,
+      "mean_overlap": 0.981314432989691,
+      "valid_tokens": 97,
+      "truncated": false,
+      "text": "Materials researchers tested small battery cells made with several electrode formulations on a clear weekend morning. The review focused on cell cycles: capacity, temperature, and cycle count. They compared each cell with a control formulation and recorded the charging profile. In that period, one sensor or record contained an unusual outlier. the team checked the raw value and calibration history instead of deleting it. the outlier remained visible in the appendix and was excluded only from the mean."
+    }
+  ],
+  "design_summary": [
+    {
+      "design": "dlzs_comp_k",
+      "percent": 10,
+      "passage_mean": 0.9408639296600462,
+      "passage_std": 0.0013287179043336573,
+      "passage_min": 0.9370515046296298,
+      "passage_max": 0.9445639187574675,
+      "mean_layer_score_mae": 0.145341612202276,
+      "max_layer_score_mae": 0.1748440427010277
+    },
+    {
+      "design": "dlzs_comp_q",
+      "percent": 10,
+      "passage_mean": 0.9556307846456982,
+      "passage_std": 0.0008281918332538878,
+      "passage_min": 0.9535493827160499,
+      "passage_max": 0.9576314217443253,
+      "mean_layer_score_mae": 0.1457088564287047,
+      "max_layer_score_mae": 0.17610442052873412
+    },
+    {
+      "design": "dlzs_snap_k",
+      "percent": 10,
+      "passage_mean": 0.8941049786456795,
+      "passage_std": 0.00195449129829657,
+      "passage_min": 0.8891836593147446,
+      "passage_max": 0.8997584541062802,
+      "mean_layer_score_mae": 0.28145779045993624,
+      "max_layer_score_mae": 0.33910716481303965
+    },
+    {
+      "design": "dlzs_snap_q",
+      "percent": 10,
+      "passage_mean": 0.9190283782504167,
+      "passage_std": 0.0014029693728972179,
+      "passage_min": 0.9143819143819134,
+      "passage_max": 0.9217293906810037,
+      "mean_layer_score_mae": 0.28656948040413804,
+      "max_layer_score_mae": 0.3513547253162236
+    },
+    {
+      "design": "drum3",
+      "percent": 10,
+      "passage_mean": 0.9270526309568932,
+      "passage_std": 0.0013717157661081196,
+      "passage_min": 0.9244357638888892,
+      "passage_max": 0.930004409171075,
+      "mean_layer_score_mae": 0.23126029218422045,
+      "max_layer_score_mae": 0.2866514793926436
+    },
+    {
+      "design": "drum4",
+      "percent": 10,
+      "passage_mean": 0.9608646364211682,
+      "passage_std": 0.000891702258412368,
+      "passage_min": 0.9586226851851853,
+      "passage_max": 0.962888291517324,
+      "mean_layer_score_mae": 0.10687890140531703,
+      "max_layer_score_mae": 0.12988379911933629
+    },
+    {
+      "design": "drum6",
+      "percent": 10,
+      "passage_mean": 0.9893602610361247,
+      "passage_std": 0.0004563764323480071,
+      "passage_min": 0.9883999167707032,
+      "passage_max": 0.990445970314884,
+      "mean_layer_score_mae": 0.026031123551933634,
+      "max_layer_score_mae": 0.03136482793576184
+    },
+    {
+      "design": "exact_int16",
+      "percent": 10,
+      "passage_mean": 1.0,
+      "passage_std": 0.0,
+      "passage_min": 1.0,
+      "passage_max": 1.0,
+      "mean_layer_score_mae": 0.0,
+      "max_layer_score_mae": 0.0
+    },
+    {
+      "design": "mitchell",
+      "percent": 10,
+      "passage_mean": 0.9824960366255214,
+      "passage_std": 0.00055003278959326,
+      "passage_min": 0.9809606481481483,
+      "passage_max": 0.983866442199775,
+      "mean_layer_score_mae": 0.09611723428011851,
+      "max_layer_score_mae": 0.12557444415904268
+    }
+  ],
+  "interpretation": "Passage-level means are averaged over all six layers and heads; low minima identify hard cases for inspection."
+}

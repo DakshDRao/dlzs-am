@@ -14,7 +14,8 @@
 #   make clean
 
 PYTHON ?= python3
-BENCHES := lzc mult mitchell drum exact opt drum_opt comp
+# `comp` is the cocotb bench for the registered dlzs_comp_three implementation.
+BENCHES := lzc mult mitchell mitchell_opt drum exact opt drum_opt comp
 
 test:
 	$(PYTHON) tests/test_golden_model.py
@@ -37,10 +38,10 @@ lint:
 # reduced; every directed and corner test still runs in full.
 smoke:
 	$(PYTHON) tests/test_golden_model.py
-	$(PYTHON) tests/test_three_level.py
 	$(MAKE) -C tb/lzc  LZC_N_RANDOM=1000
 	$(MAKE) -C tb/mult MULT_N_RANDOM=1000
 	$(MAKE) -C tb/mitchell MITCHELL_N_RANDOM=1000
+	$(MAKE) -C tb/mitchell_opt MITCHELL_OPT_N_RANDOM=1000
 	$(MAKE) -C tb/drum  DRUM_N_RANDOM=1000
 	$(MAKE) -C tb/exact EXACT_N_RANDOM=1000
 	$(MAKE) -C tb/opt   OPT_N_RANDOM=1000

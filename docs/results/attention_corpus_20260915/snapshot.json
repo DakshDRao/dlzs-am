@@ -1,0 +1,22 @@
+{
+  "source_run": "C:\\projects\\major_project\\results\\attention_corpus_eval\\20260915T081426_479296Z",
+  "validation": "All summary means and passage ranges recomputed from per_text.csv to tolerance 1e-12",
+  "files_sha256": {
+    "manifest.json": "07bd096a793d9df0173d2afe048f4edcf27dd0667f56f017efd9bb0c30100371",
+    "summary_corrected.csv": "1a1b71af69798c542725dc8bac79d6614873c56b3b14950dc6ecb2d13f67a341",
+    "summary.csv": "ef7155f5a42b8bf8b9decee9b4d029c07d8493318329e9ca81216a5c6f9883cc",
+    "design_summary.csv": "2c8c95db439ca6ee047332a4b6acf23dda0566bc1f9f99d8245f4962194cd647",
+    "per_layer.csv": "2d98cb0c6b668f568598383ae4a6ca0dd67964a1060a9643b81b14fd61be6c7f",
+    "per_text.csv": "b4a085f9ecc871c07a029efae542a17799b0a5c4b986e8564e606b251dd369f6",
+    "score_errors.csv": "9fb6c9412ac2639ed38c32e076d49d88f28a6c0f7958cad4ad43ee2b8300a9df",
+    "reconstruction_checks.csv": "2ab9c2dfddb270b8fff8faaaaf6c267f6dbe4a34ca737e679ca91e516e73ab6c",
+    "outliers_10pct.csv": "a3f1cb53e559765c25812a6b17b3adedd1e15f31b354369275121ddf6453e38e",
+    "outlier_report.json": "049e8cad9762ee314b3aa240b599001dac35508ce897ea202088360605a24b2e"
+  },
+  "plot_baseline": "quantized_exact",
+  "arithmetic_source_sha256": {
+    "golden_model.py": "7923ad3b4a81c525edc4e7d3ce5007fef5e60c0e6ef53e0c3e5b2e0eb0ac5e8c",
+    "sweep.py": "acbf8d369b02da5e541f8157623d189338252c8b9af2ada7a10128a20652354f",
+    "metrics.py": "da1e3cfc25cbe9eec0e169872cffc63c29c8b74db7cec8153172a4c20ee27aae"
+  }
+}

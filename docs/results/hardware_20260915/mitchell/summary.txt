@@ -1,0 +1,27 @@
+design    mitchell
+top       mitchell_wrapper_test
+generics  
+part      xc7z020clg400-1
+period_ns 10.0
+stage     impl
+dsp_policy lut
+synth_luts   446
+synth_ffs    64
+synth_dsps   0
+synth_wns_ns -7.069
+synth_fmax_mhz 58.59
+synth_logic_levels 30
+synth_worst_from b_reg_reg[0]/C
+synth_worst_to   p_reg[28]/D
+impl_luts    496
+impl_ffs     66
+impl_dsps    0
+impl_wns_ns  -5.696
+impl_whs_ns  0.938
+impl_fmax_mhz 63.71
+impl_fmax_limit data_path
+impl_min_period_ns 1.000
+impl_min_period_pin FDRE/C
+impl_logic_levels 26
+impl_worst_from a_reg_reg[0]/C
+impl_worst_to   p_reg[30]/D
