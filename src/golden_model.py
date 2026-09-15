@@ -41,6 +41,7 @@ model/RTL divergence.
 __all__ = [
     "lead_one",
     "exact",
+    "dlzs_three_level",
     "dlzs_floor",
     "dlzs_ceil",
     "dlzs_nearest_linear",
@@ -90,6 +91,16 @@ def exact(a, b, w):
 # ---------------------------------------------------------------------------
 # DLZS family -- one operand snapped to a power of two, the other shifted
 # ---------------------------------------------------------------------------
+
+def dlzs_three_level(a, b, w):
+    """Nearest two-significant-bit magnitude, ties up; B remains exact."""
+    assert 0 <= a < (1 << w) and 0 <= b < (1 << w)
+    if a == 0 or b == 0:
+        return 0
+    step = 1 << max(0, a.bit_length() - 2)
+    rounded = ((a + step // 2) // step) * step
+    return rounded * b
+
 
 def dlzs_floor(a, b, w):
     """DLZS with A snapped DOWN: A -> 2^floor(log2 A).
@@ -353,6 +364,7 @@ def signed_wrap(design, a, b, w):
 # ---------------------------------------------------------------------------
 
 DESIGNS = {
+    "dlzs_three_level": dlzs_three_level,
     "exact":               exact,
     "dlzs_floor":          dlzs_floor,
     "dlzs_ceil":           dlzs_ceil,

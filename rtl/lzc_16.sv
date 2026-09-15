@@ -28,3 +28,4 @@ always_comb begin
     output_power = all_zero1 ? {1'b0, output_power2} : {1'b1, output_power1};
 end
 endmodule
+

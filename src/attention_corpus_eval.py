@@ -42,7 +42,7 @@ import golden_model as gm
 
 PERCENTAGES = tuple(range(5, 51, 5))
 APPROXIMATE_DESIGNS = (
-    "dlzs_snap_q", "dlzs_snap_k", "mitchell", "drum3", "drum4", "drum6"
+    "dlzs_comp_q", "dlzs_comp_k", "dlzs_snap_q", "dlzs_snap_k", "mitchell", "drum3", "drum4", "drum6"
 )
 ALL_DESIGNS = ("exact_int16",) + APPROXIMATE_DESIGNS
 
@@ -128,6 +128,14 @@ def signed_approx_product(a, b, design, lead_table):
         round_up = (exponent > 0) & (lower_bit != 0)
         exponent = exponent + round_up.to(torch.int64)
         unsigned = left_shift(shifted, exponent)
+    elif design in ("dlzs_comp_q", "dlzs_comp_k"):
+        snapped = magnitude_a if design == "dlzs_comp_q" else magnitude_b
+        shifted = magnitude_b if design == "dlzs_comp_q" else magnitude_a
+        exponent = lead_one_tensor(snapped, lead_table)
+        step = left_shift(torch.ones_like(exponent), torch.clamp(exponent - 1, min=0))
+        rounded = torch.div(snapped + right_shift(step, 1), step,
+                            rounding_mode="floor") * step
+        unsigned = rounded * shifted
     elif design == "mitchell":
         exponent_a = lead_one_tensor(magnitude_a, lead_table)
         exponent_b = lead_one_tensor(magnitude_b, lead_table)
@@ -167,6 +175,8 @@ def self_check(device, lead_table):
     at = torch.from_numpy(a).to(device=device)
     bt = torch.from_numpy(b).to(device=device)
     scalar = {
+        "dlzs_comp_q": lambda x, y: gm.SIGNED_DESIGNS["dlzs_three_level"](x, y, 16),
+        "dlzs_comp_k": lambda x, y: gm.SIGNED_DESIGNS["dlzs_three_level"](y, x, 16),
         "dlzs_snap_q": lambda x, y: gm.SIGNED_DESIGNS["dlzs_nearest_linear"](x, y, 16),
         "dlzs_snap_k": lambda x, y: gm.SIGNED_DESIGNS["dlzs_nearest_linear"](y, x, 16),
         "mitchell": lambda x, y: gm.SIGNED_DESIGNS["mitchell"](x, y, 16),

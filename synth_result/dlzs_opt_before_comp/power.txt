@@ -1,12 +1,12 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
-| Date             : Tue Sep 15 10:39:52 2026
+| Date             : Fri Sep 11 02:46:25 2026
 | Host             : LAPTOP-OO671G6K running 64-bit major release  (build 9200)
-| Command          : report_power -file synth_result/dlzs_opt/post_route/power.txt
+| Command          : report_power -file synth_result/dlzs_opt/power.txt
 | Design           : dlzc_opt_wrapper
 | Device           : xc7z020clg400-1
-| Design State     : routed
+| Design State     : synthesized
 | Grade            : commercial
 | Process          : typical
 | Characterization : Production
@@ -54,11 +54,11 @@ Table of Contents
 +----------------+-----------+----------+-----------+-----------------+
 | Clocks         |    <0.001 |        3 |       --- |             --- |
 | Slice Logic    |    <0.001 |      245 |       --- |             --- |
-|   LUT as Logic |    <0.001 |      145 |     53200 |            0.27 |
+|   LUT as Logic |    <0.001 |      147 |     53200 |            0.28 |
 |   Register     |    <0.001 |       64 |    106400 |            0.06 |
 |   CARRY4       |    <0.001 |        8 |     13300 |            0.06 |
 |   Others       |     0.000 |        4 |       --- |             --- |
-| Signals        |    <0.001 |      177 |       --- |             --- |
+| Signals        |    <0.001 |      228 |       --- |             --- |
 | Static Power   |     0.103 |          |           |                 |
 | Total          |     0.105 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
@@ -99,7 +99,7 @@ Table of Contents
 +-----------------------------+------------+------------------------------------------------+------------------------------------------------------------------------------------------------------------+
 | User Input Data             | Confidence | Details                                        | Action                                                                                                     |
 +-----------------------------+------------+------------------------------------------------+------------------------------------------------------------------------------------------------------------+
-| Design implementation state | High       | Design is routed                               |                                                                                                            |
+| Design implementation state | Low        | Design is synthesized                          | Accuracy of the tool is not optimal until design is fully placed and routed                                |
 | Clock nodes activity        | High       | User specified more than 95% of clocks         |                                                                                                            |
 | I/O nodes activity          | High       | User specified more than 95% of inputs         |                                                                                                            |
 | Internal nodes activity     | Medium     | User specified less than 25% of internal nodes | Provide missing internal nodes activity with simulation results or by editing the "By Resource Type" views |

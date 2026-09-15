@@ -14,10 +14,11 @@
 #   make clean
 
 PYTHON ?= python3
-BENCHES := lzc mult mitchell drum exact opt drum_opt
+BENCHES := lzc mult mitchell drum exact opt drum_opt comp
 
 test:
 	$(PYTHON) tests/test_golden_model.py
+	$(PYTHON) tests/test_three_level.py
 
 sweep:
 	$(PYTHON) src/sweep.py
@@ -36,6 +37,7 @@ lint:
 # reduced; every directed and corner test still runs in full.
 smoke:
 	$(PYTHON) tests/test_golden_model.py
+	$(PYTHON) tests/test_three_level.py
 	$(MAKE) -C tb/lzc  LZC_N_RANDOM=1000
 	$(MAKE) -C tb/mult MULT_N_RANDOM=1000
 	$(MAKE) -C tb/mitchell MITCHELL_N_RANDOM=1000
@@ -43,6 +45,7 @@ smoke:
 	$(MAKE) -C tb/exact EXACT_N_RANDOM=1000
 	$(MAKE) -C tb/opt   OPT_N_RANDOM=1000
 	$(MAKE) -C tb/drum_opt DRUM_OPT_N_RANDOM=1000
+	$(MAKE) -C tb/comp COMP_N_RANDOM=1000
 
 # Full flow: synth, place, route, post-route timing. Finished designs are
 # skipped, so adding a new algorithm rebuilds only that one. Pass EXTRA for

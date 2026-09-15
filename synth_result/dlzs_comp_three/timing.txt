@@ -1,0 +1,104 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
+| Date         : Tue Sep 15 11:30:52 2026
+| Host         : LAPTOP-OO671G6K running 64-bit major release  (build 9200)
+| Command      : report_timing -file synth_result/dlzs_comp_three/timing.txt
+| Design       : dlzc_comp_wrapper
+| Device       : 7z020-clg400
+| Speed File   : -1  PRODUCTION 1.12 2019-11-22
+| Design State : Synthesized
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (VIOLATED) :        -0.649ns  (required time - arrival time)
+  Source:                 a_reg_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            p_reg[20]/D
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
+  Data Path Delay:        10.642ns  (logic 4.439ns (41.712%)  route 6.203ns (58.288%))
+  Logic Levels:           17  (CARRY4=8 LUT1=1 LUT2=1 LUT5=1 LUT6=6)
+  Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=63, unset)           0.973     0.973    clk
+                         FDRE                                         r  a_reg_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 f  a_reg_reg[0]/Q
+                         net (fo=4, unplaced)         0.335     1.826    core/compensated.multiples/a_reg[0]
+                         LUT1 (Prop_lut1_I0_O)        0.295     2.121 r  core/compensated.multiples/p[31]_i_62/O
+                         net (fo=1, unplaced)         0.333     2.454    core/compensated.multiples/p[31]_i_62_n_0
+                         CARRY4 (Prop_carry4_CYINIT_CO[3])
+                                                      0.595     3.049 r  core/compensated.multiples/p_reg[31]_i_43/CO[3]
+                         net (fo=1, unplaced)         0.009     3.058    core/compensated.multiples/p_reg[31]_i_43_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117     3.175 r  core/compensated.multiples/p_reg[31]_i_23/CO[3]
+                         net (fo=1, unplaced)         0.000     3.175    core/compensated.multiples/p_reg[31]_i_23_n_0
+                         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.337     3.512 r  core/compensated.multiples/p_reg[31]_i_56/O[1]
+                         net (fo=5, unplaced)         0.639     4.151    core/compensated.multiples/compensated.magnitude0[10]
+                         LUT5 (Prop_lut5_I1_O)        0.306     4.457 r  core/compensated.multiples/p[31]_i_50/O
+                         net (fo=1, unplaced)         0.964     5.421    core/compensated.multiples/p[31]_i_50_n_0
+                         LUT6 (Prop_lut6_I2_O)        0.124     5.545 r  core/compensated.multiples/p[31]_i_21/O
+                         net (fo=3, unplaced)         0.920     6.465    core/compensated.multiples/p[31]_i_21_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.124     6.589 r  core/compensated.multiples/p[31]_i_16/O
+                         net (fo=1, unplaced)         0.449     7.038    core/compensated.multiples/p[31]_i_16_n_0
+                         LUT6 (Prop_lut6_I5_O)        0.124     7.162 r  core/compensated.multiples/p[31]_i_5/O
+                         net (fo=5, unplaced)         0.447     7.609    core/compensated.multiples/p[31]_i_5_n_0
+                         LUT2 (Prop_lut2_I0_O)        0.124     7.733 r  core/compensated.multiples/_carry_i_9/O
+                         net (fo=17, unplaced)        0.505     8.238    core/compensated.prepare/_carry__3_1
+                         LUT6 (Prop_lut6_I0_O)        0.124     8.362 r  core/compensated.prepare/_carry_i_6/O
+                         net (fo=1, unplaced)         0.000     8.362    core/compensated.multiples/S[0]
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.533     8.895 r  core/compensated.multiples/_carry/CO[3]
+                         net (fo=1, unplaced)         0.009     8.904    core/compensated.multiples/_carry_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117     9.021 r  core/compensated.multiples/_carry__0/CO[3]
+                         net (fo=1, unplaced)         0.000     9.021    core/compensated.multiples/_carry__0_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117     9.138 r  core/compensated.multiples/_carry__1/CO[3]
+                         net (fo=1, unplaced)         0.000     9.138    core/compensated.multiples/_carry__1_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117     9.255 r  core/compensated.multiples/_carry__2/CO[3]
+                         net (fo=1, unplaced)         0.000     9.255    core/compensated.multiples/_carry__2_n_0
+                         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.337     9.592 r  core/compensated.multiples/_carry__3/O[1]
+                         net (fo=17, unplaced)        0.667    10.259    core/compensated.multiples/b_reg_reg[15][1]
+                         LUT6 (Prop_lut6_I1_O)        0.306    10.565 r  core/compensated.multiples/p[23]_i_2/O
+                         net (fo=4, unplaced)         0.926    11.491    core/compensated.multiples/p[23]_i_2_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.124    11.615 r  core/compensated.multiples/p[20]_i_1/O
+                         net (fo=1, unplaced)         0.000    11.615    result[20]
+                         FDRE                                         r  p_reg[20]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)       10.000    10.000 r  
+                                                      0.000    10.000 r  clk (IN)
+                         net (fo=63, unset)           0.924    10.924    clk
+                         FDRE                                         r  p_reg[20]/C
+                         clock pessimism              0.000    10.924    
+                         clock uncertainty           -0.035    10.889    
+                         FDRE (Setup_fdre_C_D)        0.077    10.966    p_reg[20]
+  -------------------------------------------------------------------
+                         required time                         10.966    
+                         arrival time                         -11.615    
+  -------------------------------------------------------------------
+                         slack                                 -0.649    
+
+
+
+

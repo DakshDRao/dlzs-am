@@ -1,9 +1,9 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
-| Date             : Tue Sep 15 10:39:52 2026
+| Date             : Fri Sep 11 02:57:39 2026
 | Host             : LAPTOP-OO671G6K running 64-bit major release  (build 9200)
-| Command          : report_power -file synth_result/dlzs_opt/post_route/power.txt
+| Command          : report_power -file synth_result/dlzs_opt/post_route/power_activity.txt
 | Design           : dlzc_opt_wrapper
 | Device           : xc7z020clg400-1
 | Design State     : routed
@@ -30,11 +30,11 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.105        |
-| Design Power Budget (W)  | Unspecified* |
-| Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 0.002        |
-| Device Static (W)        | 0.103        |
+| Total On-Chip Power (mW) | 104.714      |
+| Design Power Budget (mW) | Unspecified* |
+| Power Budget Margin (mW) | NA           |
+| Dynamic (mW)             | 2.120        |
+| Device Static (mW)       | 102.594      |
 | Effective TJA (C/W)      | 11.5         |
 | Max Ambient (C)          | 83.8         |
 | Junction Temperature (C) | 26.2         |
@@ -49,19 +49,19 @@ Table of Contents
 1.1 On-Chip Components
 ----------------------
 
-+----------------+-----------+----------+-----------+-----------------+
-| On-Chip        | Power (W) | Used     | Available | Utilization (%) |
-+----------------+-----------+----------+-----------+-----------------+
-| Clocks         |    <0.001 |        3 |       --- |             --- |
-| Slice Logic    |    <0.001 |      245 |       --- |             --- |
-|   LUT as Logic |    <0.001 |      145 |     53200 |            0.27 |
-|   Register     |    <0.001 |       64 |    106400 |            0.06 |
-|   CARRY4       |    <0.001 |        8 |     13300 |            0.06 |
-|   Others       |     0.000 |        4 |       --- |             --- |
-| Signals        |    <0.001 |      177 |       --- |             --- |
-| Static Power   |     0.103 |          |           |                 |
-| Total          |     0.105 |          |           |                 |
-+----------------+-----------+----------+-----------+-----------------+
++----------------+------------+----------+-----------+-----------------+
+| On-Chip        | Power (mW) | Used     | Available | Utilization (%) |
++----------------+------------+----------+-----------+-----------------+
+| Clocks         |     0.921  |        3 |       --- |             --- |
+| Slice Logic    |     0.602  |      245 |       --- |             --- |
+|   LUT as Logic |     0.567  |      145 |     53200 |            0.27 |
+|   Register     |     0.021  |       64 |    106400 |            0.06 |
+|   CARRY4       |     0.014  |        8 |     13300 |            0.06 |
+|   Others       |     0.000  |        4 |       --- |             --- |
+| Signals        |     0.597  |      177 |       --- |             --- |
+| Static Power   |   102.594  |          |           |                 |
+| Total          |   104.714  |          |           |                 |
++----------------+------------+----------+-----------+-----------------+
 
 
 1.2 Power Supply Summary
@@ -143,12 +143,12 @@ Table of Contents
 3.1 By Hierarchy
 ----------------
 
-+------------------+-----------+
-| Name             | Power (W) |
-+------------------+-----------+
-| dlzc_opt_wrapper |     0.002 |
-|   u_dlzc_opt     |     0.001 |
-|     b_p          |     0.001 |
-+------------------+-----------+
++------------------+------------+
+| Name             | Power (mW) |
++------------------+------------+
+| dlzc_opt_wrapper |     2.120  |
+|   u_dlzc_opt     |     1.080  |
+|     b_p          |     1.080  |
++------------------+------------+
 
 

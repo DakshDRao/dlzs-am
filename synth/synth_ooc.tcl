@@ -156,6 +156,25 @@ dict set DESIGNS dlzs_opt {
     }
 }
 
+dict set DESIGNS dlzs_comp_three {
+    top     dlzc_comp_wrapper
+    generic {}
+    sources {
+        ./rtl/lzc_8.sv
+        ./rtl/lzc_16.sv
+        ./rtl/lzc_8_meta.sv
+        ./rtl/lzc_16_meta.sv
+        ./rtl/dlzs_snap_exp.sv
+        ./rtl/dlzs_b_prep.sv
+        ./rtl/dlzc_shift.sv
+        ./rtl/dlzc_opt_top.sv
+        ./rtl/dlzs_comp_decode.sv
+        ./rtl/dlzs_b_multiple.sv
+        ./rtl/dlzc_comp_top.sv
+        ./synth/wrappers/dlzc_comp_wrapper.sv
+    }
+}
+
 set DRUM_OPT_SOURCES {
     ./rtl/lzc_8.sv
     ./rtl/lzc_16.sv

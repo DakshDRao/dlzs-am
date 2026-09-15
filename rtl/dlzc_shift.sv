@@ -1,12 +1,12 @@
 `default_nettype none
-module dlzc_shift(
-    input wire logic [16:0] bp,
+module dlzc_shift #(parameter integer INPUT_WIDTH = 17)(
+    input wire logic [INPUT_WIDTH-1:0] bp,
     input wire logic [3:0] e,
     output logic [31:0] p
 );
 logic [31:0] s1;
 logic [31:0] sign_bp;
-assign sign_bp = {{15{bp[16]}}, bp};
+assign sign_bp = {{(32-INPUT_WIDTH){bp[INPUT_WIDTH-1]}}, bp};
 always_comb begin
     case (e[3:2])
         2'b01: s1 = sign_bp << 4'd4;

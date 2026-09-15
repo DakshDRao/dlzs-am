@@ -18,6 +18,8 @@ from pathlib import Path
 
 
 HARDWARE = {
+    "dlzs_comp_q": "dlzs_comp_three",
+    "dlzs_comp_k": "dlzs_comp_three",
     "dlzs_snap_q": "dlzs_opt",
     "dlzs_snap_k": "dlzs_opt",
     "drum3": "drum_opt3",
@@ -77,7 +79,11 @@ def main():
                 if row["baseline"] == "quantized_exact" and
                 int(row["percent"]) == args.percent and
                 row["design"] in HARDWARE]
-    if set(row["design"] for row in selected) != set(HARDWARE):
+    present = {row["design"] for row in selected}
+    # Preserve old seven-design runs; new compensation directions must occur together.
+    optional = {"dlzs_comp_q", "dlzs_comp_k"}
+    required = set(HARDWARE) - optional
+    if not required.issubset(present) or (present & optional and not optional.issubset(present)):
         raise ValueError("Attention summary is missing one or more expected designs.")
 
     rows = []
@@ -104,7 +110,7 @@ def main():
             "meets_100mhz_constraint": None if wns is None else wns >= 0.0,
         })
     order = {name: index for index, name in enumerate(
-        ("exact_int16", "dlzs_snap_q", "dlzs_snap_k", "drum3", "drum4", "drum6", "mitchell"))}
+        ("exact_int16", "dlzs_snap_q", "dlzs_snap_k", "dlzs_comp_q", "dlzs_comp_k", "drum3", "drum4", "drum6", "mitchell"))}
     rows.sort(key=lambda row: order[row["attention_design"]])
     output = args.output.resolve() if args.output else run / "attention_cost_table.csv"
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -119,7 +125,7 @@ def main():
         "corpus_count": manifest.get("text_count"),
         "device_name": manifest.get("device_name"),
         "timing_note": "Fmax and WNS are post-route OOC report values; they are not board measurements.",
-        "mapping_note": "Both DLZS snap directions use the same dlzs_opt hardware cost because the direction changes the software operand assignment, not the RTL core.",
+        "mapping_note": "Original Q/K directions share dlzs_opt; compensated Q/K directions share dlzs_comp_three. Operand assignment does not change the RTL core.",
         "rows": rows,
     }
     (output.with_suffix(".json")).write_text(json.dumps(metadata, indent=2), encoding="utf-8")
