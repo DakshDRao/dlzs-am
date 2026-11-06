@@ -1,0 +1,20 @@
+# Board: EDGE ZYNQ (Invent Logics), xc7z010clg400-1, vendor preset edgeZ7_10
+# PL: dlzs_axi (dlzc_opt_top) via M_AXI_GP0 + SmartConnect, FCLK_CLK0 = 49.999947 MHz
+# Tools: Vivado/Vitis 2025.2, standalone BSP; run via board/edge_zynq/run_on_board.tcl
+# Date: 2026-11-06
+# Vectors: board/edge_zynq/gen_vectors.py --design opt (sweep.sampled_pairs, seed 20260828)
+=== DLZS on-board regression (EDGE ZYNQ xc7z010) ===
+base 0x43C00000  model dlzs_nearest_linear  seed 20260828
+vectors 13600 (3600 corner + 10000 random)
+-- smoke test --
+       3 x      5 =          20  (expect          20) ok
+       4 x      5 =          20  (expect          20) ok
+       0 x   1234 =           0  (expect           0) ok
+      -4 x      5 =         -20  (expect         -20) ok
+       4 x     -5 =         -20  (expect         -20) ok
+      -4 x     -5 =          20  (expect          20) ok
+       1 x -32768 =      -32768  (expect      -32768) ok
+-- full regression --
+checked 13600  mismatches 0  timeouts 0  smoke_fail 0
+elapsed 23438 us (1723 ns per AXI multiply incl. polling)
+RESULT: PASS
