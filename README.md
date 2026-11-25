@@ -5,14 +5,16 @@ error compensation, and attention top-k ranking study.**
 
 B.Tech ECE major project, NIT Andhra Pradesh.
 
-**Updated: 15 September 2026.** Standalone RTL characterization, AXI simulation,
-PYNQ bitstream generation, and the fixed-corpus attention ranking study are
-complete. Three-level compensated DLZS and optimized Mitchell now have post-route
-results. Compensation has been evaluated on the full attention corpus. Physical-board
-regression remains pending; the current PYNQ overlay still uses uncompensated `dlzs_opt`.
+**Updated: 6 November 2026.** Standalone RTL characterization, AXI simulation,
+the fixed-corpus attention ranking study, and **physical-board validation** are
+complete. Three-level compensated DLZS and optimized Mitchell have post-route
+results, and compensation has been evaluated on the full attention corpus. The
+`dlzs_opt` AXI peripheral passed a 13,600-vector regression on an EDGE ZYNQ
+(XC7Z010) board with zero mismatches (§8). The board overlay still uses
+uncompensated `dlzs_opt`.
 
 Jump to [hardware results](#7-implementation-results),
-[PYNQ integration](#8-pynq-z2-integration-checkpoint),
+[board integration](#8-zynq-integration-and-board-validation),
 [attention results](#9-attention-top-k-study--completed-fixed-corpus-experiment),
 [run instructions](#12-running-it), or [roadmap](#14-roadmap).
 
@@ -89,7 +91,7 @@ measured. Operand **A** is always snapped; operand **B** is shifted.
 |------|-----------|---------------|---------------------|
 | `dlzs_floor` | 2^⌊log₂A⌋ | never | (−0.5, 0] — always under |
 | `dlzs_ceil` | 2^⌈log₂A⌉ | whenever A is not a power of two | [0, +1.0) — always over |
-| `dlzs_nearest_linear` | nearer power, **linear** midpoint 1.5·2^k | bit (k−1) of A is set | [−0.25, +0.333] |
+| `dlzs_nearest_linear` | nearer power, **linear** midpoint 1.5·2^k | bit (k−1) of A is set | (−1/3, +1/3] |
 | `dlzs_nearest_log` | nearer power, **log** midpoint √2·2^k | A² ≥ 2^(2k+1) | [−0.293, +0.414] |
 
 **Chosen specification: `dlzs_nearest_linear`, ties round up.** It wins the
@@ -596,7 +598,7 @@ include the compensation activity-driven power report.
 
 ---
 
-## 8. PYNQ-Z2 integration checkpoint
+## 8. Zynq integration and board validation
 
 The Week 8–9 hardware integration is now built through Vivado 2025.2 for the
 PYNQ-Z2 (`xc7z020clg400-1`). The packaged `dlzs_axi` IP contains the optimized
@@ -651,7 +653,7 @@ implement the DistilBERT attention evaluation or a complete top-k accelerator.
 | Failing timing endpoints | 0 in each category |
 | XSim smoke test | User-recorded PASS: 100 signed pairs, split writes, strobes, reset, RO/unaligned writes, response stalls |
 | Bitstream generation | Completed |
-| Physical-board execution | Pending board access |
+| Physical-board execution | PASS on EDGE ZYNQ (XC7Z010), see below |
 
 Timing and XSim completion above are recorded from the Vivado screenshots and
 console output; the cleanup removed the generated run logs. These integration
@@ -662,6 +664,44 @@ the following clock captures the product. DONE stays set until reset or the
 next accepted start. Starts while busy are ignored. Read-only writes return
 OKAY without changing storage; unaligned accesses return SLVERR. Software
 should use the documented register offsets within the assigned address window.
+
+### Board validation — EDGE ZYNQ (XC7Z010)
+
+The PYNQ-Z2 was not available, so the regression ran on an **EDGE ZYNQ** board
+(Invent Logics, `xc7z010clg400-1`): the same 7-series fabric and speed grade as
+the Zynq-7020 used for every standalone result. The block design was rebuilt for
+the 7Z010 with the vendor's `edgeZ7_10` board preset (DDR3L, UART0 on MIO 14/15),
+`dlzs_axi_0` at `0x43C00000` behind GP0 and SmartConnect, and `FCLK_CLK0` at
+50 MHz. The packaged IP's fixed `FREQ_HZ` was removed so it inherits the PS
+clock (49.999947 MHz) instead of failing validation.
+
+A bare-metal Cortex-A9 program (Vitis 2025.2, standalone) drives the same
+13,600 vectors the cocotb benches use — 3,600 corner pairs plus 10,000 random
+pairs from `sweep.sampled_pairs` (seed `20260828`) — and compares every AXI
+result with `dlzs_nearest_linear` from the golden model:
+
+```
+checked 13600  mismatches 0  timeouts 0  smoke_fail 0
+elapsed 23438 us (1723 ns per AXI multiply incl. polling)
+RESULT: PASS
+```
+
+Golden model, RTL simulation and silicon therefore agree on one identical
+vector set. The 1.72 µs per multiply is the AXI4-Lite round trip (five uncached
+register accesses plus polling), not multiplier latency; the core itself
+completes in one 20 ns fabric cycle.
+
+- Log: [evidence/logs/board_regression_edge_zynq_20261106.log](evidence/logs/board_regression_edge_zynq_20261106.log)
+- Scripts: [board/edge_zynq/](board/edge_zynq/) — `gen_vectors.py` (golden
+  vectors to `dlzs_vectors.h`, `--design opt|comp`), `dlzs_board_test.c`,
+  `build_vitis.py` (GUI-free Vitis build), `run_on_board.tcl` (xsdb: reset,
+  program PL, `ps7_init`, run), `fix_dlzs_ip.tcl` (IP path and `FREQ_HZ` repair)
+
+To repeat: build with
+`vitis.bat -s board/edge_zynq/build_vitis.py`, open a serial terminal at
+115200 8N1 on the board's USB-UART, then run
+`xsdb.bat board/edge_zynq/run_on_board.tcl` (edit the paths at the top of both
+scripts first). Measured board power remains pending.
 
 ---
 
@@ -865,7 +905,8 @@ Things that are easy to get wrong and were got right:
     src/combine_attention_costs.py join overlap with OOC multiplier reports
     axi_lite_wrapper/dlzs/         Vivado project, block design and wrapper
     axi_lite_wrapper/ip_repo/dlzs_axi_1_0/  packaged IP and its RTL
-    pynq_overlay/                 paired final .bit and .hwh files
+    pynq_overlay/                 paired final .bit and .hwh files (PYNQ-Z2)
+    board/edge_zynq/              EDGE ZYNQ (7Z010) regression: vectors, test, build/run scripts
     board_files/                  local PYNQ-Z2 board definitions (ignored)
     docs/results/                 curated, versionable experiment tables
     docs/images/results/          overlap, layer and hardware-cost figures
@@ -1013,9 +1054,9 @@ vectors and the published error tables are the same set.
    pending.
 4. **The RTL is fixed at 16 bits.** No 8-bit synthesis numbers and no
    exhaustive 8-bit model/RTL equivalence yet.
-5. **No ≥10,000-vector PYNQ hardware log is committed yet.** The AXI wrapper has
-   passed a local Vivado XSim smoke test; the real-board regression is pending
-   until the PYNQ-Z2 is available.
+5. **Board regression covers `dlzs_opt` only.** The 13,600-vector run passed on
+   an EDGE ZYNQ (XC7Z010); the compensated core has not been run on the board,
+   and no board power has been measured.
 6. **Attention summary minima:** the current evaluator labels query-row minima
    as passage minima. Saved corrected tables and the audit fix the interpretation;
    the producer still needs correction before a fresh publication run.
@@ -1035,7 +1076,7 @@ vectors and the published error tables are the same set.
 | 1–2 | Literature lock + golden model | done |
 | 3–5 | DLZS RTL + verification | done |
 | 6–7 | Baselines, OOC LUT-only synthesis, comparison table | mostly done — DLZS, DRUM K=3..8, Mitchell and exact LUT/DSP reports included; remaining: 8-bit characterization, committed simulation evidence, Mitchell refined power, tighter-period run |
-| 8–9 | AXI-Lite wrapper, PYNQ-Z2 overlay, ≥10,000 vectors hardware-vs-sim | in progress — wrapper, validated block design, timing, bitstream, and local smoke test complete; board regression pending |
+| 8–9 | AXI-Lite wrapper, PYNQ-Z2 overlay, ≥10,000 vectors hardware-vs-sim | done — wrapper, validated block design, timing, bitstream and XSim smoke test complete; 13,600-vector board regression PASS on EDGE ZYNQ (XC7Z010) |
 | 10–11 | Attention Q/K from DistilBERT, top-k index overlap vs hardware cost | fixed-corpus study complete: 100 passages, 6 layers, both snap directions, audited tables, plots and OOC cost join; generalization/task validation remains open |
 | 12–13 | Three-level compensation, accuracy-vs-LUTs comparison | complete for model, RTL validation, OOC implementation, estimated power and fixed-corpus ranking; board deployment pending |
 | 14 | Buffer, thesis writeup, defense dry-run | README and evidence updated; thesis and defense preparation pending |
@@ -1048,7 +1089,8 @@ attention datasets are follow-up experiments.
 
 ## 15. Environment
 
-- **Board:** PYNQ-Z2 (primary); Arty A7-100T (optional stretch)
+- **Boards:** EDGE ZYNQ, XC7Z010 (board regression); PYNQ-Z2 overlay built, not run; Arty A7-100T (optional stretch)
+- **Embedded software:** Vitis 2025.2, standalone BSP, xsdb
 - **Tools:** Vivado 2025.2, Icarus Verilog / Verilator, cocotb, Python 3, PyTorch
 - **Recorded GPU run:** PyTorch `2.11.0+cu128`, CUDA runtime `12.8`,
   Transformers `5.17.0`, NumPy `2.5.3`, RTX 4070 Laptop GPU (8 GiB).
