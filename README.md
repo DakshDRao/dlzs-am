@@ -686,6 +686,11 @@ elapsed 23438 us (1723 ns per AXI multiply incl. polling)
 RESULT: PASS
 ```
 
+![PuTTY output of the EDGE ZYNQ board regression](docs/images/board/edge_zynq_putty_regression.png)
+
+*UART console (PuTTY, COM4, 115200 8N1) after the run: all seven smoke-test
+products correct, then 13,600 vectors with zero mismatches and `RESULT: PASS`.*
+
 Golden model, RTL simulation and silicon therefore agree on one identical
 vector set. The 1.72 µs per multiply is the AXI4-Lite round trip (five uncached
 register accesses plus polling), not multiplier latency; the core itself
